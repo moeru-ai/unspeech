@@ -1,0 +1,19 @@
+root = true
+
+[*.proto]
+indent_size = 2
+indent_style = space
+insert_final_newline = true
+
+[*.yaml]
+indent_size = 2
+indent_style = space
+insert_final_newline = true
+
+[*.go]
+charset = utf-8
+indent_style = tab
+indent_size = 4
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
