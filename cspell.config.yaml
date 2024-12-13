@@ -3,12 +3,15 @@ ignorePaths: []
 dictionaryDefinitions: []
 dictionaries: []
 words:
+  - apierrors
   - containedctx
   - contextcheck
   - cyclop
   - depguard
+  - Describedby
   - dupl
   - durationcheck
+  - elevenlabs
   - errcheck
   - errname
   - execinquery
@@ -33,16 +36,20 @@ words:
   - gosec
   - gosimple
   - govet
+  - hreflang
   - ineffassign
   - ireturn
+  - labstack
   - lll
   - maintidx
   - misspell
+  - moeru
   - musttag
   - nakedret
   - nestif
   - nilnil
   - nlreturn
+  - nolint
   - nolintlint
   - nosprintfhostport
   - paralleltest
@@ -57,11 +64,14 @@ words:
   - tenv
   - testableexamples
   - testpackage
+  - Traceparent
   - typecheck
   - unconvert
   - unparam
+  - unspeech
   - unused
   - varnamelen
+  - Vercel
   - whitespace
   - wrapcheck
   - wsl
