@@ -3,43 +3,67 @@ ignorePaths: []
 dictionaryDefinitions: []
 dictionaries: []
 words:
+  - containedctx
+  - contextcheck
+  - cyclop
+  - depguard
   - dupl
+  - durationcheck
   - errcheck
+  - errname
+  - execinquery
+  - exhaustive
+  - exhaustruct
   - exportloopref
+  - forcetypeassert
+  - funlen
+  - gochecknoglobals
+  - gochecknoinits
+  - gocognit
   - goconst
+  - gocritic
   - gocyclo
+  - godox
   - gofmt
+  - gofumpt
+  - goheader
   - goimports
+  - gomnd
+  - goprintffuncname
+  - gosec
   - gosimple
   - govet
   - ineffassign
+  - ireturn
   - lll
+  - maintidx
   - misspell
+  - musttag
   - nakedret
+  - nestif
+  - nilnil
+  - nlreturn
+  - nolintlint
+  - nosprintfhostport
+  - paralleltest
+  - perfsprint
   - prealloc
+  - predeclared
+  - reassign
+  - revive
   - staticcheck
+  - strconv
+  - tagalign
+  - tenv
+  - testableexamples
+  - testpackage
   - typecheck
   - unconvert
   - unparam
   - unused
-  - containedctx
-  - durationcheck
-  - errname
-  - exhaustive
-  - forcetypeassert
-  - goheader
-  - goprintffuncname
-  - gosec
-  - musttag
-  - nestif
-  - nolintlint
-  - nosprintfhostport
-  - predeclared
-  - reassign
-  - revive
-  - tenv
-  - testableexamples
+  - varnamelen
   - whitespace
+  - wrapcheck
   - wsl
 ignoreWords: []
 import: []
