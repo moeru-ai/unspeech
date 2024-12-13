@@ -1,12 +1,11 @@
 package middlewares
 
 import (
-	"net/http"
-
 	"github.com/labstack/echo/v4"
 	"github.com/moeru-ai/unspeech/pkg/apierrors"
+	"github.com/samber/mo"
 )
 
-func NotFound(c echo.Context) error {
-	return c.JSON(http.StatusNotFound, apierrors.NewErrNotFound().AsResponse())
+func NotFound(c echo.Context) mo.Result[any] {
+	return mo.Err[any](apierrors.NewErrNotFound())
 }
