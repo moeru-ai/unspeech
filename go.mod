@@ -7,6 +7,7 @@ require (
 	github.com/labstack/echo/v4 v4.13.2
 	github.com/nekomeowww/fo v1.4.0
 	github.com/samber/lo v1.47.0
+	github.com/samber/mo v1.13.0
 	github.com/spf13/cobra v1.8.1
 )
 

@@ -6,6 +6,8 @@ import (
 	"runtime"
 
 	"github.com/moeru-ai/unspeech/pkg/jsonapi"
+	"github.com/moeru-ai/unspeech/pkg/logs"
+	"github.com/samber/mo"
 )
 
 type Error struct {
@@ -23,8 +25,12 @@ func (e *Error) AsResponse() *ErrResponse {
 	return NewErrResponse().WithError(e)
 }
 
-func (e *Error) Caller() *jsonapi.ErrorCaller {
-	return e.caller
+func (e *Error) Caller() mo.Option[logs.CallerLike] {
+	if e == nil || e.caller == nil {
+		return mo.None[logs.CallerLike]()
+	}
+
+	return mo.Some(logs.CallerLike(e.caller))
 }
 
 func NewError[S ~int](status S, code string) *Error {
@@ -75,25 +81,25 @@ func (e *Error) WithDetailf(format string, args ...any) *Error {
 }
 
 func (e *Error) WithSourcePointer(pointer string) *Error {
-	e.Source = &jsonapi.ErrorObjectSource{
+	e.Source = mo.Some(jsonapi.ErrorObjectSource{
 		Pointer: pointer,
-	}
+	})
 
 	return e
 }
 
 func (e *Error) WithSourceParameter(parameter string) *Error {
-	e.Source = &jsonapi.ErrorObjectSource{
+	e.Source = mo.Some(jsonapi.ErrorObjectSource{
 		Parameter: parameter,
-	}
+	})
 
 	return e
 }
 
 func (e *Error) WithSourceHeader(header string) *Error {
-	e.Source = &jsonapi.ErrorObjectSource{
+	e.Source = mo.Some(jsonapi.ErrorObjectSource{
 		Header: header,
-	}
+	})
 
 	return e
 }

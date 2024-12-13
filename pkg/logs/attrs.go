@@ -4,6 +4,7 @@ import (
 	"log/slog"
 
 	"github.com/samber/lo"
+	"github.com/samber/mo"
 )
 
 type CallerLike interface {
@@ -12,14 +13,14 @@ type CallerLike interface {
 	GetFunction() string
 }
 
-func Caller(c CallerLike) []slog.Attr {
-	if lo.IsNil(c) {
+func Caller(c mo.Option[CallerLike]) []slog.Attr {
+	if c.IsAbsent() || lo.IsNil(c) {
 		return make([]slog.Attr, 0)
 	}
 
 	return []slog.Attr{
-		slog.String("file", c.GetFile()),
-		slog.Int64("line", c.GetLine()),
-		slog.String("function", c.GetFunction()),
+		slog.String("file", c.MustGet().GetFile()),
+		slog.Int64("line", c.MustGet().GetLine()),
+		slog.String("function", c.MustGet().GetFunction()),
 	}
 }
