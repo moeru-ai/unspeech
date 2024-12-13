@@ -20,9 +20,7 @@ func HandleErrors() echo.MiddlewareFunc {
 				if !errors.As(err, &errResp) {
 					errResp = apierrors.NewErrInternal().WithError(err)
 					// Unknown error
-					slog.Error("unknown error responded",
-						slog.Any("error", err.Error()),
-					)
+					slog.Error("unknown error responded", slog.Any("error", err.Error()))
 				}
 				if 500 >= errResp.Status || errResp.Status < 600 {
 					attrs := make([]slog.Attr, 0)
@@ -31,7 +29,7 @@ func HandleErrors() echo.MiddlewareFunc {
 					slog.Error("error occurred during request", lo.ToAnySlice(attrs)...)
 				}
 
-				return c.JSON(errResp.Status, errResp)
+				return c.JSON(errResp.Status, errResp.AsResponse())
 			}
 
 			return nil
