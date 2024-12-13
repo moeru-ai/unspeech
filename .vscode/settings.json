@@ -1,0 +1,32 @@
+{
+    "go.useLanguageServer": true,
+    "go.lintOnSave": "package",
+    "go.vetOnSave": "workspace",
+    "go.coverOnSave": false,
+    "go.lintTool": "golangci-lint",
+    "go.lintFlags": [
+        "--config=${workspaceFolder}/.golangci.yml",
+    ],
+    "go.inferGopath": true,
+    "go.alternateTools": {},
+    "go.coverOnSingleTest": true,
+    "go.testTimeout": "900s",
+    "go.testFlags": [
+        "-v",
+        "-count=1"
+    ],
+    "go.toolsManagement.autoUpdate": true,
+    "go.coverOnSingleTestFile": true,
+    "gopls": {
+        "build.buildFlags": [],
+        "ui.completion.usePlaceholders": true,
+        "ui.semanticTokens": true
+    },
+    "[go]": {
+        "editor.insertSpaces": false,
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "always"
+        },
+    },
+}

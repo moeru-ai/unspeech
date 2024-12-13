@@ -1,0 +1,45 @@
+version: "0.2"
+ignorePaths: []
+dictionaryDefinitions: []
+dictionaries: []
+words:
+  - dupl
+  - errcheck
+  - exportloopref
+  - goconst
+  - gocyclo
+  - gofmt
+  - goimports
+  - gosimple
+  - govet
+  - ineffassign
+  - lll
+  - misspell
+  - nakedret
+  - prealloc
+  - staticcheck
+  - typecheck
+  - unconvert
+  - unparam
+  - unused
+  - containedctx
+  - durationcheck
+  - errname
+  - exhaustive
+  - forcetypeassert
+  - goheader
+  - goprintffuncname
+  - gosec
+  - musttag
+  - nestif
+  - nolintlint
+  - nosprintfhostport
+  - predeclared
+  - reassign
+  - revive
+  - tenv
+  - testableexamples
+  - whitespace
+  - wsl
+ignoreWords: []
+import: []
