@@ -12,11 +12,11 @@ import (
 // https://platform.openai.com/docs/api-reference/audio/createSpeech
 type Options struct {
 	// One of the available TTS models.
-	Model string `json:"model" validate:"required"`
+	Model string `json:"model"`
 	// The text to generate audio for.
-	Input string `json:"input" validate:"required"`
+	Input string `json:"input"`
 	// The voice to use when generating the audio.
-	Voice string `json:"voice" validate:"required"`
+	Voice string `json:"voice"`
 
 	// The format to audio in.
 	// Supported formats are mp3, opus, aac, flac, wav, and pcm.
