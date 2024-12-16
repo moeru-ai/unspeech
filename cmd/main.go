@@ -19,9 +19,10 @@ func main() {
 			e.Use(middlewares.CORS())
 			e.Use(middlewares.HandleErrors())
 
-			e.POST("/api/v1/elevenlabs/tts", ho.MonadEcho1(func(c echo.Context) mo.Result[any] {
+			e.POST("/v1/audio/speech", ho.MonadEcho1(func(c echo.Context) mo.Result[any] {
 				return mo.Err[any](apierrors.NewErrInternal().WithCaller())
 			}))
+
 			e.RouteNotFound("/*", ho.MonadEcho1(middlewares.NotFound))
 
 			return e.Start(":5933")
