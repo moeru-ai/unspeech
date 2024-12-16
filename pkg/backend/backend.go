@@ -11,11 +11,11 @@ import (
 
 // https://platform.openai.com/docs/api-reference/audio/createSpeech
 type Options struct {
-	// One of the available TTS models.
+	// (required) One of the available TTS models.
 	Model string `json:"model"`
-	// The text to generate audio for.
+	// (required) The text to generate audio for.
 	Input string `json:"input"`
-	// The voice to use when generating the audio.
+	// (required) The voice to use when generating the audio.
 	Voice string `json:"voice"`
 
 	// The format to audio in.
@@ -32,6 +32,10 @@ func Speech(c echo.Context) mo.Result[any] {
 	options := new(Options)
 
 	if err := c.Bind(options); err != nil {
+		return mo.Err[any](apierrors.NewErrBadRequest().WithCaller())
+	}
+
+	if options.Model == "" || options.Input == "" || options.Voice == "" {
 		return mo.Err[any](apierrors.NewErrBadRequest().WithCaller())
 	}
 
