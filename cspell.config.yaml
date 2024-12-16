@@ -18,6 +18,7 @@ words:
   - exhaustive
   - exhaustruct
   - exportloopref
+  - flac
   - forcetypeassert
   - funlen
   - gochecknoglobals

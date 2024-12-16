@@ -2,11 +2,10 @@ package main
 
 import (
 	"github.com/labstack/echo/v4"
-	"github.com/samber/mo"
 	"github.com/spf13/cobra"
 
 	"github.com/moeru-ai/unspeech/internal/middlewares"
-	"github.com/moeru-ai/unspeech/pkg/apierrors"
+	"github.com/moeru-ai/unspeech/pkg/backend"
 	"github.com/moeru-ai/unspeech/pkg/ho"
 )
 
@@ -19,9 +18,7 @@ func main() {
 			e.Use(middlewares.CORS())
 			e.Use(middlewares.HandleErrors())
 
-			e.POST("/v1/audio/speech", ho.MonadEcho1(func(c echo.Context) mo.Result[any] {
-				return mo.Err[any](apierrors.NewErrInternal().WithCaller())
-			}))
+			e.POST("/v1/audio/speech", ho.MonadEcho1(backend.Speech))
 
 			e.RouteNotFound("/*", ho.MonadEcho1(middlewares.NotFound))
 
