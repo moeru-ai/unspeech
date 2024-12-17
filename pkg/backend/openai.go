@@ -45,7 +45,7 @@ func openai(c echo.Context, options FullOptions) mo.Result[any] {
 		return mo.Err[any](apierrors.NewErrBadGateway().WithDetail(err.Error()).WithError(err).WithCaller())
 	}
 
-	defer res.Body.Close()
+	defer func() { _ = res.Body.Close() }()
 
 	if res.StatusCode >= 400 && res.StatusCode < 600 {
 		switch {
