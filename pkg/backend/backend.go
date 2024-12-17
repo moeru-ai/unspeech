@@ -10,7 +10,7 @@ import (
 	"github.com/moeru-ai/unspeech/pkg/apierrors"
 )
 
-// https://platform.openai.com/docs/api-reference/audio/createSpeech
+// Options represent API parameters refer to https://platform.openai.com/docs/api-reference/audio/createSpeech
 type Options struct {
 	// (required) One of the available TTS models.
 	Model string `json:"model"`
