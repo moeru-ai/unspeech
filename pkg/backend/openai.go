@@ -38,5 +38,5 @@ func openai(c echo.Context, options FullOptions) mo.Result[any] {
 
 	body, _ := io.ReadAll(res.Body)
 
-	return mo.Ok[any](c.Blob(http.StatusOK, "audio/mp3", body))
+	return mo.Ok[any](c.Stream(http.StatusOK, "audio/mp3", bytes.NewReader(body)))
 }
