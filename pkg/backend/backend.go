@@ -2,8 +2,10 @@ package backend
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/labstack/echo/v4"
+	"github.com/samber/lo"
 	"github.com/samber/mo"
 
 	"github.com/moeru-ai/unspeech/pkg/apierrors"
@@ -28,6 +30,12 @@ type Options struct {
 	Speed int `json:"speed"`
 }
 
+type Result struct {
+	Options
+	Backend string `json:"backend"`
+	Model   string `json:"model"`
+}
+
 func Speech(c echo.Context) mo.Result[any] {
 	options := new(Options)
 
@@ -39,5 +47,17 @@ func Speech(c echo.Context) mo.Result[any] {
 		return mo.Err[any](apierrors.NewErrBadRequest().WithCaller())
 	}
 
-	return mo.Ok[any](c.JSON(http.StatusOK, options))
+	backendAndModel := lo.Ternary(
+		strings.Contains(options.Model, ":"),
+		strings.SplitN(options.Model, ":", 2),
+		[]string{options.Model, ""},
+	)
+
+	result := Result{
+		Options: *options,
+		Backend: backendAndModel[0],
+		Model:   backendAndModel[1],
+	}
+
+	return mo.Ok[any](c.JSON(http.StatusOK, result))
 }
