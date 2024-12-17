@@ -36,29 +36,26 @@ type FullOptions struct {
 }
 
 func Speech(c echo.Context) mo.Result[any] {
-	options := new(Options)
+	var options Options
 
-	if err := c.Bind(options); err != nil {
-		return mo.Err[any](apierrors.NewErrBadRequest().WithCaller())
+	if err := c.Bind(&options); err != nil {
+		return mo.Err[any](apierrors.NewErrBadRequest())
 	}
-
 	if options.Model == "" || options.Input == "" || options.Voice == "" {
-		return mo.Err[any](apierrors.NewErrBadRequest().WithCaller())
+		return mo.Err[any](apierrors.NewErrInvalidArgument().WithDetail("either one of model, input, and voice parameter is required"))
 	}
 
 	backendAndModel := lo.Ternary(
 		strings.Contains(options.Model, ":"),
-		//nolint:mnd
-		strings.SplitN(options.Model, ":", 2),
+		strings.SplitN(options.Model, ":", 2), //nolint:mnd
 		[]string{options.Model, ""},
 	)
 
 	fullOptions := FullOptions{
-		Options: *options,
+		Options: options,
 		Backend: backendAndModel[0],
 		Model:   backendAndModel[1],
 	}
 
 	return openai(c, fullOptions)
-	// return mo.Ok[any](c.JSON(http.StatusOK, fullOptions))
 }
