@@ -22,11 +22,11 @@ type Options struct {
 	// The format to audio in.
 	// Supported formats are mp3, opus, aac, flac, wav, and pcm.
 	// mp3 is the default.
-	ResponseFormat string `json:"response_format"`
+	ResponseFormat string `json:"response_format,omitempty"`
 	// The speed of the generated audio.
 	// Select a value from 0.25 to 4.0.
 	// 1.0 is the default.
-	Speed int `json:"speed"`
+	Speed int `json:"speed,omitempty"`
 }
 
 type FullOptions struct {
