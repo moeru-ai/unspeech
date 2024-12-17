@@ -1,7 +1,6 @@
 package backend
 
 import (
-	"net/http"
 	"strings"
 
 	"github.com/labstack/echo/v4"
@@ -30,7 +29,7 @@ type Options struct {
 	Speed int `json:"speed"`
 }
 
-type Result struct {
+type FullOptions struct {
 	Options
 	Backend string `json:"backend"`
 	Model   string `json:"model"`
@@ -53,11 +52,12 @@ func Speech(c echo.Context) mo.Result[any] {
 		[]string{options.Model, ""},
 	)
 
-	result := Result{
+	fullOptions := FullOptions{
 		Options: *options,
 		Backend: backendAndModel[0],
 		Model:   backendAndModel[1],
 	}
 
-	return mo.Ok[any](c.JSON(http.StatusOK, result))
+	return openai(fullOptions)
+	// return mo.Ok[any](c.JSON(http.StatusOK, fullOptions))
 }
