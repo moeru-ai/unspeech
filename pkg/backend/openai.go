@@ -3,7 +3,6 @@ package backend
 import (
 	"bytes"
 	"encoding/json"
-	"io"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -34,9 +33,9 @@ func openai(c echo.Context, options FullOptions) mo.Result[any] {
 		return mo.Err[any](apierrors.NewErrBadRequest().WithCaller())
 	}
 
-	defer res.Body.Close()
+	// defer res.Body.Close()
 
-	body, _ := io.ReadAll(res.Body)
+	// body, _ := io.ReadAll(res.Body)
 
-	return mo.Ok[any](c.Stream(http.StatusOK, "audio/mp3", bytes.NewReader(body)))
+	return mo.Ok[any](c.Stream(http.StatusOK, "audio/mp3", res.Body))
 }
