@@ -21,7 +21,10 @@ func openai(c echo.Context, options FullOptions) mo.Result[any] {
 		Speed:          options.Speed,
 	}
 
-	payload, _ := json.Marshal(values) //nolint:errchkjson
+	payload, err := json.Marshal(values)
+	if err != nil {
+		panic(err)
+	}
 
 	req, err := http.NewRequestWithContext(
 		c.Request().Context(),
