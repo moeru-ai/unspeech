@@ -58,6 +58,6 @@ func Speech(c echo.Context) mo.Result[any] {
 		Model:   backendAndModel[1],
 	}
 
-	return openai(fullOptions)
+	return openai(c, fullOptions)
 	// return mo.Ok[any](c.JSON(http.StatusOK, fullOptions))
 }

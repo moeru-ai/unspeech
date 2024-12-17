@@ -3,13 +3,15 @@ package backend
 import (
 	"bytes"
 	"encoding/json"
+	"io"
 	"net/http"
 
+	"github.com/labstack/echo/v4"
 	"github.com/moeru-ai/unspeech/pkg/apierrors"
 	"github.com/samber/mo"
 )
 
-func openai(options FullOptions) mo.Result[any] {
+func openai(c echo.Context, options FullOptions) mo.Result[any] {
 	values := Options{
 		Model:          options.Model,
 		Input:          options.Input,
@@ -18,7 +20,7 @@ func openai(options FullOptions) mo.Result[any] {
 		Speed:          options.Speed,
 	}
 
-	body, err := json.Marshal(values)
+	payload, err := json.Marshal(values)
 	if err != nil {
 		return mo.Err[any](apierrors.NewErrBadRequest().WithCaller())
 	}
@@ -26,7 +28,7 @@ func openai(options FullOptions) mo.Result[any] {
 	res, err := http.Post(
 		"https://openai.com/v1/audio/speech",
 		"application/json",
-		bytes.NewBuffer(body),
+		bytes.NewBuffer(payload),
 	)
 	if err != nil {
 		return mo.Err[any](apierrors.NewErrBadRequest().WithCaller())
@@ -34,5 +36,7 @@ func openai(options FullOptions) mo.Result[any] {
 
 	defer res.Body.Close()
 
-	return mo.Ok[any](res)
+	body, _ := io.ReadAll(res.Body)
+
+	return mo.Ok[any](c.Blob(http.StatusOK, "audio/mp3", body))
 }
