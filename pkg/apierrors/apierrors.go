@@ -104,6 +104,20 @@ func (e *Error) WithSourceHeader(header string) *Error {
 	return e
 }
 
+func (e *Error) WithReason(reason string) *Error {
+	return e.WithMeta("reason", reason)
+}
+
+func (e *Error) WithMeta(key string, val any) *Error {
+	if e.Meta.IsAbsent() {
+		e.Meta = mo.Some(map[string]any{})
+	}
+
+	e.Meta.MustGet()[key] = val
+
+	return e
+}
+
 type ErrResponse struct {
 	jsonapi.Response
 }

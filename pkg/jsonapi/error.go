@@ -43,8 +43,6 @@ type ErrorObject struct {
 	Links mo.Option[*Links] `json:"links,omitempty"`
 	// the HTTP status code applicable to this problem, expressed as a string value.
 	Status int `json:"status,omitempty"`
-	// the HTTP status code applicable to this problem, expressed as a string value.
-	GrpcStatus uint64 `json:"grpc_status,omitempty"`
 	// an application-specific error code, expressed as a string value.
 	Code string `json:"code,omitempty"`
 	// a short, human-readable summary of the problem

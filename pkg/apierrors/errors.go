@@ -10,24 +10,6 @@ func NewErrBadRequest() *Error {
 		WithDetail("The request was invalid or cannot be served")
 }
 
-func NewErrInternal() *Error {
-	return NewError(http.StatusInternalServerError, "INTERNAL_SERVER_ERROR").
-		WithTitle("Internal Server Error").
-		WithDetail("An internal server error occurred")
-}
-
-func NewErrPermissionDenied() *Error {
-	return NewError(http.StatusForbidden, "PERMISSION_DENIED").
-		WithTitle("Permission Denied").
-		WithDetail("You do not have permission to access the requested resources")
-}
-
-func NewErrUnavailable() *Error {
-	return NewError(http.StatusServiceUnavailable, "UNAVAILABLE").
-		WithTitle("Service Unavailable").
-		WithDetail("The requested service is unavailable")
-}
-
 func NewErrInvalidArgument() *Error {
 	return NewError(http.StatusBadRequest, "INVALID_ARGUMENT").
 		WithTitle("Invalid Argument").
@@ -44,6 +26,18 @@ func NewErrUnauthorized() *Error {
 	return NewError(http.StatusUnauthorized, "UNAUTHORIZED").
 		WithTitle("Unauthorized").
 		WithDetail("The requested resources require authentication")
+}
+
+func NewErrPermissionDenied() *Error {
+	return NewError(http.StatusForbidden, "PERMISSION_DENIED").
+		WithTitle("Permission Denied").
+		WithDetail("You do not have permission to access the requested resources")
+}
+
+func NewErrForbidden() *Error {
+	return NewError(http.StatusForbidden, "FORBIDDEN").
+		WithTitle("Forbidden").
+		WithDetail("You do not have permission to access the requested resources")
 }
 
 func NewErrNotFound() *Error {
@@ -64,8 +58,26 @@ func NewErrQuotaExceeded() *Error {
 		WithDetail("The request quota has been exceeded")
 }
 
-func NewErrForbidden() *Error {
-	return NewError(http.StatusForbidden, "FORBIDDEN").
-		WithTitle("Forbidden").
-		WithDetail("You do not have permission to access the requested resources")
+func NewErrInternal() *Error {
+	return NewError(http.StatusInternalServerError, "INTERNAL_SERVER_ERROR").
+		WithTitle("Internal Server Error").
+		WithDetail("An internal server error occurred")
+}
+
+func NewErrBadGateway() *Error {
+	return NewError(http.StatusBadGateway, "BAD_GATEWAY").
+		WithTitle("Bad gateway").
+		WithDetail("The server received an invalid response from an upstream server")
+}
+
+func NewErrUnavailable() *Error {
+	return NewError(http.StatusServiceUnavailable, "UNAVAILABLE").
+		WithTitle("Service Unavailable").
+		WithDetail("The requested service is unavailable")
+}
+
+func NewUpstreamError(statusCode int) *Error {
+	return NewError(statusCode, "UPSTREAM_ERROR").
+		WithTitle("Upstream Error").
+		WithReason("An error occurred while processing the request from the upstream service")
 }
