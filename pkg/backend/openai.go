@@ -22,16 +22,26 @@ func openai(c echo.Context, options FullOptions) mo.Result[any] {
 
 	payload := fo.May(json.Marshal(values))
 
-	res, err := http.Post(
+	req, err := http.NewRequestWithContext(
+		c.Request().Context(),
+		http.MethodPost,
 		"https://openai.com/v1/audio/speech",
-		"application/json",
 		bytes.NewBuffer(payload),
 	)
 	if err != nil {
 		return mo.Err[any](apierrors.NewErrBadRequest().WithCaller())
 	}
 
-	// defer res.Body.Close()
+	// TODO: Bearer Auth
+	req.Header.Set("Content-Type", "application/json")
+
+	res, err := http.DefaultClient.Do(req)
+
+	if err != nil {
+		return mo.Err[any](apierrors.NewErrBadRequest().WithCaller())
+	}
+
+	defer res.Body.Close()
 
 	// body, _ := io.ReadAll(res.Body)
 
