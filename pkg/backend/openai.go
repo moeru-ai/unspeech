@@ -7,6 +7,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/moeru-ai/unspeech/pkg/apierrors"
+	"github.com/nekomeowww/fo"
 	"github.com/samber/mo"
 )
 
@@ -19,10 +20,7 @@ func openai(c echo.Context, options FullOptions) mo.Result[any] {
 		Speed:          options.Speed,
 	}
 
-	payload, err := json.Marshal(values)
-	if err != nil {
-		return mo.Err[any](apierrors.NewErrBadRequest().WithCaller())
-	}
+	payload := fo.May(json.Marshal(values))
 
 	res, err := http.Post(
 		"https://openai.com/v1/audio/speech",
