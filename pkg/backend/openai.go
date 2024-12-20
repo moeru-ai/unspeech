@@ -9,6 +9,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/moeru-ai/unspeech/pkg/apierrors"
+	"github.com/samber/lo"
 	"github.com/samber/mo"
 )
 
@@ -21,10 +22,7 @@ func openai(c echo.Context, options FullOptions) mo.Result[any] {
 		Speed:          options.Speed,
 	}
 
-	payload, err := json.Marshal(values)
-	if err != nil {
-		panic(err)
-	}
+	payload := lo.Must(json.Marshal(values))
 
 	req, err := http.NewRequestWithContext(
 		c.Request().Context(),
