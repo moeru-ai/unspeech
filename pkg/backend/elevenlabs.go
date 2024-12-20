@@ -10,7 +10,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/moeru-ai/unspeech/pkg/apierrors"
-	"github.com/nekomeowww/fo"
+	"github.com/samber/lo"
 	"github.com/samber/mo"
 )
 
@@ -21,7 +21,7 @@ type ElevenLabsOptions struct {
 }
 
 func elevenlabs(c echo.Context, options FullOptions) mo.Result[any] {
-	reqURL := fo.May(url.Parse("https://api.elevenlabs.io/v1/text-to-speech")).
+	reqURL := lo.Must(url.Parse("https://api.elevenlabs.io/v1/text-to-speech")).
 		JoinPath(options.Voice).
 		String()
 
@@ -30,10 +30,7 @@ func elevenlabs(c echo.Context, options FullOptions) mo.Result[any] {
 		ModelID: options.Model,
 	}
 
-	payload, err := json.Marshal(values)
-	if err != nil {
-		panic(err)
-	}
+	payload := lo.Must(json.Marshal(values))
 
 	req, err := http.NewRequestWithContext(
 		c.Request().Context(),
