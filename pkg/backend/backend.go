@@ -46,8 +46,8 @@ func Speech(c echo.Context) mo.Result[any] {
 	}
 
 	backendAndModel := lo.Ternary(
-		strings.Contains(options.Model, ":"),
-		strings.SplitN(options.Model, ":", 2), //nolint:mnd
+		strings.Contains(options.Model, "/"),
+		strings.SplitN(options.Model, "/", 2), //nolint:mnd
 		[]string{options.Model, ""},
 	)
 
