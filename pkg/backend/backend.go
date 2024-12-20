@@ -57,5 +57,10 @@ func Speech(c echo.Context) mo.Result[any] {
 		Model:   backendAndModel[1],
 	}
 
-	return openai(c, fullOptions)
+	switch backendAndModel[0] {
+	case "openai":
+		return openai(c, fullOptions)
+	default:
+		return mo.Err[any](apierrors.NewErrBadRequest())
+	}
 }
