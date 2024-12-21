@@ -4,7 +4,7 @@
 
 ## Features
 
-unSpeech lets you use other online TTS in OpenAI-compatible format.
+unSpeech lets you use various online TTS with OpenAI-compatible API.
 
 - [OpenAI](https://platform.openai.com/docs/api-reference/audio/createSpeech)
 - [ElevenLabs](https://elevenlabs.io/docs/api-reference/text-to-speech/convert)
