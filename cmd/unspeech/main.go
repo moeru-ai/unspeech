@@ -15,6 +15,8 @@ func main() {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			e := echo.New()
 
+			e.HideBanner = true
+
 			e.Use(middlewares.CORS())
 			e.Use(middlewares.HandleErrors())
 
