@@ -12,6 +12,8 @@ import (
 func main() {
 	rootCmd := &cobra.Command{
 		Use: "unspeech",
+		// TODO: set version
+		Version: "0.0.0",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			e := echo.New()
 
