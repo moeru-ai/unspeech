@@ -70,7 +70,7 @@ Looking for something like unSpeech, but for local TTS? check it out:
 - [astramind-ai/Auralis](https://github.com/astramind-ai/Auralis)
 - [matatonic/openedai-speech](https://github.com/matatonic/openedai-speech)
 
-Or to use Edge TTS, which unSpeech is not intended to support:
+Or to use free Edge TTS:
 
 - [travisvn/openai-edge-tts](https://github.com/travisvn/openai-edge-tts)
 
