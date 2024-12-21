@@ -2,4 +2,4 @@ list:
   @just --list
 
 build:
-  go build -o ./result/unspeech ./cmd/unspeech
+  CGO_ENABLED=0 go build -o ./result/unspeech ./cmd/unspeech
