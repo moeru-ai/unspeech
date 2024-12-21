@@ -34,6 +34,10 @@ go build -o ./result/unspeech ./cmd/unspeech
 
 You can use unSpeech with most OpenAI clients.
 
+The `model` parameter should be provider + model, e.g. `openai/tts-1-hd`, `elevenlabs/eleven_multilingual_v2`.
+
+The `Authorization` header is auto-converted to the vendor's corresponding auth method, such as `xi-api-key`. 
+
 ###### `curl`
 
 ```bash
