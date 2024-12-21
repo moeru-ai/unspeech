@@ -24,6 +24,10 @@ go.work.sum
 # env file
 .env
 
+# .idea file
 /.idea/*
 !/.idea/.gitignore
 !/.idea/codeStyles
+
+# build result
+/result
