@@ -48,7 +48,7 @@ curl http://localhost:5933/v1/audio/speech \
   --output speech.mp3
 ```
 
-###### [`@xsai/generate-speech`](https://github.com/moeru-ai/xsai)
+###### [`@xsai/generate-speech`](https://github.com/moeru-ai/xsai) (TypeScript)
 
 ```ts
 import { generateSpeech } from '@xsai/generate-speech'
