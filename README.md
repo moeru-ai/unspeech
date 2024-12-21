@@ -34,6 +34,20 @@ go build -o ./result/unspeech ./cmd/unspeech
 
 You can use unSpeech with most OpenAI clients.
 
+###### `curl`
+
+```bash
+curl http://localhost:5933/v1/audio/speech \
+  -H "Authorization: Bearer $XI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "elevenlabs/eleven_multilingual_v2",
+    "input": "Hello, World!",
+    "voice": "9BWtsMINqrJLrRacOk9x",
+  }' \
+  --output speech.mp3
+```
+
 ###### [`@xsai/generate-speech`](https://github.com/moeru-ai/xsai)
 
 ```ts
