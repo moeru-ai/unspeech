@@ -48,6 +48,18 @@ const speech = await generateSpeech({
 })
 ```
 
+## Related Projects
+
+Looking for something like unSpeech, but for local TTS? check it out:
+
+- [erew123/alltalk_tts/alltalkbeta](https://github.com/erew123/alltalk_tts/tree/alltalkbeta)
+- [astramind-ai/Auralis](https://github.com/astramind-ai/Auralis)
+- [matatonic/openedai-speech](https://github.com/matatonic/openedai-speech)
+
+Or to use Edge TTS, which unSpeech is not intended to support:
+
+- [travisvn/openai-edge-tts](https://github.com/travisvn/openai-edge-tts)
+
 ## License
 
 [AGPL-3.0](./LICENSE)
