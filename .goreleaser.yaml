@@ -1,2 +1,6 @@
 builds:
   - main: ./cmd/unspeech
+    # remove 386
+    goarch:
+      - amd64
+      - arm64

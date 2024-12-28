@@ -23,6 +23,7 @@ words:
   - flac
   - forcetypeassert
   - funlen
+  - goarch
   - gochecknoglobals
   - gochecknoinits
   - gocognit
