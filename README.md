@@ -1,4 +1,4 @@
-# unSpeech `0.0.1`
+# unSpeech `0.0.2`
 
 > Your Text-to-Speech Services, All-in-One.
 
