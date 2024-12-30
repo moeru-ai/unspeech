@@ -2,7 +2,6 @@ package backend
 
 import (
 	"bytes"
-	"encoding/json"
 	"log/slog"
 	"net/http"
 	"net/url"
@@ -10,34 +9,35 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/moeru-ai/unspeech/pkg/apierrors"
+	"github.com/moeru-ai/unspeech/pkg/utils/jsonpatch"
 	"github.com/samber/lo"
 	"github.com/samber/mo"
 )
-
-// https://elevenlabs.io/docs/api-reference/text-to-speech/convert#request
-type ElevenLabsOptions struct {
-	Text    string `json:"text"`
-	ModelID string `json:"model_id,omitempty"`
-	// TODO: support other options
-}
 
 func elevenlabs(c echo.Context, options mo.Option[SpeechRequestOptions]) mo.Result[any] {
 	reqURL := lo.Must(url.Parse("https://api.elevenlabs.io/v1/text-to-speech")).
 		JoinPath(options.MustGet().Voice).
 		String()
 
-	values := ElevenLabsOptions{
-		Text:    options.MustGet().Input,
-		ModelID: options.MustGet().Model,
+	// https://elevenlabs.io/docs/api-reference/text-to-speech/convert#request
+	patchedPayload := jsonpatch.ApplyPatches(
+		options.MustGet().body.OrElse(new(bytes.Buffer)).Bytes(),
+		mo.Some(jsonpatch.ApplyOptions{AllowMissingPathOnRemove: true}),
+		jsonpatch.NewRemove("/model"),
+		jsonpatch.NewRemove("/voice"),
+		jsonpatch.NewRemove("/input"),
+		jsonpatch.NewAdd("/text", options.MustGet().Input),
+		jsonpatch.NewAdd("/model_id", options.MustGet().Model),
+	)
+	if patchedPayload.IsError() {
+		return mo.Err[any](apierrors.NewErrInternal().WithDetail(patchedPayload.Error().Error()).WithCaller())
 	}
-
-	payload := lo.Must(json.Marshal(values))
 
 	req, err := http.NewRequestWithContext(
 		c.Request().Context(),
 		http.MethodPost,
 		reqURL,
-		bytes.NewBuffer(payload),
+		bytes.NewBuffer(patchedPayload.MustGet()),
 	)
 	if err != nil {
 		return mo.Err[any](apierrors.NewErrInternal().WithCaller())
@@ -71,8 +71,8 @@ func elevenlabs(c echo.Context, options mo.Option[SpeechRequestOptions]) mo.Resu
 		default:
 			slog.Warn("unknown upstream error with unknown Content-Type",
 				slog.Int("status", res.StatusCode),
-				slog.String("content-type", res.Header.Get("Content-Type")),
-				slog.String("content-length", res.Header.Get("Content-Length")),
+				slog.String("content_type", res.Header.Get("Content-Type")),
+				slog.String("content_length", res.Header.Get("Content-Length")),
 			)
 		}
 	}
