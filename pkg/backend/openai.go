@@ -58,8 +58,8 @@ func openai(c echo.Context, options mo.Option[SpeechRequestOptions]) mo.Result[a
 		default:
 			slog.Warn("unknown upstream error with unknown Content-Type",
 				slog.Int("status", res.StatusCode),
-				slog.String("content-type", res.Header.Get("Content-Type")),
-				slog.String("content-length", res.Header.Get("Content-Length")),
+				slog.String("content_type", res.Header.Get("Content-Type")),
+				slog.String("content_length", res.Header.Get("Content-Length")),
 			)
 		}
 	}
