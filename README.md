@@ -8,6 +8,7 @@ unSpeech lets you use various online TTS with OpenAI-compatible API.
 
 - [OpenAI](https://platform.openai.com/docs/api-reference/audio/createSpeech)
 - [ElevenLabs](https://elevenlabs.io/docs/api-reference/text-to-speech/convert)
+- [Koemotion (by Rinna)](https://koemotion.rinna.co.jp/)
 
 ## Getting Started
 
@@ -36,7 +37,7 @@ You can use unSpeech with most OpenAI clients.
 
 The `model` parameter should be provider + model, e.g. `openai/tts-1-hd`, `elevenlabs/eleven_multilingual_v2`.
 
-The `Authorization` header is auto-converted to the vendor's corresponding auth method, such as `xi-api-key`. 
+The `Authorization` header is auto-converted to the vendor's corresponding auth method, such as `xi-api-key`.
 
 ###### `curl`
 

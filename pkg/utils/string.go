@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+
+	"github.com/samber/lo"
 )
 
 var (
@@ -39,6 +41,9 @@ func FromString[T any](str string) (T, error) { //nolint:gocyclo
 	case string:
 		val, _ := any(str).(T)
 		return val, nil
+	case *string:
+		val, _ := any(&str).(T)
+		return val, nil
 	case int:
 		val, err := strconv.ParseInt(str, 10, 0)
 		if err != nil {
@@ -46,6 +51,15 @@ func FromString[T any](str string) (T, error) { //nolint:gocyclo
 		}
 
 		typeVal, _ := any(int(val)).(T)
+
+		return typeVal, nil
+	case *int:
+		val, err := strconv.ParseInt(str, 10, 0)
+		if err != nil {
+			return empty, errFailedToConvertStringToType(empty, err)
+		}
+
+		typeVal, _ := any(lo.ToPtr(int(val))).(T)
 
 		return typeVal, nil
 	case int8:
@@ -57,6 +71,15 @@ func FromString[T any](str string) (T, error) { //nolint:gocyclo
 		typeVal, _ := any(int8(val)).(T)
 
 		return typeVal, nil
+	case *int8:
+		val, err := strconv.ParseInt(str, 10, 8)
+		if err != nil {
+			return empty, errFailedToConvertStringToType(empty, err)
+		}
+
+		typeVal, _ := any(lo.ToPtr(int8(val))).(T)
+
+		return typeVal, nil
 	case int16:
 		val, err := strconv.ParseInt(str, 10, 16)
 		if err != nil {
@@ -64,6 +87,15 @@ func FromString[T any](str string) (T, error) { //nolint:gocyclo
 		}
 
 		typeVal, _ := any(int16(val)).(T)
+
+		return typeVal, nil
+	case *int16:
+		val, err := strconv.ParseInt(str, 10, 16)
+		if err != nil {
+			return empty, errFailedToConvertStringToType(empty, err)
+		}
+
+		typeVal, _ := any(lo.ToPtr(int16(val))).(T)
 
 		return typeVal, nil
 	case int32:
@@ -75,6 +107,15 @@ func FromString[T any](str string) (T, error) { //nolint:gocyclo
 		typeVal, _ := any(int32(val)).(T)
 
 		return typeVal, nil
+	case *int32:
+		val, err := strconv.ParseInt(str, 10, 32)
+		if err != nil {
+			return empty, errFailedToConvertStringToType(empty, err)
+		}
+
+		typeVal, _ := any(lo.ToPtr(int32(val))).(T)
+
+		return typeVal, nil
 	case int64:
 		val, err := strconv.ParseInt(str, 10, 64)
 		if err != nil {
@@ -82,6 +123,15 @@ func FromString[T any](str string) (T, error) { //nolint:gocyclo
 		}
 
 		typeVal, _ := any(val).(T)
+
+		return typeVal, nil
+	case *int64:
+		val, err := strconv.ParseInt(str, 10, 64)
+		if err != nil {
+			return empty, errFailedToConvertStringToType(empty, err)
+		}
+
+		typeVal, _ := any(lo.ToPtr(val)).(T)
 
 		return typeVal, nil
 	case uint:
@@ -93,6 +143,15 @@ func FromString[T any](str string) (T, error) { //nolint:gocyclo
 		typeVal, _ := any(uint(val)).(T)
 
 		return typeVal, nil
+	case *uint:
+		val, err := strconv.ParseUint(str, 10, 0)
+		if err != nil {
+			return empty, errFailedToConvertStringToType(empty, err)
+		}
+
+		typeVal, _ := any(lo.ToPtr(uint(val))).(T)
+
+		return typeVal, nil
 	case uint8:
 		val, err := strconv.ParseUint(str, 10, 8)
 		if err != nil {
@@ -100,6 +159,15 @@ func FromString[T any](str string) (T, error) { //nolint:gocyclo
 		}
 
 		typeVal, _ := any(uint8(val)).(T)
+
+		return typeVal, nil
+	case *uint8:
+		val, err := strconv.ParseUint(str, 10, 8)
+		if err != nil {
+			return empty, errFailedToConvertStringToType(empty, err)
+		}
+
+		typeVal, _ := any(lo.ToPtr(uint8(val))).(T)
 
 		return typeVal, nil
 	case uint16:
@@ -111,6 +179,15 @@ func FromString[T any](str string) (T, error) { //nolint:gocyclo
 		typeVal, _ := any(uint16(val)).(T)
 
 		return typeVal, nil
+	case *uint16:
+		val, err := strconv.ParseUint(str, 10, 16)
+		if err != nil {
+			return empty, errFailedToConvertStringToType(empty, err)
+		}
+
+		typeVal, _ := any(lo.ToPtr(uint16(val))).(T)
+
+		return typeVal, nil
 	case uint32:
 		val, err := strconv.ParseUint(str, 10, 32)
 		if err != nil {
@@ -118,6 +195,15 @@ func FromString[T any](str string) (T, error) { //nolint:gocyclo
 		}
 
 		typeVal, _ := any(uint32(val)).(T)
+
+		return typeVal, nil
+	case *uint32:
+		val, err := strconv.ParseUint(str, 10, 32)
+		if err != nil {
+			return empty, errFailedToConvertStringToType(empty, err)
+		}
+
+		typeVal, _ := any(lo.ToPtr(uint32(val))).(T)
 
 		return typeVal, nil
 	case uint64:
@@ -129,6 +215,15 @@ func FromString[T any](str string) (T, error) { //nolint:gocyclo
 		typeVal, _ := any(val).(T)
 
 		return typeVal, nil
+	case *uint64:
+		val, err := strconv.ParseUint(str, 10, 64)
+		if err != nil {
+			return empty, errFailedToConvertStringToType(empty, err)
+		}
+
+		typeVal, _ := any(lo.ToPtr(val)).(T)
+
+		return typeVal, nil
 	case float32:
 		val, err := strconv.ParseFloat(str, 32)
 		if err != nil {
@@ -136,6 +231,15 @@ func FromString[T any](str string) (T, error) { //nolint:gocyclo
 		}
 
 		typeVal, _ := any(float32(val)).(T)
+
+		return typeVal, nil
+	case *float32:
+		val, err := strconv.ParseFloat(str, 32)
+		if err != nil {
+			return empty, errFailedToConvertStringToType(empty, err)
+		}
+
+		typeVal, _ := any(lo.ToPtr(float32(val))).(T)
 
 		return typeVal, nil
 	case float64:
@@ -147,6 +251,15 @@ func FromString[T any](str string) (T, error) { //nolint:gocyclo
 		typeVal, _ := any(val).(T)
 
 		return typeVal, nil
+	case *float64:
+		val, err := strconv.ParseFloat(str, 64)
+		if err != nil {
+			return empty, errFailedToConvertStringToType(empty, err)
+		}
+
+		typeVal, _ := any(lo.ToPtr(val)).(T)
+
+		return typeVal, nil
 	case complex64:
 		val, err := strconv.ParseComplex(str, 64)
 		if err != nil {
@@ -154,6 +267,15 @@ func FromString[T any](str string) (T, error) { //nolint:gocyclo
 		}
 
 		typeVal, _ := any(complex64(val)).(T)
+
+		return typeVal, nil
+	case *complex64:
+		val, err := strconv.ParseComplex(str, 64)
+		if err != nil {
+			return empty, errFailedToConvertStringToType(empty, err)
+		}
+
+		typeVal, _ := any(lo.ToPtr(complex64(val))).(T)
 
 		return typeVal, nil
 	case complex128:
@@ -165,6 +287,15 @@ func FromString[T any](str string) (T, error) { //nolint:gocyclo
 		typeVal, _ := any(val).(T)
 
 		return typeVal, nil
+	case *complex128:
+		val, err := strconv.ParseComplex(str, 128)
+		if err != nil {
+			return empty, errFailedToConvertStringToType(empty, err)
+		}
+
+		typeVal, _ := any(lo.ToPtr(val)).(T)
+
+		return typeVal, nil
 	case bool:
 		val, err := strconv.ParseBool(str)
 		if err != nil {
@@ -172,6 +303,15 @@ func FromString[T any](str string) (T, error) { //nolint:gocyclo
 		}
 
 		typeVal, _ := any(val).(T)
+
+		return typeVal, nil
+	case *bool:
+		val, err := strconv.ParseBool(str)
+		if err != nil {
+			return empty, errFailedToConvertStringToType(empty, err)
+		}
+
+		typeVal, _ := any(lo.ToPtr(val)).(T)
 
 		return typeVal, nil
 	case []byte:

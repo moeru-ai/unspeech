@@ -1,6 +1,9 @@
 package backend
 
 import (
+	"bytes"
+	"encoding/json"
+	"io"
 	"strings"
 
 	"github.com/labstack/echo/v4"
@@ -8,10 +11,11 @@ import (
 	"github.com/samber/mo"
 
 	"github.com/moeru-ai/unspeech/pkg/apierrors"
+	"github.com/moeru-ai/unspeech/pkg/utils"
 )
 
-// Options represent API parameters refer to https://platform.openai.com/docs/api-reference/audio/createSpeech
-type Options struct {
+// OpenAISpeechRequestOptions represent API parameters refer to https://platform.openai.com/docs/api-reference/audio/createSpeech
+type OpenAISpeechRequestOptions struct {
 	// (required) One of the available TTS models.
 	Model string `json:"model"`
 	// (required) The text to generate audio for.
@@ -29,20 +33,48 @@ type Options struct {
 	Speed int `json:"speed,omitempty"`
 }
 
-type FullOptions struct {
-	Options
+type SpeechRequestOptions struct {
+	OpenAISpeechRequestOptions
+
 	Backend string `json:"backend"`
 	Model   string `json:"model"`
+
+	body          mo.Option[*bytes.Buffer]
+	bodyParsedMap map[string]any
 }
 
-func Speech(c echo.Context) mo.Result[any] {
-	var options Options
+func (o SpeechRequestOptions) AsBuffer() mo.Option[*bytes.Buffer] {
+	return o.body
+}
 
-	if err := c.Bind(&options); err != nil {
-		return mo.Err[any](apierrors.NewErrBadRequest())
+func (o SpeechRequestOptions) AsMap() map[string]any {
+	return o.bodyParsedMap
+}
+
+func NewSpeechRequestOptions(body io.ReadCloser) mo.Result[SpeechRequestOptions] {
+	buffer := new(bytes.Buffer)
+
+	_, err := buffer.ReadFrom(body)
+	if err != nil {
+		return mo.Err[SpeechRequestOptions](apierrors.NewErrBadRequest().WithDetail(err.Error()))
 	}
+
+	var optionsMap map[string]any
+
+	err = json.Unmarshal(buffer.Bytes(), &optionsMap)
+	if err != nil {
+		return mo.Err[SpeechRequestOptions](apierrors.NewErrBadRequest().WithDetail(err.Error()))
+	}
+
+	var options OpenAISpeechRequestOptions
+
+	err = json.Unmarshal(buffer.Bytes(), &options)
+	if err != nil {
+		return mo.Err[SpeechRequestOptions](apierrors.NewErrBadRequest().WithDetail(err.Error()))
+	}
+
 	if options.Model == "" || options.Input == "" || options.Voice == "" {
-		return mo.Err[any](apierrors.NewErrInvalidArgument().WithDetail("either one of model, input, and voice parameter is required"))
+		return mo.Err[SpeechRequestOptions](apierrors.NewErrInvalidArgument().WithDetail("either one of model, input, and voice parameter is required"))
 	}
 
 	backendAndModel := lo.Ternary(
@@ -51,18 +83,29 @@ func Speech(c echo.Context) mo.Result[any] {
 		[]string{options.Model, ""},
 	)
 
-	fullOptions := FullOptions{
-		Options: options,
-		Backend: backendAndModel[0],
-		Model:   backendAndModel[1],
+	return mo.Ok(SpeechRequestOptions{
+		OpenAISpeechRequestOptions: options,
+		Backend:                    backendAndModel[0],
+		Model:                      backendAndModel[1],
+		body:                       mo.Some(buffer),
+		bodyParsedMap:              optionsMap,
+	})
+}
+
+func Speech(c echo.Context) mo.Result[any] {
+	options := NewSpeechRequestOptions(c.Request().Body)
+	if options.IsError() {
+		return mo.Err[any](options.Error())
 	}
 
-	switch backendAndModel[0] {
+	switch options.MustGet().Backend {
 	case "openai":
-		return openai(c, fullOptions)
+		return openai(c, utils.ResultToOption(options))
 	case "elevenlabs":
-		return elevenlabs(c, fullOptions)
+		return elevenlabs(c, utils.ResultToOption(options))
+	case "koemotion":
+		return koemotion(c, utils.ResultToOption(options))
 	default:
-		return mo.Err[any](apierrors.NewErrBadRequest())
+		return mo.Err[any](apierrors.NewErrBadRequest().WithDetail("unsupported backend"))
 	}
 }
