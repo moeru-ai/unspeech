@@ -39,9 +39,7 @@ func GetByJSONPath[T any](input any, template string) T {
 }
 
 func ReadAsJSONWithClose(readCloser io.ReadCloser) (*bytes.Buffer, map[string]any, error) {
-	defer func() {
-		_ = readCloser.Close()
-	}()
+	defer func() { readCloser.Close() }()
 
 	buffer, jsonMap, err := ReadAsJSON(readCloser)
 	if err != nil {
@@ -72,7 +70,6 @@ func FromMap[T any, MK comparable, MV any](m map[MK]MV) (*T, error) {
 	if m == nil {
 		return nil, nil
 	}
-
 	if len(m) == 0 {
 		return nil, nil
 	}

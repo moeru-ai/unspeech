@@ -18,16 +18,17 @@ import (
 type ElevenLabsOptions struct {
 	Text    string `json:"text"`
 	ModelID string `json:"model_id,omitempty"`
+	// TODO: support other options
 }
 
-func elevenlabs(c echo.Context, options FullOptions) mo.Result[any] {
+func elevenlabs(c echo.Context, options mo.Option[SpeechRequestOptions]) mo.Result[any] {
 	reqURL := lo.Must(url.Parse("https://api.elevenlabs.io/v1/text-to-speech")).
-		JoinPath(options.Voice).
+		JoinPath(options.MustGet().Voice).
 		String()
 
 	values := ElevenLabsOptions{
-		Text:    options.Input,
-		ModelID: options.Model,
+		Text:    options.MustGet().Input,
+		ModelID: options.MustGet().Model,
 	}
 
 	payload := lo.Must(json.Marshal(values))

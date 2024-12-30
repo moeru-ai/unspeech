@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -46,65 +47,129 @@ func TestFromString(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, "", stringVal)
 
+		stringPtrVal, err := FromString[*string]("")
+		require.NoError(t, err)
+		assert.Nil(t, stringPtrVal)
+
 		intVal, err := FromString[int]("")
 		require.NoError(t, err)
 		assert.Zero(t, intVal)
+
+		intPtrVal, err := FromString[*int]("")
+		require.NoError(t, err)
+		assert.Nil(t, intPtrVal)
 
 		int8Val, err := FromString[int8]("")
 		require.NoError(t, err)
 		assert.Zero(t, int8Val)
 
+		int8PtrVal, err := FromString[*int8]("")
+		require.NoError(t, err)
+		assert.Nil(t, int8PtrVal)
+
 		int16Val, err := FromString[int16]("")
 		require.NoError(t, err)
 		assert.Zero(t, int16Val)
+
+		int16PtrVal, err := FromString[*int16]("")
+		require.NoError(t, err)
+		assert.Nil(t, int16PtrVal)
 
 		int32Val, err := FromString[int32]("")
 		require.NoError(t, err)
 		assert.Zero(t, int32Val)
 
+		int32PtrVal, err := FromString[*int32]("")
+		require.NoError(t, err)
+		assert.Nil(t, int32PtrVal)
+
 		int64Val, err := FromString[int64]("")
 		require.NoError(t, err)
 		assert.Zero(t, int64Val)
+
+		int64PtrVal, err := FromString[*int64]("")
+		require.NoError(t, err)
+		assert.Nil(t, int64PtrVal)
 
 		uintVal, err := FromString[uint]("")
 		require.NoError(t, err)
 		assert.Zero(t, uintVal)
 
+		uintPtrVal, err := FromString[*uint]("")
+		require.NoError(t, err)
+		assert.Nil(t, uintPtrVal)
+
 		uint8Val, err := FromString[uint8]("")
 		require.NoError(t, err)
 		assert.Zero(t, uint8Val)
+
+		uint8PtrVal, err := FromString[*uint8]("")
+		require.NoError(t, err)
+		assert.Nil(t, uint8PtrVal)
 
 		uint16Val, err := FromString[uint16]("")
 		require.NoError(t, err)
 		assert.Zero(t, uint16Val)
 
+		uint16PtrVal, err := FromString[*uint16]("")
+		require.NoError(t, err)
+		assert.Nil(t, uint16PtrVal)
+
 		uint32Val, err := FromString[uint32]("")
 		require.NoError(t, err)
 		assert.Zero(t, uint32Val)
+
+		uint32PtrVal, err := FromString[*uint32]("")
+		require.NoError(t, err)
+		assert.Nil(t, uint32PtrVal)
 
 		uint64Val, err := FromString[uint64]("")
 		require.NoError(t, err)
 		assert.Zero(t, uint64Val)
 
+		uint64PtrVal, err := FromString[*uint64]("")
+		require.NoError(t, err)
+		assert.Nil(t, uint64PtrVal)
+
 		float32Val, err := FromString[float32]("")
 		require.NoError(t, err)
 		assert.Zero(t, float32Val)
+
+		float32PtrVal, err := FromString[*float32]("")
+		require.NoError(t, err)
+		assert.Nil(t, float32PtrVal)
 
 		float64Val, err := FromString[float64]("")
 		require.NoError(t, err)
 		assert.Zero(t, float64Val)
 
+		float64PtrVal, err := FromString[*float64]("")
+		require.NoError(t, err)
+		assert.Nil(t, float64PtrVal)
+
 		complex64Val, err := FromString[complex64]("")
 		require.NoError(t, err)
 		assert.Zero(t, complex64Val)
+
+		complex64PtrVal, err := FromString[*complex64]("")
+		require.NoError(t, err)
+		assert.Nil(t, complex64PtrVal)
 
 		complex128Val, err := FromString[complex128]("")
 		require.NoError(t, err)
 		assert.Zero(t, complex128Val)
 
+		complex128PtrVal, err := FromString[*complex128]("")
+		require.NoError(t, err)
+		assert.Nil(t, complex128PtrVal)
+
 		boolVal, err := FromString[bool]("")
 		require.NoError(t, err)
 		assert.False(t, boolVal)
+
+		boolPtrVal, err := FromString[*bool]("")
+		require.NoError(t, err)
+		assert.Nil(t, boolPtrVal)
 
 		bytesVal, err := FromString[[]byte]("")
 		require.NoError(t, err)
@@ -142,75 +207,150 @@ func TestFromString(t *testing.T) {
 		require.EqualError(t, err, "failed to convert string to type int: strconv.ParseInt: parsing \"invalid\": invalid syntax")
 		assert.Zero(t, intVal)
 
+		intPtrVal, err := FromString[*int]("invalid")
+		require.Error(t, err)
+		require.EqualError(t, err, "failed to convert string to type *int: strconv.ParseInt: parsing \"invalid\": invalid syntax")
+		assert.Nil(t, intPtrVal)
+
 		int8Val, err := FromString[int8]("invalid")
 		require.Error(t, err)
 		require.EqualError(t, err, "failed to convert string to type int8: strconv.ParseInt: parsing \"invalid\": invalid syntax")
 		assert.Zero(t, int8Val)
+
+		int8PtrVal, err := FromString[*int8]("invalid")
+		require.Error(t, err)
+		require.EqualError(t, err, "failed to convert string to type *int8: strconv.ParseInt: parsing \"invalid\": invalid syntax")
+		assert.Nil(t, int8PtrVal)
 
 		int16Val, err := FromString[int16]("invalid")
 		require.Error(t, err)
 		require.EqualError(t, err, "failed to convert string to type int16: strconv.ParseInt: parsing \"invalid\": invalid syntax")
 		assert.Zero(t, int16Val)
 
+		int16PtrVal, err := FromString[*int16]("invalid")
+		require.Error(t, err)
+		require.EqualError(t, err, "failed to convert string to type *int16: strconv.ParseInt: parsing \"invalid\": invalid syntax")
+		assert.Nil(t, int16PtrVal)
+
 		int32Val, err := FromString[int32]("invalid")
 		require.Error(t, err)
 		require.EqualError(t, err, "failed to convert string to type int32: strconv.ParseInt: parsing \"invalid\": invalid syntax")
 		assert.Zero(t, int32Val)
+
+		int32PtrVal, err := FromString[*int32]("invalid")
+		require.Error(t, err)
+		require.EqualError(t, err, "failed to convert string to type *int32: strconv.ParseInt: parsing \"invalid\": invalid syntax")
+		assert.Nil(t, int32PtrVal)
 
 		int64Val, err := FromString[int64]("invalid")
 		require.Error(t, err)
 		require.EqualError(t, err, "failed to convert string to type int64: strconv.ParseInt: parsing \"invalid\": invalid syntax")
 		assert.Zero(t, int64Val)
 
+		int64PtrVal, err := FromString[*int64]("invalid")
+		require.Error(t, err)
+		require.EqualError(t, err, "failed to convert string to type *int64: strconv.ParseInt: parsing \"invalid\": invalid syntax")
+		assert.Nil(t, int64PtrVal)
+
 		uintVal, err := FromString[uint]("invalid")
 		require.Error(t, err)
 		require.EqualError(t, err, "failed to convert string to type uint: strconv.ParseUint: parsing \"invalid\": invalid syntax")
 		assert.Zero(t, uintVal)
+
+		uintPtrVal, err := FromString[*uint]("invalid")
+		require.Error(t, err)
+		require.EqualError(t, err, "failed to convert string to type *uint: strconv.ParseUint: parsing \"invalid\": invalid syntax")
+		assert.Nil(t, uintPtrVal)
 
 		uint8Val, err := FromString[uint8]("invalid")
 		require.Error(t, err)
 		require.EqualError(t, err, "failed to convert string to type uint8: strconv.ParseUint: parsing \"invalid\": invalid syntax")
 		assert.Zero(t, uint8Val)
 
+		uint8PtrVal, err := FromString[*uint8]("invalid")
+		require.Error(t, err)
+		require.EqualError(t, err, "failed to convert string to type *uint8: strconv.ParseUint: parsing \"invalid\": invalid syntax")
+		assert.Nil(t, uint8PtrVal)
+
 		uint16Val, err := FromString[uint16]("invalid")
 		require.Error(t, err)
 		require.EqualError(t, err, "failed to convert string to type uint16: strconv.ParseUint: parsing \"invalid\": invalid syntax")
 		assert.Zero(t, uint16Val)
+
+		uint16PtrVal, err := FromString[*uint16]("invalid")
+		require.Error(t, err)
+		require.EqualError(t, err, "failed to convert string to type *uint16: strconv.ParseUint: parsing \"invalid\": invalid syntax")
+		assert.Nil(t, uint16PtrVal)
 
 		uint32Val, err := FromString[uint32]("invalid")
 		require.Error(t, err)
 		require.EqualError(t, err, "failed to convert string to type uint32: strconv.ParseUint: parsing \"invalid\": invalid syntax")
 		assert.Zero(t, uint32Val)
 
+		uint32PtrVal, err := FromString[*uint32]("invalid")
+		require.Error(t, err)
+		require.EqualError(t, err, "failed to convert string to type *uint32: strconv.ParseUint: parsing \"invalid\": invalid syntax")
+		assert.Nil(t, uint32PtrVal)
+
 		uint64Val, err := FromString[uint64]("invalid")
 		require.Error(t, err)
 		require.EqualError(t, err, "failed to convert string to type uint64: strconv.ParseUint: parsing \"invalid\": invalid syntax")
 		assert.Zero(t, uint64Val)
+
+		uint64PtrVal, err := FromString[*uint64]("invalid")
+		require.Error(t, err)
+		require.EqualError(t, err, "failed to convert string to type *uint64: strconv.ParseUint: parsing \"invalid\": invalid syntax")
+		assert.Nil(t, uint64PtrVal)
 
 		float32Val, err := FromString[float32]("invalid")
 		require.Error(t, err)
 		require.EqualError(t, err, "failed to convert string to type float32: strconv.ParseFloat: parsing \"invalid\": invalid syntax")
 		assert.Zero(t, float32Val)
 
+		float32PtrVal, err := FromString[*float32]("invalid")
+		require.Error(t, err)
+		require.EqualError(t, err, "failed to convert string to type *float32: strconv.ParseFloat: parsing \"invalid\": invalid syntax")
+		assert.Nil(t, float32PtrVal)
+
 		float64Val, err := FromString[float64]("invalid")
 		require.Error(t, err)
 		require.EqualError(t, err, "failed to convert string to type float64: strconv.ParseFloat: parsing \"invalid\": invalid syntax")
 		assert.Zero(t, float64Val)
+
+		float64PtrVal, err := FromString[*float64]("invalid")
+		require.Error(t, err)
+		require.EqualError(t, err, "failed to convert string to type *float64: strconv.ParseFloat: parsing \"invalid\": invalid syntax")
+		assert.Nil(t, float64PtrVal)
 
 		complex64Val, err := FromString[complex64]("invalid")
 		require.Error(t, err)
 		require.EqualError(t, err, "failed to convert string to type complex64: strconv.ParseComplex: parsing \"invalid\": invalid syntax")
 		assert.Zero(t, complex64Val)
 
+		complex64PtrVal, err := FromString[*complex64]("invalid")
+		require.Error(t, err)
+		require.EqualError(t, err, "failed to convert string to type *complex64: strconv.ParseComplex: parsing \"invalid\": invalid syntax")
+		assert.Nil(t, complex64PtrVal)
+
 		complex128Val, err := FromString[complex128]("invalid")
 		require.Error(t, err)
 		require.EqualError(t, err, "failed to convert string to type complex128: strconv.ParseComplex: parsing \"invalid\": invalid syntax")
 		assert.Zero(t, complex128Val)
 
+		complex128PtrVal, err := FromString[*complex128]("invalid")
+		require.Error(t, err)
+		require.EqualError(t, err, "failed to convert string to type *complex128: strconv.ParseComplex: parsing \"invalid\": invalid syntax")
+		assert.Nil(t, complex128PtrVal)
+
 		boolVal, err := FromString[bool]("invalid")
 		require.Error(t, err)
 		require.EqualError(t, err, "failed to convert string to type bool: strconv.ParseBool: parsing \"invalid\": invalid syntax")
 		assert.False(t, boolVal)
+
+		boolPtrVal, err := FromString[*bool]("invalid")
+		require.Error(t, err)
+		require.EqualError(t, err, "failed to convert string to type *bool: strconv.ParseBool: parsing \"invalid\": invalid syntax")
+		assert.Nil(t, boolPtrVal)
 
 		mapVal, err := FromString[map[string]any]("invalid")
 		require.Error(t, err)
@@ -248,65 +388,129 @@ func TestFromString(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, "abcd", stringVal)
 
+		stringPtrVal, err := FromString[*string]("abcd")
+		require.NoError(t, err)
+		assert.Equal(t, "abcd", lo.FromPtr(stringPtrVal))
+
 		intVal, err := FromString[int]("1234")
 		require.NoError(t, err)
 		assert.Equal(t, 1234, intVal)
+
+		intPtrVal, err := FromString[*int]("1234")
+		require.NoError(t, err)
+		assert.Equal(t, 1234, lo.FromPtr(intPtrVal))
 
 		int8Val, err := FromString[int8]("123")
 		require.NoError(t, err)
 		assert.Equal(t, int8(123), int8Val)
 
+		int8PtrVal, err := FromString[*int8]("123")
+		require.NoError(t, err)
+		assert.Equal(t, int8(123), lo.FromPtr(int8PtrVal))
+
 		int16Val, err := FromString[int16]("1234")
 		require.NoError(t, err)
 		assert.Equal(t, int16(1234), int16Val)
+
+		int16PtrVal, err := FromString[*int16]("1234")
+		require.NoError(t, err)
+		assert.Equal(t, int16(1234), lo.FromPtr(int16PtrVal))
 
 		int32Val, err := FromString[int32]("1234")
 		require.NoError(t, err)
 		assert.Equal(t, int32(1234), int32Val)
 
+		int32PtrVal, err := FromString[*int32]("1234")
+		require.NoError(t, err)
+		assert.Equal(t, int32(1234), lo.FromPtr(int32PtrVal))
+
 		int64Val, err := FromString[int64]("1234")
 		require.NoError(t, err)
 		assert.Equal(t, int64(1234), int64Val)
+
+		int64PtrVal, err := FromString[*int64]("1234")
+		require.NoError(t, err)
+		assert.Equal(t, int64(1234), lo.FromPtr(int64PtrVal))
 
 		uintVal, err := FromString[uint]("1234")
 		require.NoError(t, err)
 		assert.Equal(t, uint(1234), uintVal)
 
+		uintPtrVal, err := FromString[*uint]("1234")
+		require.NoError(t, err)
+		assert.Equal(t, uint(1234), lo.FromPtr(uintPtrVal))
+
 		uint8Val, err := FromString[uint8]("123")
 		require.NoError(t, err)
 		assert.Equal(t, uint8(123), uint8Val)
+
+		uint8PtrVal, err := FromString[*uint8]("123")
+		require.NoError(t, err)
+		assert.Equal(t, uint8(123), lo.FromPtr(uint8PtrVal))
 
 		uint16Val, err := FromString[uint16]("1234")
 		require.NoError(t, err)
 		assert.Equal(t, uint16(1234), uint16Val)
 
+		uint16PtrVal, err := FromString[*uint16]("1234")
+		require.NoError(t, err)
+		assert.Equal(t, uint16(1234), lo.FromPtr(uint16PtrVal))
+
 		uint32Val, err := FromString[uint32]("1234")
 		require.NoError(t, err)
 		assert.Equal(t, uint32(1234), uint32Val)
+
+		uint32PtrVal, err := FromString[*uint32]("1234")
+		require.NoError(t, err)
+		assert.Equal(t, uint32(1234), lo.FromPtr(uint32PtrVal))
 
 		uint64Val, err := FromString[uint64]("1234")
 		require.NoError(t, err)
 		assert.Equal(t, uint64(1234), uint64Val)
 
+		uint64PtrVal, err := FromString[*uint64]("1234")
+		require.NoError(t, err)
+		assert.Equal(t, uint64(1234), lo.FromPtr(uint64PtrVal))
+
 		float32Val, err := FromString[float32]("1234.56")
 		require.NoError(t, err)
 		assert.InDelta(t, float32(1234.56), float32Val, 0.0001)
+
+		float32PtrVal, err := FromString[*float32]("1234.56")
+		require.NoError(t, err)
+		assert.InDelta(t, float32(1234.56), lo.FromPtr(float32PtrVal), 0.0001)
 
 		float64Val, err := FromString[float64]("1234.56")
 		require.NoError(t, err)
 		assert.InDelta(t, float64(1234.56), float64Val, 0.0001)
 
+		float64PtrVal, err := FromString[*float64]("1234.56")
+		require.NoError(t, err)
+		assert.InDelta(t, float64(1234.56), lo.FromPtr(float64PtrVal), 0.0001)
+
 		complex64Val, err := FromString[complex64]("1234.56")
 		require.NoError(t, err)
 		assert.Equal(t, complex64(1234.56), complex64Val)
+
+		complex64PtrVal, err := FromString[*complex64]("1234.56")
+		require.NoError(t, err)
+		assert.Equal(t, complex64(1234.56), lo.FromPtr(complex64PtrVal))
 
 		complex128Val, err := FromString[complex128]("1234.56")
 		require.NoError(t, err)
 		assert.Equal(t, complex128(1234.56), complex128Val)
 
+		complex128PtrVal, err := FromString[*complex128]("1234.56")
+		require.NoError(t, err)
+		assert.Equal(t, complex128(1234.56), lo.FromPtr(complex128PtrVal))
+
 		boolVal, err := FromString[bool]("true")
 		require.NoError(t, err)
 		assert.True(t, boolVal)
+
+		boolPtrVal, err := FromString[*bool]("true")
+		require.NoError(t, err)
+		assert.True(t, lo.FromPtr(boolPtrVal))
 
 		bytesVal, err := FromString[[]byte]("abcd")
 		require.NoError(t, err)

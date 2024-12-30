@@ -13,13 +13,13 @@ import (
 	"github.com/samber/mo"
 )
 
-func openai(c echo.Context, options FullOptions) mo.Result[any] {
-	values := Options{
-		Model:          options.Model,
-		Input:          options.Input,
-		Voice:          options.Voice,
-		ResponseFormat: options.ResponseFormat,
-		Speed:          options.Speed,
+func openai(c echo.Context, options mo.Option[SpeechRequestOptions]) mo.Result[any] {
+	values := OpenAISpeechRequestOptions{
+		Model:          options.MustGet().Model,
+		Input:          options.MustGet().Input,
+		Voice:          options.MustGet().Voice,
+		ResponseFormat: options.MustGet().ResponseFormat,
+		Speed:          options.MustGet().Speed,
 	}
 
 	payload := lo.Must(json.Marshal(values))
