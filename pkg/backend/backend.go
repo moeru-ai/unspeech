@@ -33,7 +33,7 @@ type OpenAISpeechRequestOptions struct {
 	Speed int `json:"speed,omitempty"`
 
 	// Extension: allows you to add custom content to body.
-	ExtraBody map[string]interface{} `json:"extra_body,omitempty"`
+	ExtraBody map[string]any `json:"extra_body,omitempty"`
 }
 
 type SpeechRequestOptions struct {
