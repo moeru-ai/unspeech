@@ -6,6 +6,7 @@ require (
 	github.com/evanphx/json-patch/v5 v5.9.0
 	github.com/golang-module/carbon v1.7.3
 	github.com/labstack/echo/v4 v4.13.3
+	github.com/lmittmann/tint v1.0.6
 	github.com/nekomeowww/fo v1.4.0
 	github.com/samber/lo v1.47.0
 	github.com/samber/mo v1.13.0

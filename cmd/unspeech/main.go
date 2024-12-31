@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/labstack/echo/v4"
+	"github.com/lmittmann/tint"
 	slogecho "github.com/samber/slog-echo"
 	"github.com/spf13/cobra"
 
@@ -23,7 +24,7 @@ func main() {
 
 			e.HideBanner = true
 
-			e.Use(slogecho.New(slog.New(slog.NewTextHandler(os.Stdout, nil))))
+			e.Use(slogecho.New(slog.New(tint.NewHandler(os.Stdout, nil))))
 			e.Use(middlewares.CORS())
 			e.Use(middlewares.HandleErrors())
 
