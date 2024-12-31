@@ -31,6 +31,9 @@ type OpenAISpeechRequestOptions struct {
 	// Select a value from 0.25 to 4.0.
 	// 1.0 is the default.
 	Speed int `json:"speed,omitempty"`
+
+	// Extension: allows you to add custom content to body.
+	ExtraBody map[string]interface{} `json:"extra_body,omitempty"`
 }
 
 type SpeechRequestOptions struct {

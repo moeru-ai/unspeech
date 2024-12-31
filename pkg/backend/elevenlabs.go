@@ -23,11 +23,20 @@ func elevenlabs(c echo.Context, options mo.Option[SpeechRequestOptions]) mo.Resu
 	patchedPayload := jsonpatch.ApplyPatches(
 		options.MustGet().body.OrElse(new(bytes.Buffer)).Bytes(),
 		mo.Some(jsonpatch.ApplyOptions{AllowMissingPathOnRemove: true}),
-		jsonpatch.NewRemove("/model"),
-		jsonpatch.NewRemove("/voice"),
-		jsonpatch.NewRemove("/input"),
-		jsonpatch.NewAdd("/text", options.MustGet().Input),
-		jsonpatch.NewAdd("/model_id", options.MustGet().Model),
+		append(
+			[]mo.Option[jsonpatch.JSONPatchOperationObject]{
+				jsonpatch.NewRemove("/model"),
+				jsonpatch.NewRemove("/voice"),
+				jsonpatch.NewRemove("/input"),
+				jsonpatch.NewAdd("/text", options.MustGet().Input),
+				jsonpatch.NewAdd("/model_id", options.MustGet().Model),
+			},
+			lo.Map(
+				lo.Entries(options.MustGet().ExtraBody),
+				func(item lo.Entry[string, interface{}], index int) mo.Option[jsonpatch.JSONPatchOperationObject] {
+					return jsonpatch.NewAdd(strings.Join([]string{"/", item.Key}, ""), item.Value)
+				})...,
+		)...,
 	)
 	if patchedPayload.IsError() {
 		return mo.Err[any](apierrors.NewErrInternal().WithDetail(patchedPayload.Error().Error()).WithCaller())
