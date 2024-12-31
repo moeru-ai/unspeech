@@ -33,7 +33,7 @@ func elevenlabs(c echo.Context, options mo.Option[SpeechRequestOptions]) mo.Resu
 			},
 			lo.Map(
 				lo.Entries(options.MustGet().ExtraBody),
-				func(item lo.Entry[string, interface{}], index int) mo.Option[jsonpatch.JSONPatchOperationObject] {
+				func(item lo.Entry[string, any], index int) mo.Option[jsonpatch.JSONPatchOperationObject] {
 					return jsonpatch.NewAdd(strings.Join([]string{"/", item.Key}, ""), item.Value)
 				})...,
 		)...,
