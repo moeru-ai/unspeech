@@ -1,7 +1,11 @@
 package main
 
 import (
+	"log/slog"
+	"os"
+
 	"github.com/labstack/echo/v4"
+	slogecho "github.com/samber/slog-echo"
 	"github.com/spf13/cobra"
 
 	"github.com/moeru-ai/unspeech/internal/middlewares"
@@ -19,6 +23,7 @@ func main() {
 
 			e.HideBanner = true
 
+			e.Use(slogecho.New(slog.New(slog.NewTextHandler(os.Stdout, nil))))
 			e.Use(middlewares.CORS())
 			e.Use(middlewares.HandleErrors())
 
