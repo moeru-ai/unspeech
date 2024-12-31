@@ -11,6 +11,7 @@ import (
 	"github.com/moeru-ai/unspeech/pkg/apierrors"
 	"github.com/moeru-ai/unspeech/pkg/utils"
 	"github.com/moeru-ai/unspeech/pkg/utils/jsonpatch"
+	"github.com/samber/lo"
 	"github.com/samber/mo"
 	"github.com/vincent-petithory/dataurl"
 )
@@ -20,10 +21,19 @@ func koemotion(c echo.Context, options mo.Option[SpeechRequestOptions]) mo.Resul
 	patchedPayload := jsonpatch.ApplyPatches(
 		options.MustGet().body.OrElse(new(bytes.Buffer)).Bytes(),
 		mo.Some(jsonpatch.ApplyOptions{AllowMissingPathOnRemove: true}),
-		jsonpatch.NewRemove("/model"),
-		jsonpatch.NewRemove("/voice"),
-		jsonpatch.NewRemove("/input"),
-		jsonpatch.NewAdd("/text", options.MustGet().Input),
+		append(
+			[]mo.Option[jsonpatch.JSONPatchOperationObject]{
+				jsonpatch.NewRemove("/model"),
+				jsonpatch.NewRemove("/voice"),
+				jsonpatch.NewRemove("/input"),
+				jsonpatch.NewAdd("/text", options.MustGet().Input),
+			},
+			lo.Map(
+				lo.Entries(options.MustGet().ExtraBody),
+				func(item lo.Entry[string, any], index int) mo.Option[jsonpatch.JSONPatchOperationObject] {
+					return jsonpatch.NewAdd(strings.Join([]string{"/", item.Key}, ""), item.Value)
+				})...,
+		)...,
 	)
 	if patchedPayload.IsError() {
 		return mo.Err[any](apierrors.NewErrInternal().WithDetail(patchedPayload.Error().Error()).WithCaller())
