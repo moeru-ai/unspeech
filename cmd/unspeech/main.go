@@ -20,11 +20,12 @@ func main() {
 		// TODO: set version
 		Version: "0.0.0",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			e := echo.New()
+			slog.SetDefault(slog.New(tint.NewHandler(os.Stdout, nil)))
 
+			e := echo.New()
 			e.HideBanner = true
 
-			e.Use(slogecho.New(slog.New(tint.NewHandler(os.Stdout, nil))))
+			e.Use(slogecho.New(slog.Default()))
 			e.Use(middlewares.CORS())
 			e.Use(middlewares.HandleErrors())
 
