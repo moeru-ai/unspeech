@@ -1,7 +1,12 @@
 package main
 
 import (
+	"log/slog"
+	"os"
+
 	"github.com/labstack/echo/v4"
+	"github.com/lmittmann/tint"
+	slogecho "github.com/samber/slog-echo"
 	"github.com/spf13/cobra"
 
 	"github.com/moeru-ai/unspeech/internal/middlewares"
@@ -15,10 +20,12 @@ func main() {
 		// TODO: set version
 		Version: "0.0.0",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			e := echo.New()
+			slog.SetDefault(slog.New(tint.NewHandler(os.Stdout, nil)))
 
+			e := echo.New()
 			e.HideBanner = true
 
+			e.Use(slogecho.New(slog.Default()))
 			e.Use(middlewares.CORS())
 			e.Use(middlewares.HandleErrors())
 
