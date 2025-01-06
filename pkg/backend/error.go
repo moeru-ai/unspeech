@@ -38,7 +38,7 @@ func NewJSONResponseError(statusCode int, responseBody io.Reader) mo.Result[*JSO
 	errorMap := utils.GetByJSONPath[map[string]any](resp.bodyParsed, "{ .error }")
 	errorStrFromErrorMap := utils.GetByJSONPath[string](errorMap, "{ .message }")
 
-	resp.Message = lo.Must(lo.Coalesce(errorMessage, errorStr, errorStrFromErrorMap, "Unknown error"))
+	resp.Message = lo.Must(lo.Coalesce(errorMessage, errorStr, errorStrFromErrorMap, string(lo.Must(json.Marshal(resp.bodyParsed)))))
 
 	return mo.Ok(resp)
 }
