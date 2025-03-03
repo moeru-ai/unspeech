@@ -9,6 +9,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/moeru-ai/unspeech/pkg/apierrors"
+	"github.com/moeru-ai/unspeech/pkg/backend/types"
 	"github.com/moeru-ai/unspeech/pkg/utils"
 	"github.com/moeru-ai/unspeech/pkg/utils/jsonpatch"
 	"github.com/samber/lo"
@@ -16,10 +17,10 @@ import (
 	"github.com/vincent-petithory/dataurl"
 )
 
-func koemotion(c echo.Context, options mo.Option[SpeechRequestOptions]) mo.Result[any] {
+func koemotion(c echo.Context, options mo.Option[types.SpeechRequestOptions]) mo.Result[any] {
 	// https://developers.rinna.co.jp/api-details#api=koemotion&operation=infer
 	patchedPayload := jsonpatch.ApplyPatches(
-		options.MustGet().body.OrElse(new(bytes.Buffer)).Bytes(),
+		options.MustGet().AsBuffer().OrElse(new(bytes.Buffer)).Bytes(),
 		mo.Some(jsonpatch.ApplyOptions{AllowMissingPathOnRemove: true}),
 		append(
 			[]mo.Option[jsonpatch.JSONPatchOperationObject]{

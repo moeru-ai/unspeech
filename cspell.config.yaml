@@ -4,6 +4,8 @@ dictionaryDefinitions: []
 dictionaries: []
 words:
   - apierrors
+  - canonicalheader
+  - chardata
   - containedctx
   - contextcheck
   - cyclop
@@ -13,6 +15,7 @@ words:
   - Detailf
   - dupl
   - durationcheck
+  - eastasia
   - elevenlabs
   - errcheck
   - errchkjson
@@ -52,6 +55,7 @@ words:
   - maintidx
   - misspell
   - moeru
+  - mulaw
   - musttag
   - nakedret
   - nestif
@@ -69,6 +73,7 @@ words:
   - Rinna
   - samber
   - slogecho
+  - ssml
   - staticcheck
   - strconv
   - tagalign
@@ -76,6 +81,7 @@ words:
   - testableexamples
   - testpackage
   - Traceparent
+  - truesilk
   - typecheck
   - unconvert
   - unparam

@@ -9,12 +9,13 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/moeru-ai/unspeech/pkg/apierrors"
+	"github.com/moeru-ai/unspeech/pkg/backend/types"
 	"github.com/samber/lo"
 	"github.com/samber/mo"
 )
 
-func openai(c echo.Context, options mo.Option[SpeechRequestOptions]) mo.Result[any] {
-	values := OpenAISpeechRequestOptions{
+func openai(c echo.Context, options mo.Option[types.SpeechRequestOptions]) mo.Result[any] {
+	values := types.OpenAISpeechRequestOptions{
 		Model:          options.MustGet().Model,
 		Input:          options.MustGet().Input,
 		Voice:          options.MustGet().Voice,
