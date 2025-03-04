@@ -7,6 +7,7 @@
 unSpeech lets you use various online TTS with OpenAI-compatible API.
 
 - [OpenAI](https://platform.openai.com/docs/api-reference/audio/createSpeech)
+- [Microsoft / Azure AI Speech service](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/text-to-speech)
 - [ElevenLabs](https://elevenlabs.io/docs/api-reference/text-to-speech/convert)
 - [Koemotion (by Rinna)](https://koemotion.rinna.co.jp/)
 
@@ -78,6 +79,10 @@ Looking for something like unSpeech, but for local TTS? check it out:
 Or to use free Edge TTS:
 
 - [travisvn/openai-edge-tts](https://github.com/travisvn/openai-edge-tts)
+
+## Similar Projects
+
+- [orate](https://github.com/haydenbleasel/orate)
 
 ## License
 
