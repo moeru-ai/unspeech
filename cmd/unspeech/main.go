@@ -29,7 +29,11 @@ func main() {
 			e.Use(middlewares.CORS())
 			e.Use(middlewares.HandleErrors())
 
+			// OpenAI Compatible API
 			e.POST("/v1/audio/speech", ho.MonadEcho1(backend.Speech))
+
+			// unSpeech API
+			e.POST("/api/voices", ho.MonadEcho1(backend.Voices))
 
 			e.RouteNotFound("/*", ho.MonadEcho1(middlewares.NotFound))
 
