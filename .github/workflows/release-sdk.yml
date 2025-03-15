@@ -16,20 +16,16 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - uses: pnpm/action-setup@v4
         with:
           run_install: false
+          package_json_file: ./sdk/typescript/package.json
       - uses: actions/setup-node@v4
         with:
           cache: pnpm
           node-version: latest
           registry-url: https://registry.npmjs.org
       - run: pnpm install --frozen-lockfile
-      - run: pnpm dlx changelogithub
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: pnpm build
       - run: pnpm publish --no-git-checks --access public
         env:
