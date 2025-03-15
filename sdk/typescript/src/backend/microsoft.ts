@@ -1,6 +1,6 @@
 import type { SpeechProviderWithExtraOptions } from '@xsai-ext/shared-providers'
 
-import { createMetadataProvider, merge } from '@xsai-ext/shared-providers'
+import { merge } from '@xsai-ext/shared-providers'
 import { objCamelToSnake } from '@xsai/shared'
 
 import type { UnSpeechOptions, VoiceProviderWithExtraOptions } from '../types'
@@ -168,7 +168,6 @@ export const createUnMicrosoft = (apiKey: string, baseURL = 'http://localhost:59
   }
 
   return merge(
-    createMetadataProvider('unspeech/microsoft'),
     speechProvider,
     voiceProvider,
   )

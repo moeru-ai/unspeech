@@ -1,4 +1,4 @@
-import { createMetadataProvider, createSpeechProviderWithExtraOptions, merge } from '@xsai-ext/shared-providers'
+import { createSpeechProviderWithExtraOptions, merge } from '@xsai-ext/shared-providers'
 
 import { MicrosoftRegions } from './microsoft'
 import { UnSpeechOptions, VoiceProviderWithExtraOptions } from '../types'
@@ -41,7 +41,6 @@ export const createUnSpeech = (apiKey: string, baseURL = 'http://localhost:5933/
   }
 
   return merge(
-  createMetadataProvider('unspeech'),
   createSpeechProviderWithExtraOptions<
     | `elevenlabs/${string}`
     | `koemotion/${string}`
