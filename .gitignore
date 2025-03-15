@@ -31,3 +31,7 @@ go.work.sum
 
 # build result
 /result
+
+node_modules
+.eslintcache
+sdk/typescript/pkg/

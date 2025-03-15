@@ -5,6 +5,7 @@ dictionaries: []
 words:
   - apierrors
   - Apim
+  - bumpp
   - canonicalheader
   - chardata
   - cognitiveservices
@@ -48,6 +49,7 @@ words:
   - gosimple
   - govet
   - hreflang
+  - importantimport
   - ineffassign
   - ireturn
   - jsonpatch
@@ -77,6 +79,7 @@ words:
   - Rinna
   - samber
   - slogecho
+  - sonarjs
   - ssml
   - staticcheck
   - strconv
