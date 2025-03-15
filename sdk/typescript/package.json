@@ -1,0 +1,56 @@
+{
+  "name": "unspeech",
+  "type": "module",
+  "version": "1.0.0",
+  "packageManager": "pnpm@10.6.3",
+  "description": "Client SDK for unSpeech",
+  "author": "Moeru AI",
+  "license": "MIT",
+  "homepage": "https://github.com/moeru-ai/unspeech",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/moeru-ai/unspeech.git",
+    "directory": "sdk/typescript"
+  },
+  "bugs": "https://github.com/moeru-ai/unspeech/issues",
+  "sideEffects": false,
+  "exports": "./src/index.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "./package.json": "./package.json"
+    },
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts"
+  },
+  "scripts": {
+    "build": "tsup",
+    "bump": "bumpp",
+    "lint": "eslint --cache .",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@xsai-ext/shared-providers": "^0.1.3",
+    "@xsai/shared": "^0.1.3"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^4.10.1",
+    "@importantimport/eslint-config": "1.0.0-beta.2",
+    "@importantimport/tsconfig": "1.0.0-beta.2",
+    "@types/eslint": "^9.6.1",
+    "@types/node": "^22.13.10",
+    "bumpp": "^10.1.0",
+    "eslint": "^9.22.0",
+    "jiti": "^2.4.2",
+    "tsup": "^8.4.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2",
+    "vitest": "^3.0.8"
+  }
+}
