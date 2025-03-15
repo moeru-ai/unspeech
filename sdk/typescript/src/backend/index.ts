@@ -12,7 +12,7 @@ export const createUnSpeech = (apiKey: string, baseURL = 'http://localhost:5933/
     {
   backend: 'elevenlabs' | 'koemotion' | 'openai'
 } | {
-  backend: 'microsoft'
+  backend: 'microsoft' | 'azure'
   region: MicrosoftRegions | string
 }
   > = {
@@ -24,9 +24,9 @@ export const createUnSpeech = (apiKey: string, baseURL = 'http://localhost:5933/
         baseURL = baseURL.slice(0, -2)
       }
 
-      if (options?.backend === 'microsoft') {
+      if (options?.backend === 'microsoft' || options?.backend === 'azure') {
         return {
-          query: `region=${options.region}&provider=microsoft`,
+          query: `region=${options.region}&provider=${options.backend}`,
           baseURL,
           apiKey,
         }
