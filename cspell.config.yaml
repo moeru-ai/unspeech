@@ -4,8 +4,10 @@ dictionaryDefinitions: []
 dictionaries: []
 words:
   - apierrors
+  - Apim
   - canonicalheader
   - chardata
+  - cognitiveservices
   - containedctx
   - contextcheck
   - cyclop
@@ -49,6 +51,8 @@ words:
   - ineffassign
   - ireturn
   - jsonpatch
+  - kbitrate
+  - kbps
   - koemotion
   - labstack
   - lll
