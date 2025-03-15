@@ -1,4 +1,4 @@
-package backend
+package koemotion
 
 import (
 	"bytes"
@@ -17,7 +17,7 @@ import (
 	"github.com/vincent-petithory/dataurl"
 )
 
-func koemotion(c echo.Context, options mo.Option[types.SpeechRequestOptions]) mo.Result[any] {
+func HandleSpeech(c echo.Context, options mo.Option[types.SpeechRequestOptions]) mo.Result[any] {
 	// https://developers.rinna.co.jp/api-details#api=koemotion&operation=infer
 	patchedPayload := jsonpatch.ApplyPatches(
 		options.MustGet().AsBuffer().OrElse(new(bytes.Buffer)).Bytes(),
@@ -69,11 +69,11 @@ func koemotion(c echo.Context, options mo.Option[types.SpeechRequestOptions]) mo
 		case strings.HasPrefix(res.Header.Get("Content-Type"), "application/json"):
 			return mo.Err[any](apierrors.
 				NewUpstreamError(res.StatusCode).
-				WithDetail(NewJSONResponseError(res.StatusCode, res.Body).OrEmpty().Error()))
+				WithDetail(utils.NewJSONResponseError(res.StatusCode, res.Body).OrEmpty().Error()))
 		case strings.HasPrefix(res.Header.Get("Content-Type"), "text/"):
 			return mo.Err[any](apierrors.
 				NewUpstreamError(res.StatusCode).
-				WithDetail(NewTextResponseError(res.StatusCode, res.Body).OrEmpty().Error()))
+				WithDetail(utils.NewTextResponseError(res.StatusCode, res.Body).OrEmpty().Error()))
 		default:
 			slog.Warn("unknown upstream error with unknown Content-Type",
 				slog.Int("status", res.StatusCode),

@@ -200,7 +200,7 @@ func formatAsSSML(text string, lang string, gender string, voiceName string) str
 </speak>`, lang, lang, gender, voiceName, text)
 }
 
-func Handle(c echo.Context, options mo.Option[types.SpeechRequestOptions]) mo.Result[any] {
+func HandleSpeech(c echo.Context, options mo.Option[types.SpeechRequestOptions]) mo.Result[any] {
 	opts := options.MustGet()
 
 	// Text to speech API reference (REST) - Speech service - Azure AI services | Microsoft Learn

@@ -1,10 +1,9 @@
-package backend
+package utils
 
 import (
 	"encoding/json"
 	"io"
 
-	"github.com/moeru-ai/unspeech/pkg/utils"
 	"github.com/samber/lo"
 	"github.com/samber/mo"
 )
@@ -33,10 +32,10 @@ func NewJSONResponseError(statusCode int, responseBody io.Reader) mo.Result[*JSO
 		return mo.Err[*JSONResponseError](err)
 	}
 
-	errorMessage := utils.GetByJSONPath[string](resp.bodyParsed, "{ .message }")
-	errorStr := utils.GetByJSONPath[string](resp.bodyParsed, "{ .error }")
-	errorMap := utils.GetByJSONPath[map[string]any](resp.bodyParsed, "{ .error }")
-	errorStrFromErrorMap := utils.GetByJSONPath[string](errorMap, "{ .message }")
+	errorMessage := GetByJSONPath[string](resp.bodyParsed, "{ .message }")
+	errorStr := GetByJSONPath[string](resp.bodyParsed, "{ .error }")
+	errorMap := GetByJSONPath[map[string]any](resp.bodyParsed, "{ .error }")
+	errorStrFromErrorMap := GetByJSONPath[string](errorMap, "{ .message }")
 
 	resp.Message = lo.Must(lo.Coalesce(errorMessage, errorStr, errorStrFromErrorMap, string(lo.Must(json.Marshal(resp.bodyParsed)))))
 
