@@ -159,6 +159,14 @@ func HandleVoices(c echo.Context, options mo.Option[types.VoicesRequestOptions])
 		return mo.Err[any](apierrors.NewErrInternal().WithError(err).WithCaller())
 	}
 
+	if c.Request().Header.Get("Authorization") != "" {
+		//nolint:canonicalheader
+		req.Header.Set("xi-api-key", strings.TrimPrefix(
+			c.Request().Header.Get("Authorization"),
+			"Bearer ",
+		))
+	}
+
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return mo.Err[any](apierrors.NewErrBadGateway().WithError(err).WithCaller())
