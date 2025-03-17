@@ -99,5 +99,6 @@ words:
   - whitespace
   - wrapcheck
   - wsl
+  - xsai
 ignoreWords: []
 import: []

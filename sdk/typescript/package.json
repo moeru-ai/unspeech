@@ -1,7 +1,7 @@
 {
   "name": "unspeech",
   "type": "module",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "packageManager": "pnpm@10.6.3",
   "description": "Client SDK for unSpeech",
   "author": "Moeru AI",
