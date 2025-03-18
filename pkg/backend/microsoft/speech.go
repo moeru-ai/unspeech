@@ -267,7 +267,29 @@ func HandleSpeech(c echo.Context, options mo.Option[types.SpeechRequestOptions])
 	req.Header.Set("Content-Type", "application/ssml+xml")
 	req.Header.Set("X-Microsoft-OutputFormat", format) //nolint:canonicalheader
 
-	res, err := http.DefaultClient.Do(req)
+	// For things like:
+	//
+	// HTTP/1.1 403 Starting September 1st, 2021 standard voices will no longer be supported for new users. Please use
+	// neural voices for your speech synthesis request on cloud or on prem. To make the change please update the voice
+	// name in your speech synthesis request to the supported neural voice names in chosen languages. Please refer to
+	// https://azure.microsoft.com/en-us/updates/we-re-retiring-the-standard-voice-on-31-august-2024/
+	//
+	// And for the implementation of HTTP2 (haven't checked the RFC yet), the status text will be converted automatically:
+	//
+	// Source code: https://cs.opensource.google/go/go/+/master:src/net/http/h2_bundle.go;l=9670
+	//
+	// This behavior aligns the same with curl when requesting over HTTP2, but both of them will return the exact
+	// status text as it is from upstream when using HTTP/1.1.
+	//
+	// The workaround here is to use a standalone HTTP Client with TLSNextProto set to non-nil to force the transport
+	// not to upgrade the connection from HTTP1.1 to HTTP2.
+	//
+	// TODO: While currently http2 package is outside of the std, but Golang team is working on moving http2 package
+	// into std, for future compatibility, we should ask Microsoft not to return error messages within the status text
+	// or explicitly tell client it's not possible to upgrade HTTP2, either way works.
+	//
+	// For migration, take a look at: [net/http: move HTTP/2 into std](https://github.com/golang/go/issues/67810)
+	res, err := httpClient.Do(req)
 	if err != nil {
 		return mo.Err[any](apierrors.NewErrBadGateway().WithDetail(err.Error()).WithError(err).WithCaller())
 	}
@@ -275,7 +297,10 @@ func HandleSpeech(c echo.Context, options mo.Option[types.SpeechRequestOptions])
 	defer func() { _ = res.Body.Close() }()
 
 	if res.StatusCode >= 400 && res.StatusCode < 600 {
-		return mo.Err[any](apierrors.NewUpstreamError(res.StatusCode).WithDetail(res.Status))
+		resError := handleResponseError(res)
+		if resError.IsError() {
+			return resError
+		}
 	}
 
 	return mo.Ok[any](c.Stream(http.StatusOK, res.Header.Get("Content-Type"), res.Body))
