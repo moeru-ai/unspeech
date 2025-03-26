@@ -10,7 +10,7 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 defaults:
   run:
-    working_directory: ./sdk/typescript
+    working-directory: ./sdk/typescript
 
 jobs:
   publish:
