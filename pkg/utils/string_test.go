@@ -45,7 +45,7 @@ func TestFromString(t *testing.T) {
 	t.Run("Empty", func(t *testing.T) {
 		stringVal, err := FromString[string]("")
 		require.NoError(t, err)
-		assert.Equal(t, "", stringVal)
+		assert.Empty(t, stringVal)
 
 		stringPtrVal, err := FromString[*string]("")
 		require.NoError(t, err)
@@ -555,7 +555,7 @@ func TestFromStringOrEmpty(t *testing.T) {
 		assert.Nil(t, FromStringOrEmpty[[]string]("abcd"))
 		assert.Empty(t, FromStringOrEmpty[[]string]("abcd"))
 		assert.Empty(t, FromStringOrEmpty[struct{}]("abcd"))
-		assert.Equal(t, "", FromStringOrEmpty[string](""))
+		assert.Empty(t, FromStringOrEmpty[string](""))
 		assert.Zero(t, FromStringOrEmpty[int](""))
 		assert.Zero(t, FromStringOrEmpty[int8](""))
 		assert.Zero(t, FromStringOrEmpty[int16](""))
@@ -573,7 +573,7 @@ func TestFromStringOrEmpty(t *testing.T) {
 		assert.False(t, FromStringOrEmpty[bool](""))
 		assert.Empty(t, FromStringOrEmpty[[]byte](""))
 		assert.Empty(t, FromStringOrEmpty[[]rune](""))
-		assert.Equal(t, "", FromStringOrEmpty[*strings.Builder]("").String())
+		assert.Empty(t, FromStringOrEmpty[*strings.Builder]("").String())
 	})
 
 	t.Run("Invalid", func(t *testing.T) {

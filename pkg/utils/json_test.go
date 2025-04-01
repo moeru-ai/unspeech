@@ -86,7 +86,7 @@ func TestJSONPathExecute(t *testing.T) {
 				"code": nil,
 			}
 
-			assert.Equal(t, "", GetByJSONPath[string](payload, "{ .code }"))
+			assert.Empty(t, GetByJSONPath[string](payload, "{ .code }"))
 		})
 
 		t.Run("nil string", func(t *testing.T) {
@@ -100,7 +100,7 @@ func TestJSONPathExecute(t *testing.T) {
 				Code: nil,
 			}
 
-			assert.Equal(t, "", GetByJSONPath[string](p, "{ .code }"))
+			assert.Empty(t, GetByJSONPath[string](p, "{ .code }"))
 		})
 	})
 }
