@@ -1,13 +1,15 @@
 module github.com/moeru-ai/unspeech
 
-go 1.23.2
+go 1.24.0
+
+toolchain go1.24.1
 
 require (
 	github.com/evanphx/json-patch/v5 v5.9.11
 	github.com/golang-module/carbon v1.7.3
 	github.com/labstack/echo/v4 v4.13.3
 	github.com/lmittmann/tint v1.0.7
-	github.com/nekomeowww/xo v1.15.2
+	github.com/nekomeowww/xo v1.16.0
 	github.com/samber/lo v1.49.1
 	github.com/samber/mo v1.13.0
 	github.com/samber/slog-echo v1.16.1

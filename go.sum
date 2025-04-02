@@ -61,6 +61,8 @@ github.com/mitchellh/go-homedir v1.1.0/go.mod h1:SfyaCUpYCn1Vlf4IUYiD9fPX4A5wJrk
 github.com/mitchellh/mapstructure v1.1.2/go.mod h1:FVVH3fgwuzCH5S8UJGiWEs2h04kUh9fWfEaFds41c1Y=
 github.com/nekomeowww/xo v1.15.2 h1:Lb7lHa57rIbAz6bsUxSpVIqzkE5AddfwJy0AGRHOkQc=
 github.com/nekomeowww/xo v1.15.2/go.mod h1:LLrU3iZPnGdT3b4bOSb6Ir+GtMJAYyeinhuNutFM8io=
+github.com/nekomeowww/xo v1.16.0 h1:+iyBqTfEKRCZz5NruKeruZ0cOwgrz+h32YA/OJWQoyQ=
+github.com/nekomeowww/xo v1.16.0/go.mod h1:uPuIqPtie41ex0mzxpEzueQbCw6kIH/VCV/l3OdvBTw=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e h1:fD57ERR4JtEqsWbfPhv4DMiApHyliiK5xCTNVSPiaAs=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e/go.mod h1:zD1mROLANZcx1PVRCS0qkT7pwLkGfwJo4zjcN/Tysno=
 github.com/pelletier/go-toml v1.2.0/go.mod h1:5z9KED0ma1S8pY6P1sdut58dfprrGBbd/94hg7ilaic=
