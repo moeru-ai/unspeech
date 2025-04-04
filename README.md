@@ -13,25 +13,6 @@ unSpeech lets you use various online TTS with OpenAI-compatible API.
 
 ## Getting Started
 
-### Build
-
-unSpeech is not released yet, you need to build it from source code:
-
-> require `go` 1.23+
-
-```bash
-git clone https://github.com/moeru-ai/unspeech.git
-cd unspeech
-go build -o ./result/unspeech ./cmd/unspeech
-```
-
-### Run
-
-```bash
-# http server started on [::]:5933
-./result/unspeech
-```
-
 ### Client
 
 You can use unSpeech with most OpenAI clients.
@@ -66,6 +47,23 @@ const speech = await generateSpeech({
   model: 'elevenlabs/eleven_multilingual_v2',
   voice: '9BWtsMINqrJLrRacOk9x',
 })
+```
+
+### Build
+
+> require `go` 1.24+
+
+```bash
+git clone https://github.com/moeru-ai/unspeech.git
+cd unspeech
+go build -o ./result/unspeech ./cmd/unspeech
+```
+
+### Run
+
+```bash
+# http server started on [::]:5933
+./result/unspeech
 ```
 
 ## Related Projects
