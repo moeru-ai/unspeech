@@ -1,0 +1,302 @@
+[
+  {
+    "name": "龙婉",
+    "preview_audio_url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20240830/dzkngm/%E9%BE%99%E5%A9%89.mp3",
+    "model": "cosyvoice-v1",
+    "voice": "longwan",
+    "scenarios": [
+      [
+        "语音助手",
+        "导航播报",
+        "聊天数字人"
+      ]
+    ],
+    "language": "中文普通话",
+    "bitrate": "22050",
+    "format": "mp3"
+  },
+  {
+    "name": "龙橙",
+    "preview_audio_url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20240830/ggjwfl/%E9%BE%99%E6%A9%99.wav",
+    "model": "cosyvoice-v1",
+    "voice": "longcheng",
+    "scenarios": [
+      [
+        "语音助手",
+        "导航播报",
+        "聊天数字人"
+      ]
+    ],
+    "language": "中文普通话",
+    "bitrate": "22050",
+    "format": "mp3"
+  },
+  {
+    "name": "龙华",
+    "preview_audio_url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20240830/jpjtvy/%E9%BE%99%E5%8D%8E.wav",
+    "model": "cosyvoice-v1",
+    "voice": "longhua",
+    "scenarios": [
+      [
+        "语音助手",
+        "导航播报",
+        "聊天数字人"
+      ]
+    ],
+    "language": "中文普通话",
+    "bitrate": "22050",
+    "format": "mp3"
+  },
+  {
+    "name": "龙小淳",
+    "preview_audio_url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20240624/rlfvcd/%E9%BE%99%E5%B0%8F%E6%B7%B3.mp3",
+    "model": "cosyvoice-v1",
+    "voice": "longxiaochun",
+    "scenarios": [
+      [
+        "语音助手",
+        "导航播报",
+        "聊天数字人"
+      ]
+    ],
+    "language": "中文+英文",
+    "bitrate": "22050",
+    "format": "mp3"
+  },
+  {
+    "name": "龙小夏",
+    "preview_audio_url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20240624/wzywtu/%E9%BE%99%E5%B0%8F%E5%A4%8F.mp3",
+    "model": "cosyvoice-v1",
+    "voice": "longxiaoxia",
+    "scenarios": [
+      "语音助手",
+      "聊天数字人"
+    ],
+    "language": "中文",
+    "bitrate": "22050",
+    "format": "mp3"
+  },
+  {
+    "name": "龙小诚",
+    "preview_audio_url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20240624/xrqksx/%E9%BE%99%E5%B0%8F%E8%AF%9A.mp3",
+    "model": "cosyvoice-v1",
+    "voice": "longxiaocheng",
+    "scenarios": [
+      "语音助手",
+      "导航播报",
+      "聊天数字人"
+    ],
+    "language": "中文+英文",
+    "bitrate": "22050",
+    "format": "mp3"
+  },
+  {
+    "name": "龙小白",
+    "preview_audio_url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20240624/vusvze/%E9%BE%99%E5%B0%8F%E7%99%BD.mp3",
+    "model": "cosyvoice-v1",
+    "voice": "longxiaobai",
+    "scenarios": [
+      "聊天数字人",
+      "有声书",
+      "语音助手"
+    ],
+    "language": "中文",
+    "bitrate": "22050",
+    "format": "mp3"
+  },
+  {
+    "name": "龙老铁",
+    "preview_audio_url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20240624/pfsfir/%E9%BE%99%E8%80%81%E9%93%81.mp3",
+    "model": "cosyvoice-v1",
+    "voice": "longlaotie",
+    "scenarios": [
+      "新闻播报",
+      "有声书",
+      "语音助手",
+      "直播带货",
+      "导航播报"
+    ],
+    "language": "中文东北口音",
+    "bitrate": "22050",
+    "format": "mp3"
+  },
+  {
+    "name": "龙书",
+    "preview_audio_url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20240624/azcerd/%E9%BE%99%E4%B9%A6.mp3",
+    "model": "cosyvoice-v1",
+    "voice": "longshu",
+    "scenarios": [
+      "有声书",
+      "语音助手",
+      "导航播报",
+      "新闻播报",
+      "智能客服"
+    ],
+    "language": "中文",
+    "bitrate": "22050",
+    "format": "mp3"
+  },
+  {
+    "name": "龙硕",
+    "preview_audio_url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20240624/lcykpl/%E9%BE%99%E7%A1%95.mp3",
+    "model": "cosyvoice-v1",
+    "voice": "longshuo",
+    "scenarios": [
+      "语音助手",
+      "导航播报",
+      "新闻播报",
+      "客服催收"
+    ],
+    "language": "中文",
+    "bitrate": "22050",
+    "format": "mp3"
+  },
+  {
+    "name": "龙婧",
+    "preview_audio_url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20240624/ozkbmb/%E9%BE%99%E5%A9%A7.mp3",
+    "model": "cosyvoice-v1",
+    "voice": "longjing",
+    "scenarios": [
+      "语音助手",
+      "导航播报",
+      "新闻播报",
+      "客服催收"
+    ],
+    "language": "中文",
+    "bitrate": "22050",
+    "format": "mp3"
+  },
+  {
+    "name": "龙妙",
+    "preview_audio_url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20240624/zjnqis/%E9%BE%99%E5%A6%99.mp3",
+    "model": "cosyvoice-v1",
+    "voice": "longmiao",
+    "scenarios": [
+      "客服催收",
+      "导航播报",
+      "有声书",
+      "语音助手"
+    ],
+    "language": "中文",
+    "bitrate": "22050",
+    "format": "mp3"
+  },
+  {
+    "name": "龙悦",
+    "preview_audio_url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20240624/nrkjqf/%E9%BE%99%E6%82%A6.mp3",
+    "model": "cosyvoice-v1",
+    "voice": "longyue",
+    "scenarios": [
+      "语音助手",
+      "诗词朗诵",
+      "有声书朗读",
+      "导航播报",
+      "新闻播报",
+      "客服催收"
+    ],
+    "language": "中文",
+    "bitrate": "22050",
+    "format": "mp3"
+  },
+  {
+    "name": "龙媛",
+    "preview_audio_url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20240624/xuboos/%E9%BE%99%E5%AA%9B.mp3",
+    "model": "cosyvoice-v1",
+    "voice": "longyuan",
+    "scenarios": [
+      "有声书",
+      "语音助手",
+      "聊天数字人"
+    ],
+    "language": "中文",
+    "bitrate": "22050",
+    "format": "mp3"
+  },
+  {
+    "name": "龙飞",
+    "preview_audio_url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20240624/bhkjjx/%E9%BE%99%E9%A3%9E.mp3",
+    "model": "cosyvoice-v1",
+    "voice": "longfei",
+    "scenarios": [
+      "会议播报",
+      "新闻播报",
+      "有声书"
+    ],
+    "language": "中文",
+    "bitrate": "22050",
+    "format": "mp3"
+  },
+  {
+    "name": "龙杰力豆",
+    "preview_audio_url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20240624/dctiyg/%E9%BE%99%E6%9D%B0%E5%8A%9B%E8%B1%86.mp3",
+    "model": "cosyvoice-v1",
+    "voice": "longjielidou",
+    "scenarios": [
+      "新闻播报",
+      "有声书",
+      "聊天助手"
+    ],
+    "language": "中文+英文",
+    "bitrate": "22050",
+    "format": "mp3"
+  },
+  {
+    "name": "龙彤",
+    "preview_audio_url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20240624/qyqmvo/%E9%BE%99%E5%BD%A4.mp3",
+    "model": "cosyvoice-v1",
+    "voice": "longtong",
+    "scenarios": [
+      "有声书",
+      "导航播报",
+      "聊天数字人"
+    ],
+    "language": "中文",
+    "bitrate": "22050",
+    "format": "mp3"
+  },
+  {
+    "name": "龙祥",
+    "preview_audio_url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20240624/jybshd/%E9%BE%99%E7%A5%A5.mp3",
+    "model": "cosyvoice-v1",
+    "voice": "longxiang",
+    "scenarios": [
+      "新闻播报",
+      "有声书",
+      "导航播报"
+    ],
+    "language": "中文",
+    "bitrate": "22050",
+    "format": "mp3"
+  },
+  {
+    "name": "Stella",
+    "preview_audio_url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20240624/haffms/Stella.mp3",
+    "model": "cosyvoice-v1",
+    "voice": "loongstella",
+    "scenarios": [
+      "语音助手",
+      "直播带货",
+      "导航播报",
+      "客服催收",
+      "有声书"
+    ],
+    "language": "中文+英文",
+    "bitrate": "22050",
+    "format": "mp3"
+  },
+  {
+    "name": "Bella",
+    "preview_audio_url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20240624/tguine/Bella.mp3",
+    "model": "cosyvoice-v1",
+    "voice": "loongbella",
+    "scenarios": [
+      "语音助手",
+      "客服催收",
+      "新闻播报",
+      "导航播报"
+    ],
+    "language": "中文",
+    "bitrate": "22050",
+    "format": "mp3"
+  }
+]
