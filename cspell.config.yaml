@@ -96,6 +96,7 @@ words:
   - unused
   - varnamelen
   - Vercel
+  - volcengine
   - whitespace
   - wrapcheck
   - wsl

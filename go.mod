@@ -7,6 +7,7 @@ toolchain go1.24.1
 require (
 	github.com/evanphx/json-patch/v5 v5.9.11
 	github.com/golang-module/carbon v1.7.3
+	github.com/google/uuid v1.6.0
 	github.com/labstack/echo/v4 v4.13.3
 	github.com/lmittmann/tint v1.0.7
 	github.com/nekomeowww/xo v1.16.0
@@ -25,7 +26,6 @@ require (
 	github.com/gobuffalo/envy v1.10.2 // indirect
 	github.com/gobuffalo/packd v1.0.2 // indirect
 	github.com/gobuffalo/packr v1.30.1 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/labstack/gommon v0.4.2 // indirect
