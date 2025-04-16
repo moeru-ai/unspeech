@@ -8,6 +8,7 @@ require (
 	github.com/evanphx/json-patch/v5 v5.9.11
 	github.com/golang-module/carbon v1.7.3
 	github.com/google/uuid v1.6.0
+	github.com/gorilla/websocket v1.5.3
 	github.com/labstack/echo/v4 v4.13.3
 	github.com/lmittmann/tint v1.0.7
 	github.com/nekomeowww/xo v1.16.0

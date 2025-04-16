@@ -8,6 +8,8 @@ unSpeech lets you use various online TTS with OpenAI-compatible API.
 
 - [OpenAI](https://platform.openai.com/docs/api-reference/audio/createSpeech)
 - [Microsoft / Azure AI Speech service](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/text-to-speech)
+- [Alibaba Cloud Model Studio / 阿里云百炼 / CozyVoice](https://www.alibabacloud.com/en/product/modelstudio)
+- [Volcano Engine / 火山引擎语音技术](https://www.volcengine.com/product/voice-tech)
 - [ElevenLabs](https://elevenlabs.io/docs/api-reference/text-to-speech/convert)
 - [Koemotion (by Rinna)](https://koemotion.rinna.co.jp/)
 
