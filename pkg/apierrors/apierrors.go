@@ -10,6 +10,16 @@ import (
 	"github.com/samber/mo"
 )
 
+func NewError[S ~int](status S, code string) *Error {
+	return &Error{
+		ErrorObject: &jsonapi.ErrorObject{
+			ID:     code,
+			Status: int(status),
+			Code:   code,
+		},
+	}
+}
+
 type Error struct {
 	*jsonapi.ErrorObject
 
@@ -31,16 +41,6 @@ func (e *Error) Caller() mo.Option[logs.CallerLike] {
 	}
 
 	return mo.Some(logs.CallerLike(e.caller))
-}
-
-func NewError[S ~int](status S, code string) *Error {
-	return &Error{
-		ErrorObject: &jsonapi.ErrorObject{
-			ID:     code,
-			Status: int(status),
-			Code:   code,
-		},
-	}
 }
 
 func (e *Error) WithError(err error) *Error {

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"log/slog"
 	"net/http"
 	"strings"
@@ -133,8 +132,6 @@ func HandleSpeech(c echo.Context, options mo.Option[types.SpeechRequestOptions])
 	if err != nil {
 		return mo.Err[any](apierrors.NewErrInternal().WithDetail(err.Error()).WithCaller())
 	}
-
-	fmt.Println(string(jsonBytes))
 
 	req, err := http.NewRequestWithContext(c.Request().Context(), http.MethodPost, "https://openspeech.bytedance.com/api/v1/tts", bytes.NewBuffer(jsonBytes))
 	if err != nil {
