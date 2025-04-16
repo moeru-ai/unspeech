@@ -10,6 +10,13 @@ import (
 	"github.com/samber/mo"
 )
 
+type Error struct {
+	*jsonapi.ErrorObject
+
+	caller   *jsonapi.ErrorCaller
+	rawError error
+}
+
 func NewError[S ~int](status S, code string) *Error {
 	return &Error{
 		ErrorObject: &jsonapi.ErrorObject{
@@ -18,13 +25,6 @@ func NewError[S ~int](status S, code string) *Error {
 			Code:   code,
 		},
 	}
-}
-
-type Error struct {
-	*jsonapi.ErrorObject
-
-	caller   *jsonapi.ErrorCaller
-	rawError error
 }
 
 func (e *Error) Error() string {
