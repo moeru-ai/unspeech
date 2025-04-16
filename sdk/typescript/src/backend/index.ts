@@ -5,7 +5,7 @@ import { UnSpeechOptions, VoiceProviderWithExtraOptions } from '../types'
 
 export * from './elevenlabs'
 export * from './microsoft'
-
+export * from './volcengine'
 /** @see {@link https://github.com/moeru-ai/unspeech} */
 export const createUnSpeech = (apiKey: string, baseURL = 'http://localhost:5933/v1/') => {
   const voiceProvider: VoiceProviderWithExtraOptions<
@@ -14,6 +14,9 @@ export const createUnSpeech = (apiKey: string, baseURL = 'http://localhost:5933/
 } | {
   backend: 'microsoft' | 'azure'
   region: MicrosoftRegions | string
+} | {
+  backend: 'volcengine'
+  appId: string
 }
   > = {
     voice: (options) => {
@@ -44,7 +47,8 @@ export const createUnSpeech = (apiKey: string, baseURL = 'http://localhost:5933/
   createSpeechProviderWithExtraOptions<
     | `elevenlabs/${string}`
     | `koemotion/${string}`
-    | `openai/${string}`,
+    | `openai/${string}`
+    | `volcengine/${string}`,
     UnSpeechOptions
       >({ apiKey, baseURL }),
     voiceProvider
