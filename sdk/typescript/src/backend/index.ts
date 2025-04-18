@@ -6,7 +6,7 @@ import { UnSpeechOptions, VoiceProviderWithExtraOptions } from '../types'
 export * from './elevenlabs'
 export * from './microsoft'
 export * from './volcengine'
-export * from './alibaba'
+export * from './alibabacloud'
 
 /** @see {@link https://github.com/moeru-ai/unspeech} */
 export const createUnSpeech = (apiKey: string, baseURL = 'http://localhost:5933/v1/') => {

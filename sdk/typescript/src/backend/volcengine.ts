@@ -5,7 +5,7 @@ import { objCamelToSnake } from '@xsai/shared'
 
 import type { UnSpeechOptions, VoiceProviderWithExtraOptions } from '../types'
 
-export interface UnVolcanoEngineOptions {
+export interface UnVolcengineOptions {
   app?: {
     appId?: string
     cluster?: string | 'volcano_tts'
@@ -105,8 +105,8 @@ export interface UnVolcanoEngineOptions {
  * @param baseURL - UnSpeech Instance URL
  * @returns SpeechProviderWithExtraOptions
  */
-export const createUnVolcanoEngine = (apiKey: string, baseURL = 'http://localhost:5933/v1/') => {
-  const toUnSpeechOptions = (options: UnVolcanoEngineOptions): UnSpeechOptions => {
+export const createUnVolcengine = (apiKey: string, baseURL = 'http://localhost:5933/v1/') => {
+  const toUnSpeechOptions = (options: UnVolcengineOptions): UnSpeechOptions => {
     const extraBody: Record<string, unknown> = {
       app: {
         appid: options.app?.appId,
@@ -134,7 +134,7 @@ export const createUnVolcanoEngine = (apiKey: string, baseURL = 'http://localhos
   const speechProvider: SpeechProviderWithExtraOptions<
     /** @see Currently, only v1 is available */
     'volcengine/v1',
-    UnVolcanoEngineOptions
+    UnVolcengineOptions
   > = {
     speech: (model, options) => ({
       ...(options ? toUnSpeechOptions(options) : {}),
@@ -145,7 +145,7 @@ export const createUnVolcanoEngine = (apiKey: string, baseURL = 'http://localhos
   }
 
   const voiceProvider: VoiceProviderWithExtraOptions<
-  UnVolcanoEngineOptions
+  UnVolcengineOptions
   > = {
     voice: (options) => {
       if (baseURL.endsWith('v1/')) {

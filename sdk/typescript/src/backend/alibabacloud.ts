@@ -5,7 +5,7 @@ import { objCamelToSnake } from '@xsai/shared'
 
 import type { UnSpeechOptions, VoiceProviderWithExtraOptions } from '../types'
 
-export interface UnAlibabaOptions {
+export interface UnAlibabaCloudOptions {
   /**
    * Sampling rate of the synthesized audio.
    * @default 22050
@@ -40,8 +40,8 @@ export interface UnAlibabaOptions {
  * @param baseURL - UnSpeech Instance URL
  * @returns SpeechProviderWithExtraOptions & VoiceProviderWithExtraOptions
  */
-export const createUnAlibaba = (apiKey: string, baseURL = 'http://localhost:5933/v1/') => {
-  const toUnSpeechOptions = (options: UnAlibabaOptions): UnSpeechOptions => {
+export const createUnAlibabaCloud = (apiKey: string, baseURL = 'http://localhost:5933/v1/') => {
+  const toUnSpeechOptions = (options: UnAlibabaCloudOptions): UnSpeechOptions => {
     const { sampleRate, volume, rate, pitch } = options
 
     const extraBody: Record<string, unknown> = {
@@ -60,7 +60,7 @@ export const createUnAlibaba = (apiKey: string, baseURL = 'http://localhost:5933
   const speechProvider: SpeechProviderWithExtraOptions<
     /** @see https://help.aliyun.com/document_detail/451271.html */
     'alibaba/v1',
-    UnAlibabaOptions
+    UnAlibabaCloudOptions
   > = {
     speech: (model, options) => ({
       ...(options ? toUnSpeechOptions(options) : {}),
@@ -73,7 +73,7 @@ export const createUnAlibaba = (apiKey: string, baseURL = 'http://localhost:5933
   }
 
   const voiceProvider: VoiceProviderWithExtraOptions<
-    UnAlibabaOptions
+    UnAlibabaCloudOptions
   > = {
     voice: (options) => {
       let adjustedBaseURL = baseURL
