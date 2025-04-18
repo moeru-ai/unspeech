@@ -1,7 +1,7 @@
 {
   "name": "unspeech",
   "type": "module",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Client SDK for unSpeech",
   "author": "Moeru AI",
   "license": "MIT",
