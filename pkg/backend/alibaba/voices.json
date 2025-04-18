@@ -5,11 +5,9 @@
     "model": "cosyvoice-v1",
     "voice": "longwan",
     "scenarios": [
-      [
-        "语音助手",
-        "导航播报",
-        "聊天数字人"
-      ]
+      "语音助手",
+      "导航播报",
+      "聊天数字人"
     ],
     "language": "中文普通话",
     "bitrate": "22050",
@@ -21,11 +19,9 @@
     "model": "cosyvoice-v1",
     "voice": "longcheng",
     "scenarios": [
-      [
-        "语音助手",
-        "导航播报",
-        "聊天数字人"
-      ]
+      "语音助手",
+      "导航播报",
+      "聊天数字人"
     ],
     "language": "中文普通话",
     "bitrate": "22050",
@@ -37,11 +33,9 @@
     "model": "cosyvoice-v1",
     "voice": "longhua",
     "scenarios": [
-      [
-        "语音助手",
-        "导航播报",
-        "聊天数字人"
-      ]
+      "语音助手",
+      "导航播报",
+      "聊天数字人"
     ],
     "language": "中文普通话",
     "bitrate": "22050",
@@ -53,11 +47,9 @@
     "model": "cosyvoice-v1",
     "voice": "longxiaochun",
     "scenarios": [
-      [
-        "语音助手",
-        "导航播报",
-        "聊天数字人"
-      ]
+      "语音助手",
+      "导航播报",
+      "聊天数字人"
     ],
     "language": "中文+英文",
     "bitrate": "22050",
