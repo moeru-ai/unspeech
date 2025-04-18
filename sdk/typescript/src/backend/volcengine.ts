@@ -5,7 +5,7 @@ import { objCamelToSnake } from '@xsai/shared'
 
 import type { UnSpeechOptions, VoiceProviderWithExtraOptions } from '../types'
 
-type UnVolcanoEngineOptions = {
+export interface UnVolcanoEngineOptions {
   app?: {
     appId?: string
     cluster?: string | 'volcano_tts'
