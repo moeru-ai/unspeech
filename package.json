@@ -1,0 +1,6 @@
+{
+  "name": "@unspeech/root",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.7.0"
+}
