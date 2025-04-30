@@ -19,9 +19,9 @@ import { createUnSpeech, listVoices } from 'unspeech'
 
 const unspeech = createUnSpeech('YOUR_EXTERNAL_PROVIDER_API_KEY', 'http://localhost:5933/v1/')
 
-const voices = await listVoices({
-  ...unspeech.voice({ backend: 'elevenlabs' })
-})
+const voices = await listVoices(
+  unspeech.voice({ backend: 'elevenlabs' })
+)
 ```
 
 ### Speech synthesis
