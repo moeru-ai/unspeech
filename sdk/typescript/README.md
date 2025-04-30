@@ -1,6 +1,6 @@
 # unSpeech TypeScript Client
 
-> unSpeech, Your Text-to-Speech Services, All-in-One.
+> Your Text-to-Speech Services, All-in-One.
 
 ## Install
 
