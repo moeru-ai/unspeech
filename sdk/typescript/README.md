@@ -77,10 +77,6 @@ Or to use free Edge TTS:
 
 - [travisvn/openai-edge-tts](https://github.com/travisvn/openai-edge-tts)
 
-## Similar Projects
-
-- [orate](https://github.com/haydenbleasel/orate)
-
 ## License
 
 [AGPL-3.0](./LICENSE)
