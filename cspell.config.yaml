@@ -10,6 +10,8 @@ words:
   - bumpp
   - canonicalheader
   - chardata
+  - clippy
+  - codegen
   - cognitiveservices
   - containedctx
   - contextcheck
@@ -18,6 +20,7 @@ words:
   - depguard
   - Describedby
   - Detailf
+  - direnv
   - dupl
   - durationcheck
   - eastasia
@@ -25,6 +28,7 @@ words:
   - errcheck
   - errchkjson
   - errname
+  - eslintcache
   - execinquery
   - exhaustive
   - exhaustruct
@@ -68,18 +72,23 @@ words:
   - nakedret
   - nestif
   - nilnil
+  - nixpkgs
   - nlreturn
   - nolint
   - nolintlint
   - nosprintfhostport
   - paralleltest
   - perfsprint
+  - pkgs
+  - pname
   - prealloc
   - predeclared
   - reassign
   - revive
   - Rinna
+  - rustc
   - samber
+  - serde
   - slogecho
   - sonarjs
   - ssml
