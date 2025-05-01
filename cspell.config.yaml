@@ -84,9 +84,11 @@ words:
   - prealloc
   - predeclared
   - reassign
+  - reqwest
   - revive
   - Rinna
   - rustc
+  - rustls
   - samber
   - serde
   - slogecho
