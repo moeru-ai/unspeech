@@ -1,9 +1,12 @@
+use std::collections::HashMap;
+
 use axum::{
   Json,
   http::StatusCode,
   debug_handler,
 };
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 
 #[derive(Deserialize)]
 // https://platform.openai.com/docs/api-reference/audio/createSpeech
@@ -17,6 +20,8 @@ pub struct SpeechOptions {
   // instructions
   // response_format
   // speed
+  #[serde(flatten)]
+  extra: HashMap<String, Value>,
 }
 
 #[derive(Serialize)]
@@ -29,6 +34,8 @@ pub struct SpeechResult {
   voice: String,
   // One of the available TTS providers.
   provider: String,
+  // Extra options
+  extra: HashMap<String, Value>,
 }
 
 #[debug_handler]
@@ -42,8 +49,8 @@ pub async fn speech(
     model: vec[0].to_string(),
     voice: body.voice,
     provider: vec[1].to_string(),
+    extra: body.extra,
   };
 
   (StatusCode::OK, Json(result))
 }
-
