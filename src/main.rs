@@ -1,20 +1,20 @@
 use axum::{
-  http::StatusCode,
-  response::IntoResponse,
   routing::{get, post},
-  Json, Router,
+  Router,
 };
-use serde::{Deserialize, Serialize};
-
 mod shutdown_signal;
 use shutdown_signal::shutdown_signal;
+
+mod speech;
+use speech::speech;
 
 #[tokio::main]
 async fn main() {
   tracing_subscriber::fmt::init();
 
   let app = Router::new()
-    .route("/", get(root));
+    .route("/", get(root))
+    .route("/v1/audio/speech", post(speech));
 
   let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
     .await
