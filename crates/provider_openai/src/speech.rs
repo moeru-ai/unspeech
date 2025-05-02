@@ -1,12 +1,15 @@
 use axum::body::Bytes;
 use reqwest::Client;
 use serde_json::json;
-use unspeech_shared::speech::ProcessedSpeechOptions;
+use unspeech_shared::{
+  AppError,
+  speech::ProcessedSpeechOptions,
+};
 
 pub async fn handle(
   options: ProcessedSpeechOptions,
   client: Client,
-) -> Result<Bytes, reqwest::Error> {
+) -> Result<Bytes, AppError> {
   let body = json!({
     "input": options.input,
     "model": options.model,
@@ -25,7 +28,9 @@ pub async fn handle(
   //   return Err(format!("API request failed with status: {}\nBody: {}", status, body).into());
   // }
 
-  let bytes = res.bytes().await?;
+  let bytes = res
+    .bytes()
+    .await?;
 
   Ok(bytes)
 }

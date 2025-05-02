@@ -16,5 +16,8 @@ name = "unspeech_shared"
 path = "src/lib.rs"
 
 [dependencies]
+anyhow = { workspace = true }
+axum = { workspace = true }
+reqwest = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }

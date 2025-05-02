@@ -1,27 +1,35 @@
 use axum::{
-  Json,
-  extract::State,
-  http::StatusCode,
+  body::Bytes,
   debug_handler,
+  extract::State,
+  Json
 };
 use axum_extra::{
   headers::{authorization::Bearer, Authorization},
   TypedHeader
 };
 use reqwest::Client;
-use unspeech_shared::speech::{
-  SpeechOptions,
-  ProcessedSpeechOptions,
-  process_speech_options
+use unspeech_shared::{
+  AppError,
+  speech::{
+    SpeechOptions,
+    process_speech_options
+  }
 };
 
 #[debug_handler]
 pub async fn speech(
-  State(_client): State<Client>,
+  State(client): State<Client>,
   TypedHeader(bearer): TypedHeader<Authorization<Bearer>>,
-  Json(options): Json<SpeechOptions>,
-) -> (StatusCode, Json<ProcessedSpeechOptions>) {
+  Json(body): Json<SpeechOptions>,
+) -> Result<Bytes, AppError> {
   tracing::info!("Bearer {}", bearer.token());
 
-  (StatusCode::OK, Json(process_speech_options(options)))
+  let options = process_speech_options(body);
+
+  match options.provider.as_str() {
+    #[cfg(feature = "openai")]
+    "openai" => unspeech_provider_openai::speech::handle(options, client).await,
+    _ => Err(AppError::anyhow(format!("Unsupported provider: {}", options.provider))),
+  }
 }

@@ -37,6 +37,10 @@ opt-level = "z"
 panic = "abort"
 strip = "symbols"
 
+[features]
+default = ["openai"]
+openai = ["dep:unspeech_provider_openai"]
+
 [workspace]
 members = [
   ".",
@@ -47,25 +51,25 @@ members = [
 [workspace.dependencies]
 unspeech_provider_openai = { path = "crates/provider_openai" }
 unspeech_shared = { path = "crates/shared" }
+anyhow = "1.0"
 axum = { version = "0.8", features = ["tokio", "macros"]}
 axum-extra = { version = "0.10", features = ["typed-header"]}
 reqwest = { version = "0.12", default-features = false, features = ["http2", "json", "rustls-tls"]}
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-snafu = "0.8"
 tokio = { version = "1.0", features = ["full"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
 [dependencies]
-unspeech_provider_openai = { workspace = true }
+unspeech_provider_openai = { workspace = true, optional = true }
 unspeech_shared = { workspace = true }
+anyhow = { workspace = true }
 axum = { workspace = true }
 axum-extra = { workspace = true }
 reqwest = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
-snafu = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }

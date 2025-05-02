@@ -33,7 +33,7 @@ pub struct ProcessedSpeechOptions {
   #[serde(flatten)]
   pub extra: HashMap<String, Value>,
   // One of the available TTS providers.
-  provider: String,
+  pub provider: String,
 }
 
 pub fn process_speech_options(options: SpeechOptions) -> ProcessedSpeechOptions {
