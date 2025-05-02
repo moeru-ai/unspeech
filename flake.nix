@@ -1,5 +1,5 @@
 {
-  description = "github:moeru-ai/cosine-similarity";
+  description = "github:moeru-ai/unspeech";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
