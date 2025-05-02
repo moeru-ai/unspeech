@@ -15,6 +15,9 @@ pub async fn handle(
     "input": options.input,
     "model": options.model,
     "voice": options.voice,
+    "instructions": options.instructions,
+    "response_format": options.response_format,
+    "speed": options.speed,
   });
 
   let res = client.post("https://api.openai.com/v1/audio/speech")

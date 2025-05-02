@@ -12,9 +12,12 @@ pub struct SpeechOptions {
   pub model: String,
   // The voice to use when generating the audio.
   pub voice: String,
-  // instructions
-  // response_format
-  // speed
+  // Control the voice of your generated audio with additional instructions.
+  pub instructions: Option<String>,
+  // The format to audio in.
+  pub response_format: Option<String>,
+  // The speed of the generated audio.
+  pub speed: Option<f32>,
   #[serde(flatten)]
   pub extra: HashMap<String, Value>,
 }
@@ -27,9 +30,12 @@ pub struct ProcessedSpeechOptions {
   pub model: String,
   // The voice to use when generating the audio.
   pub voice: String,
-  // instructions
-  // response_format
-  // speed
+  // Control the voice of your generated audio with additional instructions.
+  pub instructions: Option<String>,
+  // The format to audio in.
+  pub response_format: Option<String>,
+  // The speed of the generated audio.
+  pub speed: Option<f32>,
   #[serde(flatten)]
   pub extra: HashMap<String, Value>,
   // One of the available TTS providers.
@@ -43,6 +49,9 @@ pub fn process_speech_options(options: SpeechOptions) -> ProcessedSpeechOptions 
     input: options.input,
     model: vec[0].to_string(),
     voice: options.voice,
+    instructions: options.instructions,
+    response_format: options.response_format,
+    speed: options.speed,
     extra: options.extra,
     provider: vec[1].to_string(),
   }
