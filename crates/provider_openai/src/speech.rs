@@ -28,7 +28,7 @@ pub async fn handle(
 
   if !res.status().is_success() {
     let status = res.status();
-    let body = res.text().await.unwrap_or_else(|_| "Could not read error body".to_string());
+    let body = res.text().await.unwrap_or_else(|err| format!("Could not read error body: {}", err));
     return Err(AppError::anyhow(format!("API request failed with status: {}\nBody: {}", status, body)));
   }
 
