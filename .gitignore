@@ -31,8 +31,12 @@ go.work.sum
 
 # build result
 /result
+/target
 
 node_modules
 .eslintcache
 sdk/typescript/pkg/
 sdk/typescript/dist/
+
+# direnv
+.direnv

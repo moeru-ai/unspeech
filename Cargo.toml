@@ -1,0 +1,75 @@
+[workspace.package]
+version = "0.2.0"
+authors = ["Moeru AI"]
+edition = "2024"
+rust-version = "1.80"
+description = "Your Text-to-Speech Services, All-in-One."
+documentation = "https://github.com/moeru-ai/unspeech"
+readme = "README.md"
+homepage = "https://github.com/moeru-ai/unspeech"
+repository = "https://github.com/moeru-ai/unspeech"
+license = "AGPL-3.0"
+publish = false
+
+[package]
+name = "unspeech"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+readme.workspace = true
+license.workspace = true
+authors.workspace = true
+description.workspace = true
+documentation.workspace = true
+homepage.workspace = true
+repository.workspace = true
+
+[profile.dev]
+opt-level = 1
+
+[profile.dev.package."*"]
+opt-level = 3
+
+[profile.release]
+codegen-units = 1
+lto = "fat"
+opt-level = "z"
+panic = "abort"
+strip = "symbols"
+
+[features]
+default = ["openai"]
+openai = ["dep:unspeech_provider_openai"]
+
+[workspace]
+members = [
+  ".",
+  "crates/provider_openai",
+  "crates/shared",
+]
+
+[workspace.dependencies]
+unspeech_provider_openai = { path = "crates/provider_openai" }
+unspeech_shared = { path = "crates/shared" }
+anyhow = "1.0"
+axum = { version = "0.8", features = ["tokio", "macros"]}
+axum-extra = { version = "0.10", features = ["typed-header"]}
+reqwest = { version = "0.12", default-features = false, features = ["http2", "json", "rustls-tls"]}
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tokio = { version = "1.0", features = ["full"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[dependencies]
+unspeech_provider_openai = { workspace = true, optional = true }
+unspeech_shared = { workspace = true }
+anyhow = { workspace = true }
+axum = { workspace = true }
+axum-extra = { workspace = true }
+reqwest = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
