@@ -1,7 +1,10 @@
 use std::collections::HashMap;
 
+use axum::http::StatusCode;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+
+use crate::AppError;
 
 #[derive(Deserialize)]
 // https://platform.openai.com/docs/api-reference/audio/createSpeech
@@ -42,17 +45,26 @@ pub struct ProcessedSpeechOptions {
   pub provider: String,
 }
 
-pub fn process_speech_options(options: SpeechOptions) -> ProcessedSpeechOptions {
-  let vec: Vec<&str> = options.model.split('/').collect();
-
-  ProcessedSpeechOptions {
-    input: options.input,
-    model: vec[1].to_string(),
-    voice: options.voice,
-    instructions: options.instructions,
-    response_format: options.response_format,
-    speed: options.speed,
-    extra: options.extra,
-    provider: vec[0].to_string(),
+pub fn process_speech_options(options: SpeechOptions) -> Result<ProcessedSpeechOptions, AppError> {
+  match options.model.split_once('/') {
+    Some((provider, model)) => {
+      if provider.is_empty() || model.is_empty() {
+        Err(AppError::new(anyhow::anyhow!("Invalid model: {}", options.model), Some(StatusCode::BAD_REQUEST)))
+      } else {
+        Ok(ProcessedSpeechOptions {
+          input: options.input,
+          model: model.to_string(),
+          voice: options.voice,
+          instructions: options.instructions,
+          response_format: options.response_format,
+          speed: options.speed,
+          extra: options.extra,
+          provider: provider.to_string(),
+        })
+      }
+    }
+    None => {
+      Err(AppError::new(anyhow::anyhow!("Invalid model: {}", options.model), Some(StatusCode::BAD_REQUEST)))
+    }
   }
 }

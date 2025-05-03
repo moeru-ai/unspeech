@@ -20,7 +20,7 @@ pub async fn speech(
   TypedHeader(bearer): TypedHeader<Authorization<Bearer>>,
   Json(body): Json<SpeechOptions>,
 ) -> Result<(HeaderMap, Bytes), AppError> {
-  let options = process_speech_options(body);
+  let options = process_speech_options(body)?;
   let token = bearer.token();
 
   match options.provider.as_str() {

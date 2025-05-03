@@ -58,7 +58,7 @@ pub async fn handle(
 
   let mut headers = HeaderMap::new();
   // TODO: remove unwrap
-  headers.insert(header::CONTENT_TYPE, "audio/mpeg".parse().unwrap());
+  headers.insert(header::CONTENT_TYPE, "audio/mpeg".parse()?);
 
   Ok((headers, bytes))
 }
