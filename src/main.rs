@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use axum::{
   routing::{get, post},
   Router,
@@ -9,12 +11,15 @@ use shutdown_signal::shutdown_signal;
 
 mod speech;
 use speech::speech;
+use unspeech_shared::AppError;
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<(), AppError> {
   tracing_subscriber::fmt::init();
 
-  let client = Client::new();
+  let client = Client::builder()
+    .timeout(Duration::from_secs(60))
+    .build()?;
 
   let app = Router::new()
     .route("/", get(root))
@@ -22,13 +27,13 @@ async fn main() {
     .with_state(client);
 
   let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
-    .await
-    .unwrap();
+    .await?;
 
-  axum::serve(listener, app)
-    .with_graceful_shutdown(shutdown_signal())
-    .await
-    .unwrap();
+  Ok(
+    axum::serve(listener, app)
+      .with_graceful_shutdown(shutdown_signal())
+      .await?
+  )
 }
 
 async fn root() -> &'static str {

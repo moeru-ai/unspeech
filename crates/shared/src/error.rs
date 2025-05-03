@@ -5,6 +5,7 @@ use axum::{
 };
 use serde::Serialize;
 
+#[derive(Debug)]
 pub struct AppError {
   /// An error message.
   pub error: anyhow::Error,
