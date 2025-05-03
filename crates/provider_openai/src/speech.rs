@@ -1,4 +1,4 @@
-use axum::body::Bytes;
+use axum::{body::Bytes, http::{header, HeaderMap}};
 use reqwest::Client;
 use serde_json::json;
 use unspeech_shared::{
@@ -10,7 +10,7 @@ pub async fn handle(
   options: ProcessedSpeechOptions,
   client: Client,
   token: &str,
-) -> Result<Bytes, AppError> {
+) -> Result<(HeaderMap, Bytes), AppError> {
   let body = json!({
     "input": options.input,
     "model": options.model,
@@ -36,5 +36,9 @@ pub async fn handle(
     .bytes()
     .await?;
 
-  Ok(bytes)
+  let mut headers = HeaderMap::new();
+  // TODO: remove unwrap
+  headers.insert(header::CONTENT_TYPE, "audio/mpeg".parse().unwrap());
+
+  Ok((headers, bytes))
 }

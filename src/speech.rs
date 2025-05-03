@@ -1,8 +1,5 @@
 use axum::{
-  body::Bytes,
-  debug_handler,
-  extract::State,
-  Json
+  body::Bytes, debug_handler, extract::State, http::HeaderMap, Json
 };
 use axum_extra::{
   headers::{authorization::Bearer, Authorization},
@@ -22,7 +19,7 @@ pub async fn speech(
   State(client): State<Client>,
   TypedHeader(bearer): TypedHeader<Authorization<Bearer>>,
   Json(body): Json<SpeechOptions>,
-) -> Result<Bytes, AppError> {
+) -> Result<(HeaderMap, Bytes), AppError> {
   let options = process_speech_options(body);
   let token = bearer.token();
 
