@@ -47,12 +47,12 @@ pub fn process_speech_options(options: SpeechOptions) -> ProcessedSpeechOptions 
 
   ProcessedSpeechOptions {
     input: options.input,
-    model: vec[0].to_string(),
+    model: vec[1].to_string(),
     voice: options.voice,
     instructions: options.instructions,
     response_format: options.response_format,
     speed: options.speed,
     extra: options.extra,
-    provider: vec[1].to_string(),
+    provider: vec[0].to_string(),
   }
 }
