@@ -1,7 +1,7 @@
 use axum::{
+  Json,
   http::StatusCode,
-  response::{Response, IntoResponse},
-  Json
+  response::{IntoResponse, Response},
 };
 use serde::Serialize;
 
@@ -39,7 +39,7 @@ impl AppErrorResponse {
 
 impl IntoResponse for AppError {
   fn into_response(self) -> Response {
-      (self.status, Json(AppErrorResponse::new(self))).into_response()
+    (self.status, Json(AppErrorResponse::new(self))).into_response()
   }
 }
 

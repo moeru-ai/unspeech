@@ -1,10 +1,10 @@
-use axum::{body::Bytes, http::{header, HeaderMap}};
+use axum::{
+  body::Bytes,
+  http::{HeaderMap, header},
+};
 use reqwest::Client;
 use serde::Serialize;
-use unspeech_shared::{
-  AppError,
-  speech::ProcessedSpeechOptions,
-};
+use unspeech_shared::{AppError, speech::ProcessedSpeechOptions};
 
 #[derive(Serialize)]
 // https://platform.openai.com/docs/api-reference/audio/createSpeech
@@ -40,7 +40,8 @@ pub async fn handle(
     speed: options.speed,
   };
 
-  let res = client.post("https://api.openai.com/v1/audio/speech")
+  let res = client
+    .post("https://api.openai.com/v1/audio/speech")
     .bearer_auth(token)
     .json(&body)
     .send()
@@ -48,13 +49,17 @@ pub async fn handle(
 
   if !res.status().is_success() {
     let status = res.status();
-    let body = res.text().await.unwrap_or_else(|err| format!("Could not read error body: {}", err));
-    return Err(AppError::new(anyhow::anyhow!("API request failed with status: {}\nBody: {}", status, body), None));
+    let body = res
+      .text()
+      .await
+      .unwrap_or_else(|err| format!("Could not read error body: {}", err));
+    return Err(AppError::new(
+      anyhow::anyhow!("API request failed with status: {}\nBody: {}", status, body),
+      None,
+    ));
   }
 
-  let bytes = res
-    .bytes()
-    .await?;
+  let bytes = res.bytes().await?;
 
   let mut headers = HeaderMap::new();
   // TODO: remove unwrap

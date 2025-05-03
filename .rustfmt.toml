@@ -1,0 +1,18 @@
+# https://github.com/rust-lang/rustfmt/blob/master/Configurations.md
+
+edition = "2024"
+tab_spaces = 2
+# empty_item_single_line = true # nightly
+# group_imports = "StdExternalCrate" # nightly
+# imports_granularity = "Crate" # nightly
+# imports_layout = "HorizontalVertical" # nightly
+# match_arm_blocks = false # nightly
+match_block_trailing_comma = true
+# normalize_comments = true # nightly
+# normalize_doc_attributes = true # nightly
+# overflow_delimited_expr = true # nightly
+# reorder_impl_items = true # nightly
+# spaces_around_ranges = true # nightly
+# unstable_features = true # nightly
+use_field_init_shorthand = true
+use_try_shorthand = true

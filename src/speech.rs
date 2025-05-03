@@ -1,17 +1,12 @@
-use axum::{
-  body::Bytes, debug_handler, extract::State, http::HeaderMap, Json
-};
+use axum::{Json, body::Bytes, debug_handler, extract::State, http::HeaderMap};
 use axum_extra::{
-  headers::{authorization::Bearer, Authorization},
-  TypedHeader
+  TypedHeader,
+  headers::{Authorization, authorization::Bearer},
 };
 use reqwest::Client;
 use unspeech_shared::{
   AppError,
-  speech::{
-    SpeechOptions,
-    process_speech_options
-  }
+  speech::{SpeechOptions, process_speech_options},
 };
 
 #[debug_handler]
@@ -26,6 +21,9 @@ pub async fn speech(
   match options.provider.as_str() {
     #[cfg(feature = "openai")]
     "openai" => unspeech_provider_openai::speech::handle(options, client, token).await,
-    _ => Err(AppError::new(anyhow::anyhow!("Unsupported provider: {}", options.provider), None)),
+    _ => Err(AppError::new(
+      anyhow::anyhow!("Unsupported provider: {}", options.provider),
+      None,
+    )),
   }
 }
