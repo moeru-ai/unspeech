@@ -1522,6 +1522,7 @@ dependencies = [
 name = "unspeech_provider_openai"
 version = "0.2.0"
 dependencies = [
+ "anyhow",
  "axum",
  "reqwest",
  "serde",

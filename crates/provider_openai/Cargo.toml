@@ -17,6 +17,7 @@ path = "src/lib.rs"
 
 [dependencies]
 unspeech_shared = { workspace = true }
+anyhow = { workspace = true }
 axum = { workspace = true }
 reqwest = { workspace = true }
 serde = { workspace = true }

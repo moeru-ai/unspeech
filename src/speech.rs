@@ -26,6 +26,6 @@ pub async fn speech(
   match options.provider.as_str() {
     #[cfg(feature = "openai")]
     "openai" => unspeech_provider_openai::speech::handle(options, client, token).await,
-    _ => Err(AppError::anyhow(format!("Unsupported provider: {}", options.provider))),
+    _ => Err(AppError::new(anyhow::anyhow!("Unsupported provider: {}", options.provider), None)),
   }
 }
