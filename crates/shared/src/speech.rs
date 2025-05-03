@@ -47,24 +47,16 @@ pub struct ProcessedSpeechOptions {
 
 pub fn process_speech_options(options: SpeechOptions) -> Result<ProcessedSpeechOptions, AppError> {
   match options.model.split_once('/') {
-    Some((provider, model)) => {
-      if provider.is_empty() || model.is_empty() {
-        Err(AppError::new(anyhow::anyhow!("Invalid model: {}", options.model), Some(StatusCode::BAD_REQUEST)))
-      } else {
-        Ok(ProcessedSpeechOptions {
-          input: options.input,
-          model: model.to_string(),
-          voice: options.voice,
-          instructions: options.instructions,
-          response_format: options.response_format,
-          speed: options.speed,
-          extra: options.extra,
-          provider: provider.to_string(),
-        })
-      }
-    }
-    None => {
-      Err(AppError::new(anyhow::anyhow!("Invalid model: {}", options.model), Some(StatusCode::BAD_REQUEST)))
-    }
+    Some((provider, model)) if !provider.is_empty() && !model.is_empty() => Ok(ProcessedSpeechOptions {
+      input: options.input,
+      model: model.to_string(),
+      voice: options.voice,
+      instructions: options.instructions,
+      response_format: options.response_format,
+      speed: options.speed,
+      extra: options.extra,
+      provider: provider.to_string(),
+    }),
+    _ => Err(AppError::new(anyhow::anyhow!("Invalid model: {}", options.model), Some(StatusCode::BAD_REQUEST)))
   }
 }
