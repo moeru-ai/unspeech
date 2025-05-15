@@ -11,9 +11,15 @@ use unspeech_shared::{AppError, speech::ProcessedSpeechOptions};
 pub struct ElevenLabsSpeechOptions {
   pub text: String,
   pub model_id: String,
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub language_code: Option<String>,
   pub voice_settings: ElevenLabsSpeechOptionsVoiceSettings,
   #[serde(skip_serializing_if = "Option::is_none")]
   pub seed: Option<f64>,
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub previous_text: Option<String>,
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub next_text: Option<String>,
 }
 
 #[derive(Deserialize, Serialize)]
@@ -52,8 +58,11 @@ pub async fn handle(
   let body = ElevenLabsSpeechOptions {
     text: options.input,
     model_id: options.model,
+    language_code: options.extra.get("language_code").and_then(|v| Some(v.to_string())),
     voice_settings,
     seed: options.extra.get("seed").and_then(|v| v.as_f64()),
+    previous_text: options.extra.get("previous_text").and_then(|v| Some(v.to_string())),
+    next_text: options.extra.get("next_text").and_then(|v| Some(v.to_string())),
   };
 
   // TODO: output_format
