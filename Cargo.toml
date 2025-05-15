@@ -38,17 +38,20 @@ panic = "abort"
 strip = "symbols"
 
 [features]
-default = ["openai"]
+default = ["elevenlabs", "openai"]
+elevenlabs = ["dep:unspeech_provider_elevenlabs"]
 openai = ["dep:unspeech_provider_openai"]
 
 [workspace]
 members = [
   ".",
+  "crates/provider_elevenlabs",
   "crates/provider_openai",
   "crates/shared",
 ]
 
 [workspace.dependencies]
+unspeech_provider_elevenlabs = { path = "crates/provider_elevenlabs" }
 unspeech_provider_openai = { path = "crates/provider_openai" }
 unspeech_shared = { path = "crates/shared" }
 anyhow = "1.0"
@@ -62,6 +65,7 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
 [dependencies]
+unspeech_provider_elevenlabs = { workspace = true, optional = true }
 unspeech_provider_openai = { workspace = true, optional = true }
 unspeech_shared = { workspace = true }
 anyhow = { workspace = true }

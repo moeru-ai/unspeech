@@ -19,6 +19,8 @@ pub async fn speech(
   let token = bearer.token();
 
   match options.provider.as_str() {
+    #[cfg(feature = "elevenlabs")]
+    "elevenlabs" => unspeech_provider_elevenlabs::speech::handle(options, client, token).await,
     #[cfg(feature = "openai")]
     "openai" => unspeech_provider_openai::speech::handle(options, client, token).await,
     _ => Err(AppError::new(

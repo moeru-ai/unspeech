@@ -1514,7 +1514,20 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-subscriber",
+ "unspeech_provider_elevenlabs",
  "unspeech_provider_openai",
+ "unspeech_shared",
+]
+
+[[package]]
+name = "unspeech_provider_elevenlabs"
+version = "0.2.0"
+dependencies = [
+ "anyhow",
+ "axum",
+ "reqwest",
+ "serde",
+ "serde_json",
  "unspeech_shared",
 ]
 

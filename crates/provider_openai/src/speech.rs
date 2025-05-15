@@ -23,7 +23,7 @@ pub struct OpenAISpeechOptions {
   pub response_format: Option<String>,
   // The speed of the generated audio.
   #[serde(skip_serializing_if = "Option::is_none")]
-  pub speed: Option<f32>,
+  pub speed: Option<f64>,
 }
 
 pub async fn handle(
@@ -62,7 +62,6 @@ pub async fn handle(
   let bytes = res.bytes().await?;
 
   let mut headers = HeaderMap::new();
-  // TODO: remove unwrap
   headers.insert(header::CONTENT_TYPE, "audio/mpeg".parse()?);
 
   Ok((headers, bytes))

@@ -20,7 +20,7 @@ pub struct SpeechOptions {
   // The format to audio in.
   pub response_format: Option<String>,
   // The speed of the generated audio.
-  pub speed: Option<f32>,
+  pub speed: Option<f64>,
   #[serde(flatten)]
   pub extra: HashMap<String, Value>,
 }
@@ -38,7 +38,7 @@ pub struct ProcessedSpeechOptions {
   // The format to audio in.
   pub response_format: Option<String>,
   // The speed of the generated audio.
-  pub speed: Option<f32>,
+  pub speed: Option<f64>,
   #[serde(flatten)]
   pub extra: HashMap<String, Value>,
   // One of the available TTS providers.
