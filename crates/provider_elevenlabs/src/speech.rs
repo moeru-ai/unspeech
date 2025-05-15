@@ -7,6 +7,15 @@ use serde::{Deserialize, Serialize};
 use unspeech_shared::{AppError, speech::ProcessedSpeechOptions};
 use url::Url;
 
+#[derive(serde::Serialize)]
+// https://elevenlabs.io/docs/api-reference/text-to-speech/convert#request.query
+pub struct ElevenLabsSpeechQuery {
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub enable_logging: Option<bool>,
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub output_format: Option<String>,
+}
+
 #[derive(Serialize)]
 // https://elevenlabs.io/docs/api-reference/text-to-speech/convert
 pub struct ElevenLabsSpeechOptions {
@@ -16,20 +25,21 @@ pub struct ElevenLabsSpeechOptions {
   pub language_code: Option<String>,
   pub voice_settings: ElevenLabsSpeechVoiceSettings,
   #[serde(skip_serializing_if = "Option::is_none")]
+  pub pronunciation_dictionary_locators: Option<Vec<ElevenLabsSpeechPronunciationDictionaryLocator>>,
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub seed: Option<f64>,
   #[serde(skip_serializing_if = "Option::is_none")]
   pub previous_text: Option<String>,
   #[serde(skip_serializing_if = "Option::is_none")]
   pub next_text: Option<String>,
-}
-
-#[derive(serde::Serialize)]
-// https://elevenlabs.io/docs/api-reference/text-to-speech/convert#request.query
-pub struct ElevenLabsSpeechQuery {
   #[serde(skip_serializing_if = "Option::is_none")]
-  pub enable_logging: Option<bool>,
+  pub previous_request_ids: Option<Vec<String>>,
   #[serde(skip_serializing_if = "Option::is_none")]
-  pub output_format: Option<String>,
+  pub next_request_ids: Option<Vec<String>>,
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub apply_text_normalization: Option<String>,
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub apply_language_text_normalization: Option<bool>,
 }
 
 #[derive(Deserialize, Serialize)]
@@ -45,6 +55,13 @@ pub struct ElevenLabsSpeechVoiceSettings {
   pub use_speaker_boost: Option<bool>,
   #[serde(skip_serializing_if = "Option::is_none")]
   pub speed: Option<f64>,
+}
+
+#[derive(Deserialize, Serialize)]
+// https://elevenlabs.io/docs/api-reference/text-to-speech/convert#request.body.voice_settings
+pub struct ElevenLabsSpeechPronunciationDictionaryLocator {
+  pub pronunciation_dictionary_id: String,
+  pub version_id: Option<String>,
 }
 
 pub async fn handle(
@@ -71,9 +88,14 @@ pub async fn handle(
     model_id: options.model,
     language_code: options.extra.get("language_code").and_then(|v| Some(v.to_string())),
     voice_settings,
+    pronunciation_dictionary_locators: options.extra.get("language_code").and_then(|v| serde_json::from_value(v.clone()).ok()?),
     seed: options.extra.get("seed").and_then(|v| v.as_f64()),
     previous_text: options.extra.get("previous_text").and_then(|v| Some(v.to_string())),
     next_text: options.extra.get("next_text").and_then(|v| Some(v.to_string())),
+    previous_request_ids: options.extra.get("previous_request_ids").and_then(|v| serde_json::from_value(v.clone()).ok()?),
+    next_request_ids: options.extra.get("next_request_ids").and_then(|v| serde_json::from_value(v.clone()).ok()?),
+    apply_text_normalization: options.extra.get("apply_text_normalization").and_then(|v| Some(v.to_string())),
+    apply_language_text_normalization: options.extra.get("apply_language_text_normalization").and_then(|v| v.as_bool())
   };
 
   let query = serde_html_form::to_string(ElevenLabsSpeechQuery {
