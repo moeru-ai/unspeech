@@ -5,6 +5,7 @@ use axum::{
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use unspeech_shared::{AppError, speech::ProcessedSpeechOptions};
+use url::Url;
 
 #[derive(Serialize)]
 // https://elevenlabs.io/docs/api-reference/text-to-speech/convert
@@ -13,7 +14,7 @@ pub struct ElevenLabsSpeechOptions {
   pub model_id: String,
   #[serde(skip_serializing_if = "Option::is_none")]
   pub language_code: Option<String>,
-  pub voice_settings: ElevenLabsSpeechOptionsVoiceSettings,
+  pub voice_settings: ElevenLabsSpeechVoiceSettings,
   #[serde(skip_serializing_if = "Option::is_none")]
   pub seed: Option<f64>,
   #[serde(skip_serializing_if = "Option::is_none")]
@@ -22,8 +23,18 @@ pub struct ElevenLabsSpeechOptions {
   pub next_text: Option<String>,
 }
 
+#[derive(serde::Serialize)]
+// https://elevenlabs.io/docs/api-reference/text-to-speech/convert#request.query
+pub struct ElevenLabsSpeechQuery {
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub enable_logging: Option<bool>,
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub output_format: Option<String>,
+}
+
 #[derive(Deserialize, Serialize)]
-pub struct ElevenLabsSpeechOptionsVoiceSettings {
+// https://elevenlabs.io/docs/api-reference/text-to-speech/convert#request.body.voice_settings
+pub struct ElevenLabsSpeechVoiceSettings {
   #[serde(skip_serializing_if = "Option::is_none")]
   pub stability: Option<f64>,
   #[serde(skip_serializing_if = "Option::is_none")]
@@ -41,12 +52,12 @@ pub async fn handle(
   client: Client,
   token: &str,
 ) -> Result<(HeaderMap, Bytes), AppError> {
-  let voice_settings: ElevenLabsSpeechOptionsVoiceSettings = match options.extra.get("voice_settings") {
-    Some(v) => ElevenLabsSpeechOptionsVoiceSettings {
+  let voice_settings: ElevenLabsSpeechVoiceSettings = match options.extra.get("voice_settings") {
+    Some(v) => ElevenLabsSpeechVoiceSettings {
       speed: options.speed,
-      ..serde_json::from_value::<ElevenLabsSpeechOptionsVoiceSettings>(v.clone())?
+      ..serde_json::from_value::<ElevenLabsSpeechVoiceSettings>(v.clone())?
     },
-    None => ElevenLabsSpeechOptionsVoiceSettings {
+    None => ElevenLabsSpeechVoiceSettings {
       stability: None,
       similarity_boost: None,
       style: None,
@@ -65,13 +76,15 @@ pub async fn handle(
     next_text: options.extra.get("next_text").and_then(|v| Some(v.to_string())),
   };
 
-  // TODO: output_format
-  // TODO: query parameters
-  // https://elevenlabs.io/docs/api-reference/text-to-speech/convert#request.query
-  let url = format!("https://api.elevenlabs.io/v1/text-to-speech/{}?output_format=mp3_44100_128", options.voice);
+  let query = serde_html_form::to_string(ElevenLabsSpeechQuery {
+    enable_logging: options.extra.get("enable_logging").and_then(|v| v.as_bool()),
+    output_format: options.response_format,
+  })?;
+
+  let url = Url::parse(&format!("https://api.elevenlabs.io/v1/text-to-speech/{}?{}", options.voice, query))?;
 
   let res = client
-    .post(&url)
+    .post(url.as_str())
     .header("xi-api-key", token)
     .json(&body)
     .send()
