@@ -115,4 +115,8 @@
       "source.organizeImports": "always"
     },
   },
+
+  "rust-analyzer.rustfmt.extraArgs": [
+    "+nightly"
+  ],
 }

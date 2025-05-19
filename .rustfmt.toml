@@ -16,3 +16,5 @@ match_block_trailing_comma = true
 # unstable_features = true # nightly
 use_field_init_shorthand = true
 use_try_shorthand = true
+struct_field_align_threshold = 999
+max_width = 512

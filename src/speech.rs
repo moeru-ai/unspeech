@@ -10,11 +10,7 @@ use unspeech_shared::{
 };
 
 #[debug_handler]
-pub async fn speech(
-  State(client): State<Client>,
-  TypedHeader(bearer): TypedHeader<Authorization<Bearer>>,
-  Json(body): Json<SpeechOptions>,
-) -> Result<(HeaderMap, Bytes), AppError> {
+pub async fn speech(State(client): State<Client>, TypedHeader(bearer): TypedHeader<Authorization<Bearer>>, Json(body): Json<SpeechOptions>) -> Result<(HeaderMap, Bytes), AppError> {
   let options = process_speech_options(body)?;
   let token = bearer.token();
 
@@ -23,9 +19,6 @@ pub async fn speech(
     "elevenlabs" => unspeech_provider_elevenlabs::speech::handle(options, client, token).await,
     #[cfg(feature = "openai")]
     "openai" => unspeech_provider_openai::speech::handle(options, client, token).await,
-    _ => Err(AppError::new(
-      anyhow::anyhow!("Unsupported provider: {}", options.provider),
-      None,
-    )),
+    _ => Err(AppError::new(anyhow::anyhow!("Unsupported provider: {}", options.provider), None)),
   }
 }

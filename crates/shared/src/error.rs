@@ -8,32 +8,26 @@ use serde::Serialize;
 #[derive(Debug)]
 pub struct AppError {
   /// An error message.
-  pub error: anyhow::Error,
+  pub error:  anyhow::Error,
   pub status: StatusCode,
 }
 
 impl AppError {
   pub fn new(error: anyhow::Error, status: Option<StatusCode>) -> Self {
-    Self {
-      error,
-      status: status.unwrap_or_else(|| StatusCode::INTERNAL_SERVER_ERROR),
-    }
+    Self { error, status: status.unwrap_or_else(|| StatusCode::INTERNAL_SERVER_ERROR) }
   }
 }
 
 #[derive(Serialize)]
 pub struct AppErrorResponse {
   /// An error message.
-  pub error: String,
+  pub error:  String,
   pub status: u16,
 }
 
 impl AppErrorResponse {
   pub fn new(err: AppError) -> Self {
-    Self {
-      error: err.error.to_string(),
-      status: err.status.as_u16(),
-    }
+    Self { error: err.error.to_string(), status: err.status.as_u16() }
   }
 }
 
