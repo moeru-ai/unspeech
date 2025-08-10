@@ -171,7 +171,7 @@ export const createUnElevenLabs = (apiKey: string, baseURL = 'http://localhost:5
       }
 
       return {
-        query: `provider=elevenlabs`,
+        query: 'provider=elevenlabs',
         ...(options ? toUnSpeechOptions(options) : {}),
         apiKey,
         baseURL,

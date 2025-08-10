@@ -8,14 +8,18 @@ import type { UnSpeechOptions, VoiceProviderWithExtraOptions } from '../types'
 export interface UnVolcengineOptions {
   app?: {
     appId?: string
-    cluster?: string | 'volcano_tts'
-  }
-  user?: {
-    uid?: string
+    cluster?: 'volcano_tts' | string
   }
   audio?: {
-    emotion?: string | 'angry'
-    enableEmotion?: boolean
+    /**
+     * @default 160
+     */
+    bitRate?: 160 | number
+    /**
+     * Languages that contextual to the model
+     */
+    contextLanguage?: 'es' | 'id' | 'pt' | string
+    emotion?: 'angry' | string
     /**
      * After calling emotion to set the emotion parameter you can use emotion_scale to
      * further set the emotion value, the range is 1~5, the default value is 4 when not
@@ -31,24 +35,11 @@ export interface UnVolcengineOptions {
      * @default 4
      */
     emotionScale?: number
+    enableEmotion?: boolean
     /**
      * @default 'mp3'
      */
-    encoding?: 'wav' | 'pcm' | 'ogg_opus' | 'mp3'
-    /**
-     * 0.8~2
-     *
-     * @default 1
-     */
-    speedRatio?: number
-    /**
-     * @default 24000
-     */
-    rate?: number | 24000 | 8000 | 16000
-    /**
-     * @default 160
-     */
-    bitRate?: number | 160
+    encoding?: 'mp3' | 'ogg_opus' | 'pcm' | 'wav'
     /**
      * - undefined: General mixed bilingual
      * - crosslingual: mix with zh/en/ja/es-ms/id/pt-br
@@ -61,34 +52,43 @@ export interface UnVolcengineOptions {
      *
      * @default 'en'
      */
-    explicitLanguage?: string | 'crosslingual' | 'zh' | 'en' | 'jp' | 'es-mx' | 'id' | 'pt-br'
-    /**
-     * Languages that contextual to the model
-     */
-    contextLanguage?: string | 'id' | 'es' | 'pt'
+    explicitLanguage?: 'crosslingual' | 'en' | 'es-mx' | 'id' | 'jp' | 'pt-br' | 'zh' | string
     /**
      * 0.5 ~ 2
      *
      * @default 1
      */
     loudnessRatio?: number
+    /**
+     * @default 24000
+     */
+    rate?: 8000 | 16000 | 24000 | number
+    /**
+     * 0.8~2
+     *
+     * @default 1
+     */
+    speedRatio?: number
   }
   request?: {
+    cacheConfig?: Record<string, unknown>
+    disableMarkdownFilter?: boolean
+    enableLatexTone?: boolean
+    extraParam?: string
     reqid?: string
-    /**
-     * - set to `ssml` to use SSML
-     */
-    textType?: string | 'ssml'
     /**
      * 0 ~ 30000ms
      */
     silenceDuration?: number
-    withTimestamp?: string
-    extraParam?: string
-    disableMarkdownFilter?: boolean
-    enableLatexTone?: boolean
-    cacheConfig?: Record<string, unknown>
+    /**
+     * - set to `ssml` to use SSML
+     */
+    textType?: 'ssml' | string
     useCache?: boolean
+    withTimestamp?: string
+  }
+  user?: {
+    uid?: string
   }
 }
 
@@ -101,7 +101,6 @@ export interface UnVolcengineOptions {
  * as ElevenLabs, Azure TTS, Google TTS, etc.
  *
  * @param apiKey - Volcano Engine Speech Service Token
- * @param appId - Volcano Engine Speech Service App ID
  * @param baseURL - UnSpeech Instance URL
  * @returns SpeechProviderWithExtraOptions
  */
@@ -156,7 +155,7 @@ export const createUnVolcengine = (apiKey: string, baseURL = 'http://localhost:5
       }
 
       return {
-        query: `provider=volcengine`,
+        query: 'provider=volcengine',
         ...(options ? toUnSpeechOptions(options) : {}),
         apiKey,
         baseURL,
