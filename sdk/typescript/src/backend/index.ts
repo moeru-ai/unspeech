@@ -1,32 +1,32 @@
 import { createSpeechProviderWithExtraOptions, merge } from '@xsai-ext/shared-providers'
 
-import { MicrosoftRegions } from './microsoft'
-import { UnSpeechOptions, VoiceProviderWithExtraOptions } from '../types'
+import type { UnSpeechOptions, VoiceProviderWithExtraOptions } from '../types'
+import type { MicrosoftRegions } from './microsoft'
 
+export * from './alibabacloud'
 export * from './elevenlabs'
 export * from './microsoft'
 export * from './volcengine'
-export * from './alibabacloud'
 
 /** @see {@link https://github.com/moeru-ai/unspeech} */
 export const createUnSpeech = (apiKey: string, baseURL = 'http://localhost:5933/v1/') => {
   const voiceProvider: VoiceProviderWithExtraOptions<
     {
-  backend:
-  | 'elevenlabs'
-  | 'koemotion'
-  | 'openai'
-  | 'alibaba' | 'aliyun' | 'ali' | 'bailian' | 'alibaba-model-studio'
-} | {
-  backend: 'microsoft' | 'azure'
-  region: MicrosoftRegions | string
-} | {
-  backend: 'volcengine'
-  appId: string
-} | {
-  backend: 'volcano'
-  appId: string
-}
+      appId: string
+      backend: 'volcano'
+    } | {
+      appId: string
+      backend: 'volcengine'
+    } | {
+      backend: 'azure' | 'microsoft'
+      region: MicrosoftRegions | string
+    } | {
+      backend:
+        | 'ali'
+        | 'alibaba'
+        | 'alibaba-model-studio'
+        | 'aliyun' | 'bailian' | 'elevenlabs' | 'koemotion' | 'openai'
+    }
   > = {
     voice: (options) => {
       if (baseURL.endsWith('v1/')) {
@@ -38,31 +38,31 @@ export const createUnSpeech = (apiKey: string, baseURL = 'http://localhost:5933/
 
       if (options?.backend === 'microsoft' || options?.backend === 'azure') {
         return {
-          query: `region=${options.region}&provider=${options.backend}`,
-          baseURL,
           apiKey,
+          baseURL,
+          query: `region=${options.region}&provider=${options.backend}`,
         }
       }
 
       return {
-        query: `provider=${options?.backend}`,
-        baseURL,
         apiKey,
+        baseURL,
+        query: `provider=${options?.backend}`,
       }
     },
   }
 
   return merge(
-  createSpeechProviderWithExtraOptions<
-    | `elevenlabs/${string}`
-    | `koemotion/${string}`
-    | `openai/${string}`
-    | `volcengine/${string}`
-    | `volcano/${string}`
-    | `aliyun/${string}`
-    | `alibaba/${string}`,
+    createSpeechProviderWithExtraOptions<
+      | `alibaba/${string}`
+      | `aliyun/${string}`
+      | `elevenlabs/${string}`
+      | `koemotion/${string}`
+      | `openai/${string}`
+      | `volcano/${string}`
+      | `volcengine/${string}`,
     UnSpeechOptions
       >({ apiKey, baseURL }),
-    voiceProvider
+    voiceProvider,
   )
 }

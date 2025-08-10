@@ -7,6 +7,16 @@ import type { UnSpeechOptions, VoiceProviderWithExtraOptions } from '../types'
 
 export interface UnAlibabaCloudOptions {
   /**
+   * Speech pitch. Range: 0.5 to 2.0.
+   * @default 1.0
+   */
+  pitch?: number
+  /**
+   * Speech rate. Range: 0.5 to 2.0.
+   * @default 1.0
+   */
+  rate?: number
+  /**
    * Sampling rate of the synthesized audio.
    * @default 22050
    */
@@ -16,16 +26,6 @@ export interface UnAlibabaCloudOptions {
    * @default 50
    */
   volume?: number
-  /**
-   * Speech rate. Range: 0.5 to 2.0.
-   * @default 1.0
-   */
-  rate?: number
-  /**
-   * Speech pitch. Range: 0.5 to 2.0.
-   * @default 1.0
-   */
-  pitch?: number
 }
 
 /**
@@ -42,13 +42,13 @@ export interface UnAlibabaCloudOptions {
  */
 export const createUnAlibabaCloud = (apiKey: string, baseURL = 'http://localhost:5933/v1/') => {
   const toUnSpeechOptions = (options: UnAlibabaCloudOptions): UnSpeechOptions => {
-    const { sampleRate, volume, rate, pitch } = options
+    const { pitch, rate, sampleRate, volume } = options
 
     const extraBody: Record<string, unknown> = {
+      pitch,
+      rate,
       sampleRate,
       volume,
-      rate,
-      pitch,
     }
 
     // Remove undefined values before converting keys

@@ -18,6 +18,7 @@ export default antfu({ typescript: { tsconfigPath: './tsconfig.json' } })
     rules: {
       '@masknet/no-default-error': 'off',
       '@masknet/no-then': 'off',
+      '@masknet/unicode-specific-set': 'off',
       'sonarjs/todo-tag': 'warn',
     },
   })
