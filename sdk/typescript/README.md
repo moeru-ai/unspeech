@@ -37,22 +37,22 @@ import { generateSpeech } from '@xsai/generate-speech'
 import { createUnSpeech } from 'unspeech'
 
 const unspeech = createUnSpeech('YOUR_EXTERNAL_PROVIDER_API_KEY', 'http://localhost:5933/v1/')
-const speech = await generateSpeech(
+const speech = await generateSpeech({
   ...unspeech.speech('elevenlabs/eleven_multilingual_v2'),
-  voice: '9BWtsMINqrJLrRacOk9x',
   input: 'Hello, World!',
-)
+  voice: '9BWtsMINqrJLrRacOk9x',
+})
 ```
 
 For the other providers, you can import them as needed
 
 ```ts
 import {
+  createUnAlibabaCloud,
   createUnElevenLabs,
   createUnMicrosoft,
   createUnSpeech,
-  createUnAlibabaCloud,
-  createUnVolcengine
+  createUnVolcengine,
 } from 'unspeech'
 ```
 

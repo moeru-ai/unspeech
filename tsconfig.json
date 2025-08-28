@@ -1,0 +1,11 @@
+{
+  "references": [
+    {
+      "path": "./sdk/typescript/tsconfig.json"
+    },
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ],
+  "files": []
+}
