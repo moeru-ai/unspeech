@@ -1,5 +1,5 @@
 import { join } from 'node:path'
-import { defineConfig } from 'tsup'
+import { defineConfig } from 'tsdown'
 
 export default defineConfig({
   dts: true,
