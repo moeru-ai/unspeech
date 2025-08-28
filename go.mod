@@ -11,12 +11,12 @@ require (
 	github.com/lmittmann/tint v1.1.2
 	github.com/nekomeowww/xo v1.17.0
 	github.com/samber/lo v1.51.0
-	github.com/samber/mo v1.14.1
+	github.com/samber/mo v1.15.0
 	github.com/samber/slog-echo v1.16.1
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
 	github.com/vincent-petithory/dataurl v1.0.0
-	k8s.io/client-go v0.33.3
+	k8s.io/client-go v0.34.0
 )
 
 require (
@@ -44,6 +44,6 @@ require (
 	golang.org/x/sys v0.35.0 // indirect
 	golang.org/x/text v0.28.0 // indirect
 	golang.org/x/time v0.12.0 // indirect
-	google.golang.org/protobuf v1.36.7 // indirect
+	google.golang.org/protobuf v1.36.8 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
