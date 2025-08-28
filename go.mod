@@ -1,8 +1,6 @@
 module github.com/moeru-ai/unspeech
 
-go 1.24.0
-
-toolchain go1.24.1
+go 1.25.0
 
 require (
 	github.com/evanphx/json-patch/v5 v5.9.11

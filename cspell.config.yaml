@@ -45,6 +45,7 @@ words:
   - gofumpt
   - goheader
   - goimports
+  - golangci
   - gomnd
   - goprintffuncname
   - gosec
