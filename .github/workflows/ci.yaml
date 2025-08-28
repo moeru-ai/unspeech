@@ -11,7 +11,7 @@ on:
 jobs:
   build-test:
     name: Build Test
-    runs-on: "ubuntu-latest"
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
@@ -19,7 +19,7 @@ jobs:
 
       - uses: actions/setup-go@v5
         with:
-          go-version: "stable"
+          go-version: stable
           cache: true
 
       - name: Test Build
@@ -33,14 +33,14 @@ jobs:
 
       - uses: actions/setup-go@v5
         with:
-          go-version: "stable"
+          go-version: stable
           cache: true
 
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v8
         with:
           # Optional: golangci-lint command line arguments.
-          args: "--timeout=10m"
+          args: --timeout=10m
 
   unittest:
     name: Unit Test
@@ -52,7 +52,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: "stable"
+          go-version: stable
           cache: true
 
       - name: Unit tests

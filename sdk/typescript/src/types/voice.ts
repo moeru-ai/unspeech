@@ -33,10 +33,9 @@ export interface VoiceLanguage {
 }
 
 export interface VoiceProvider {
-  // eslint-disable-next-line sonarjs/no-useless-intersection
-  voice: () => Omit<CommonRequestOptions, 'model'> & {query?: string }
+  voice: () => Omit<CommonRequestOptions, 'model'> & { query?: string }
 }
 
 export interface VoiceProviderWithExtraOptions<T = undefined> {
-  voice: (options?: T) => Omit<CommonRequestOptions, 'model'> & {query?: string } & Partial<T>
+  voice: (options?: T) => Omit<CommonRequestOptions, 'model'> & Partial<T> & { query?: string }
 }
