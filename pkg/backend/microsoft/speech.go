@@ -140,8 +140,6 @@ func processSSML(input string, option types.SpeechRequestOptions, extraBody mo.O
 	if extraBody.OrEmpty().Gender.IsPresent() {
 		defaultGender = extraBody.MustGet().Gender.MustGet()
 	}
-
-	// Check if input already contains SSML
 	if !strings.Contains(input, "<speak") {
 		// For plain text, format with defaults
 		return formatAsSSML(input, defaultLang, defaultGender, defaultVoiceName)

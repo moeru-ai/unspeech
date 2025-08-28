@@ -51,10 +51,12 @@ func HandleSpeech(c echo.Context, options mo.Option[types.SpeechRequestOptions])
 				WithCaller(),
 		)
 	}
+
 	defer func() { _ = res.Body.Close() }()
 
-	if res.StatusCode >= 400 {
+	if res.StatusCode >= http.StatusBadRequest {
 		ct := res.Header.Get("Content-Type")
+
 		switch {
 		case strings.HasPrefix(ct, "application/json"):
 			return mo.Err[any](
@@ -72,6 +74,7 @@ func HandleSpeech(c echo.Context, options mo.Option[types.SpeechRequestOptions])
 				slog.String("content_type", ct),
 				slog.String("content_length", res.Header.Get("Content-Length")),
 			)
+
 			return mo.Err[any](
 				apierrors.NewUpstreamError(res.StatusCode).
 					WithDetail("unknown Content-Type: " + ct),

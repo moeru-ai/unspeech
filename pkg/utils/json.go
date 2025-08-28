@@ -70,6 +70,7 @@ func FromMap[T any, MK comparable, MV any](m map[MK]MV) (*T, error) {
 	if m == nil {
 		return nil, nil
 	}
+
 	if len(m) == 0 {
 		return nil, nil
 	}

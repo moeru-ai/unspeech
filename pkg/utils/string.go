@@ -324,6 +324,7 @@ func FromString[T any](str string) (T, error) { //nolint:gocyclo
 		var sb strings.Builder
 
 		sb.WriteString(str)
+
 		val, _ := any(&sb).(T)
 
 		return val, nil
