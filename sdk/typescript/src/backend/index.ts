@@ -61,8 +61,8 @@ export const createUnSpeech = (apiKey: string, baseURL = 'http://localhost:5933/
       | `openai/${string}`
       | `volcano/${string}`
       | `volcengine/${string}`,
-    UnSpeechOptions
-      >({ apiKey, baseURL }),
+      UnSpeechOptions
+    >({ apiKey, baseURL }),
     voiceProvider,
   )
 }

@@ -144,7 +144,7 @@ export const createUnVolcengine = (apiKey: string, baseURL = 'http://localhost:5
   }
 
   const voiceProvider: VoiceProviderWithExtraOptions<
-  UnVolcengineOptions
+    UnVolcengineOptions
   > = {
     voice: (options) => {
       if (baseURL.endsWith('v1/')) {
