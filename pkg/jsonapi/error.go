@@ -34,6 +34,8 @@ type ErrorObjectSource struct {
 	Header string `json:"header,omitempty"`
 }
 
+// ErrorObject
+//
 // JSON API spec error object
 // Documentation: https://jsonapi.org/format/#error-objects
 type ErrorObject struct {
