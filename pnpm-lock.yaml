@@ -15,8 +15,8 @@ importers:
         specifier: 1.0.0-beta.2
         version: 1.0.0-beta.2
       '@moeru/eslint-config':
-        specifier: 0.1.0-beta.9
-        version: 0.1.0-beta.9(@antfu/eslint-config@6.2.0(@vue/compiler-sfc@3.5.20)(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
+        specifier: ^0.1.0-beta.13
+        version: 0.1.0-beta.13(@antfu/eslint-config@6.2.0(@vue/compiler-sfc@3.5.20)(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
       '@types/node':
         specifier: ^24.10.1
         version: 24.10.1
@@ -399,25 +399,25 @@ packages:
   '@jridgewell/trace-mapping@0.3.30':
     resolution: {integrity: sha512-GQ7Nw5G2lTu/BtHTKfXhKHok2WGetd4XYcVKGx00SjAk8GMwgJM3zr6zORiPGuOE+/vkc90KtTosSSvaCjKb2Q==}
 
-  '@masknet/eslint-plugin@0.3.0':
-    resolution: {integrity: sha512-JXWUhcmUY20vEr70C6JJwVw7LZ8pGjXTcXWuSc4Ogj9vbASB9QJLPbgVuss66KOGMEDnuVFa2N01wE78+nBpPA==}
-    engines: {node: '>= 18'}
+  '@masknet/eslint-plugin@0.4.1':
+    resolution: {integrity: sha512-Bl0e0ZC2iZn+pvQcDA+kP9XZU5cuNRA6je9q7VxaaJrURpMGC/P7+DsqlqCDbZ5IF0Q4OZwivi75YDfXJuDjBw==}
+    engines: {node: '>= 22'}
     peerDependencies:
-      eslint: '>= 8'
+      eslint: '>= 9'
 
-  '@moeru/eslint-config@0.1.0-beta.9':
-    resolution: {integrity: sha512-YPL92eg9riAEdo2jfUh0sJu9ih77WxtGYs37lKc9xjDjGOCVByBMzJ0RJdLkcnmaHfQeV0QfRfbDp5nMTbY0HQ==}
+  '@moeru/eslint-config@0.1.0-beta.13':
+    resolution: {integrity: sha512-iowU67XRnaDG99Zi0IotuyqjRrVHj5bnnv//XafQn2IsK1/WKCJc59MS6xmIJ8KhNarFeOj+SdAzkjjh7z3IOA==}
     hasBin: true
     peerDependencies:
-      '@antfu/eslint-config': ^4.12.0
-      eslint: ^9.25.1
-      eslint-plugin-oxlint: ^1.3.0
+      '@antfu/eslint-config': ^6.0.0
+      eslint: ^9.37.0
+      eslint-plugin-oxlint: ^1.23.0
     peerDependenciesMeta:
       eslint-plugin-oxlint:
         optional: true
 
-  '@moeru/std@0.1.0-beta.9':
-    resolution: {integrity: sha512-VDK4Q3u4nwEihWZehbvZX5mTzCTse1yu3st07lfs3UceKYwIfkUNwO36VZ7g8B+bleR4qyRBsKmDCETX2pfmTA==}
+  '@moeru/std@0.1.0-beta.13':
+    resolution: {integrity: sha512-h96JMCYgXZwMBrw1bGJ6xVVIwhjc9mfKEKMtQdti55x1NJm2wHBLJVYtGV3ULr7lGtTQEn2sW1F/9YIqV6mF2Q==}
 
   '@napi-rs/wasm-runtime@1.0.7':
     resolution: {integrity: sha512-SeDnOO0Tk7Okiq6DbXmmBODgOAb9dp9gjlphokTUxmt8U3liIP1ZsozBahH69j/RJv+Rfs6IwUKHTgQYJ/HBAw==}
@@ -939,11 +939,14 @@ packages:
     peerDependencies:
       eslint: '*'
 
-  eslint-plugin-de-morgan@1.3.1:
-    resolution: {integrity: sha512-pB0xqHPXCRgCFnFSLvQDSP/egYrlccYMI0txz4gzBF6RuT2X+4LsZl0JoWAQc7dphEjJBQ3dWyMqXfBgdP2UVg==}
-    engines: {node: ^18.0.0 || >=20.0.0}
+  eslint-plugin-de-morgan@2.0.0:
+    resolution: {integrity: sha512-oGkawlmwOp7p3yYG/abEkQRw6IfQ677E5ejQulUZdXdXpSHv/jNNaHPokA7mo1SaxcQWRn5vojaBLrwJ7wy5MQ==}
+    engines: {node: ^20.0.0 || >=22.0.0}
     peerDependencies:
       eslint: '>=8.0.0'
+
+  eslint-plugin-depend@1.4.0:
+    resolution: {integrity: sha512-MQs+m4nHSfgAO9bJDsBzqw0ofK/AOA0vfeY/6ahofqcUMLeM6/D1sTYs21fOhc17kNU/gn58YCtj20XaAssh2A==}
 
   eslint-plugin-es-x@7.8.0:
     resolution: {integrity: sha512-7Ds8+wAAoV3T+LAKeu39Y5BzXCrGKrcISfgKEqTS4BDN8SFEDQd0S43jiQ8vIa3wUKD07qitZdfzlenSi8/0qQ==}
@@ -1448,6 +1451,9 @@ packages:
 
   mlly@1.8.0:
     resolution: {integrity: sha512-l8D9ODSRWLe2KHJSifWGwBqpTZXIXTeo8mlKjY+E2HAakaTeNpqAyBZ8GSqLzHgw4XmHmC8whvpjJNMbFZN7/g==}
+
+  module-replacements@2.10.1:
+    resolution: {integrity: sha512-qkKuLpMHDqRSM676OPL7HUpCiiP3NSxgf8NNR1ga2h/iJLNKTsOSjMEwrcT85DMSti2vmOqxknOVBGWj6H6etQ==}
 
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
@@ -2132,26 +2138,28 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@masknet/eslint-plugin@0.3.0(eslint@9.39.1(jiti@2.6.1))':
+  '@masknet/eslint-plugin@0.4.1(eslint@9.39.1(jiti@2.6.1))':
     dependencies:
       eslint: 9.39.1(jiti@2.6.1)
 
-  '@moeru/eslint-config@0.1.0-beta.9(@antfu/eslint-config@6.2.0(@vue/compiler-sfc@3.5.20)(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)':
+  '@moeru/eslint-config@0.1.0-beta.13(@antfu/eslint-config@6.2.0(@vue/compiler-sfc@3.5.20)(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)':
     dependencies:
       '@antfu/eslint-config': 6.2.0(@vue/compiler-sfc@3.5.20)(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
-      '@masknet/eslint-plugin': 0.3.0(eslint@9.39.1(jiti@2.6.1))
-      '@moeru/std': 0.1.0-beta.9
+      '@masknet/eslint-plugin': 0.4.1(eslint@9.39.1(jiti@2.6.1))
+      '@moeru/std': 0.1.0-beta.13
       eslint: 9.39.1(jiti@2.6.1)
       eslint-flat-config-utils: 2.1.4
-      eslint-plugin-de-morgan: 1.3.1(eslint@9.39.1(jiti@2.6.1))
+      eslint-plugin-de-morgan: 2.0.0(eslint@9.39.1(jiti@2.6.1))
+      eslint-plugin-depend: 1.4.0
       eslint-plugin-perfectionist: 4.15.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
       eslint-plugin-prefer-arrow: 1.2.3(eslint@9.39.1(jiti@2.6.1))
       eslint-plugin-sonarjs: 3.0.5(eslint@9.39.1(jiti@2.6.1))
+      tinyexec: 1.0.2
     transitivePeerDependencies:
       - supports-color
       - typescript
 
-  '@moeru/std@0.1.0-beta.9': {}
+  '@moeru/std@0.1.0-beta.13': {}
 
   '@napi-rs/wasm-runtime@1.0.7':
     dependencies:
@@ -2657,9 +2665,15 @@ snapshots:
       '@es-joy/jsdoccomment': 0.50.2
       eslint: 9.39.1(jiti@2.6.1)
 
-  eslint-plugin-de-morgan@1.3.1(eslint@9.39.1(jiti@2.6.1)):
+  eslint-plugin-de-morgan@2.0.0(eslint@9.39.1(jiti@2.6.1)):
     dependencies:
       eslint: 9.39.1(jiti@2.6.1)
+
+  eslint-plugin-depend@1.4.0:
+    dependencies:
+      empathic: 2.0.0
+      module-replacements: 2.10.1
+      semver: 7.7.3
 
   eslint-plugin-es-x@7.8.0(eslint@9.39.1(jiti@2.6.1)):
     dependencies:
@@ -3412,6 +3426,8 @@ snapshots:
       pathe: 2.0.3
       pkg-types: 1.3.1
       ufo: 1.6.1
+
+  module-replacements@2.10.1: {}
 
   ms@2.1.3: {}
 

@@ -1,9 +1,9 @@
 import type { SpeechProviderWithExtraOptions } from '@xsai-ext/shared-providers'
 
+import type { UnSpeechOptions, VoiceProviderWithExtraOptions } from '../types'
+
 import { merge } from '@xsai-ext/shared-providers'
 import { objCamelToSnake } from '@xsai/shared'
-
-import type { UnSpeechOptions, VoiceProviderWithExtraOptions } from '../types'
 
 export type MicrosoftRegions
   = | 'australiaeast'
@@ -112,7 +112,7 @@ export type UnMicrosoftOptions = (UnMicrosoftOptionAutoSSML | UnMicrosoftOptionC
  * @param baseURL - UnSpeech Instance URL
  * @returns SpeechProviderWithExtraOptions
  */
-export const createUnMicrosoft = (apiKey: string, baseURL = 'http://localhost:5933/v1/') => {
+export function createUnMicrosoft(apiKey: string, baseURL = 'http://localhost:5933/v1/') {
   const toUnSpeechOptions = (options: UnMicrosoftOptions): UnSpeechOptions => {
     const { deploymentId, region, sampleRate } = options
 

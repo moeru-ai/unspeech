@@ -8,12 +8,13 @@
     "build": "pnpm -r run build",
     "bump": "bumpp",
     "lint": "eslint --flag unstable_native_nodejs_ts_config --cache .",
+    "lint:fix": "eslint --flag unstable_native_nodejs_ts_config --cache . --fix",
     "test": "vitest"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^6.2.0",
     "@importantimport/tsconfig": "1.0.0-beta.2",
-    "@moeru/eslint-config": "0.1.0-beta.9",
+    "@moeru/eslint-config": "^0.1.0-beta.13",
     "@types/node": "^24.10.1",
     "bumpp": "^10.3.1",
     "eslint": "^9.39.1",

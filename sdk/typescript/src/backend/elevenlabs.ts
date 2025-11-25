@@ -1,9 +1,9 @@
 import type { SpeechProviderWithExtraOptions } from '@xsai-ext/shared-providers'
 
+import type { UnSpeechOptions, VoiceProviderWithExtraOptions } from '../types'
+
 import { merge } from '@xsai-ext/shared-providers'
 import { objCamelToSnake } from '@xsai/shared'
-
-import type { UnSpeechOptions, VoiceProviderWithExtraOptions } from '../types'
 
 /** @see {@link https://elevenlabs.io/docs/api-reference/text-to-speech/convert#request} */
 export interface UnElevenLabsOptions {
@@ -114,7 +114,7 @@ export interface UnElevenLabsOptions {
  * @param baseURL - UnSpeech Instance URL
  * @returns SpeechProviderWithExtraOptions
  */
-export const createUnElevenLabs = (apiKey: string, baseURL = 'http://localhost:5933/v1/') => {
+export function createUnElevenLabs(apiKey: string, baseURL = 'http://localhost:5933/v1/') {
   const toUnSpeechOptions = ({
     applyTextNormalization,
     languageCode,

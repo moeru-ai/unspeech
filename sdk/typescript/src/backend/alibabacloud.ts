@@ -1,9 +1,9 @@
 import type { SpeechProviderWithExtraOptions } from '@xsai-ext/shared-providers'
 
+import type { UnSpeechOptions, VoiceProviderWithExtraOptions } from '../types'
+
 import { merge } from '@xsai-ext/shared-providers'
 import { objCamelToSnake } from '@xsai/shared'
-
-import type { UnSpeechOptions, VoiceProviderWithExtraOptions } from '../types'
 
 export interface UnAlibabaCloudOptions {
   /**
@@ -40,7 +40,7 @@ export interface UnAlibabaCloudOptions {
  * @param baseURL - UnSpeech Instance URL
  * @returns SpeechProviderWithExtraOptions & VoiceProviderWithExtraOptions
  */
-export const createUnAlibabaCloud = (apiKey: string, baseURL = 'http://localhost:5933/v1/') => {
+export function createUnAlibabaCloud(apiKey: string, baseURL = 'http://localhost:5933/v1/') {
   const toUnSpeechOptions = (options: UnAlibabaCloudOptions): UnSpeechOptions => {
     const { pitch, rate, sampleRate, volume } = options
 

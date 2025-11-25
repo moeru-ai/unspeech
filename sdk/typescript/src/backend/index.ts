@@ -1,7 +1,7 @@
-import { createSpeechProviderWithExtraOptions, merge } from '@xsai-ext/shared-providers'
-
 import type { UnSpeechOptions, VoiceProviderWithExtraOptions } from '../types'
 import type { MicrosoftRegions } from './microsoft'
+
+import { createSpeechProviderWithExtraOptions, merge } from '@xsai-ext/shared-providers'
 
 export * from './alibabacloud'
 export * from './elevenlabs'
@@ -9,7 +9,7 @@ export * from './microsoft'
 export * from './volcengine'
 
 /** @see {@link https://github.com/moeru-ai/unspeech} */
-export const createUnSpeech = (apiKey: string, baseURL = 'http://localhost:5933/v1/') => {
+export function createUnSpeech(apiKey: string, baseURL = 'http://localhost:5933/v1/') {
   const voiceProvider: VoiceProviderWithExtraOptions<
     {
       appId: string
