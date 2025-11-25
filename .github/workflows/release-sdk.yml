@@ -24,10 +24,13 @@ jobs:
           cache: pnpm
           node-version: latest
           registry-url: https://registry.npmjs.org
+
+      # npm 11.5.1 or later is required so update to latest to use OIDC trusted publisher
+      # https://github.com/eslint/config-inspector/pull/174/files
+      # https://github.com/e18e/ecosystem-issues/issues/201
+      - run: npm install -g npm@latest
+
       - run: pnpm install --frozen-lockfile
       - working-directory: sdk/typescript
         run: pnpm -F unspeech build
       - run: pnpm publish -r --no-git-checks --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_CONFIG_PROVENANCE: true
