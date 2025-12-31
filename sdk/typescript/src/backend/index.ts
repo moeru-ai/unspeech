@@ -4,6 +4,7 @@ import type { MicrosoftRegions } from './microsoft'
 import { createSpeechProviderWithExtraOptions, merge } from '@xsai-ext/shared-providers'
 
 export * from './alibabacloud'
+export * from './deepgram'
 export * from './elevenlabs'
 export * from './microsoft'
 export * from './volcengine'
@@ -25,7 +26,7 @@ export function createUnSpeech(apiKey: string, baseURL = 'http://localhost:5933/
         | 'ali'
         | 'alibaba'
         | 'alibaba-model-studio'
-        | 'aliyun' | 'bailian' | 'elevenlabs' | 'koemotion' | 'openai'
+        | 'aliyun' | 'bailian' | 'deepgram' | 'elevenlabs' | 'koemotion' | 'openai'
     }
   > = {
     voice: (options) => {
@@ -56,6 +57,7 @@ export function createUnSpeech(apiKey: string, baseURL = 'http://localhost:5933/
     createSpeechProviderWithExtraOptions<
       | `alibaba/${string}`
       | `aliyun/${string}`
+      | `deepgram/${string}`
       | `elevenlabs/${string}`
       | `koemotion/${string}`
       | `openai/${string}`
