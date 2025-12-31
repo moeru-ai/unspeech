@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 	"github.com/moeru-ai/unspeech/pkg/apierrors"
@@ -45,8 +46,8 @@ func HandleSpeech(c echo.Context, options mo.Option[types.SpeechRequestOptions])
 	}
 
 	auth := c.Request().Header.Get("Authorization")
-	if len(auth) > 7 && auth[:7] == "Bearer " {
-		auth = "Token " + auth[7:]
+	if strings.HasPrefix(auth, "Bearer ") {
+		auth = "Token " + strings.TrimPrefix(auth, "Bearer ")
 	}
 	req.Header.Set("Authorization", auth)
 	req.Header.Set("Content-Type", "application/json")

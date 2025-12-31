@@ -3,6 +3,7 @@ package deepgram
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 	"github.com/moeru-ai/unspeech/pkg/apierrors"
@@ -37,8 +38,8 @@ type DeepgramModelsResponse struct {
 func HandleVoices(c echo.Context, options mo.Option[types.VoicesRequestOptions]) mo.Result[any] {
 	// Deepgram requires authentication to list models
 	auth := c.Request().Header.Get("Authorization")
-	if len(auth) > 7 && auth[:7] == "Bearer " {
-		auth = "Token " + auth[7:]
+	if strings.HasPrefix(auth, "Bearer ") {
+		auth = "Token " + strings.TrimPrefix(auth, "Bearer ")
 	}
 
 	req, err := http.NewRequestWithContext(
