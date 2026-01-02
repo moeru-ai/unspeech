@@ -15,7 +15,7 @@ func TestJSONPatchReplace(t *testing.T) {
 	))
 	require.NoError(t, err)
 
-	patched, err := patch.Apply(lo.Must(json.Marshal(map[string]interface{}{
+	patched, err := patch.Apply(lo.Must(json.Marshal(map[string]any{
 		"model": "gpt-3.5",
 	})))
 	require.NoError(t, err)
@@ -31,7 +31,7 @@ func TestJSONPatchAdd(t *testing.T) {
 	))
 	require.NoError(t, err)
 
-	patched, err := patch.Apply(lo.Must(json.Marshal(map[string]interface{}{
+	patched, err := patch.Apply(lo.Must(json.Marshal(map[string]any{
 		"model": "gpt-3.5",
 	})))
 	require.NoError(t, err)
@@ -45,7 +45,7 @@ func TestJSONPatchRemove(t *testing.T) {
 	))
 	require.NoError(t, err)
 
-	patched, err := patch.Apply(lo.Must(json.Marshal(map[string]interface{}{
+	patched, err := patch.Apply(lo.Must(json.Marshal(map[string]any{
 		"model": "gpt-3.5",
 	})))
 	require.NoError(t, err)

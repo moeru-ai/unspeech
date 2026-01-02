@@ -38,8 +38,8 @@ type DeepgramModelsResponse struct {
 func HandleVoices(c echo.Context, options mo.Option[types.VoicesRequestOptions]) mo.Result[any] {
 	// Deepgram requires authentication to list models
 	auth := c.Request().Header.Get("Authorization")
-	if strings.HasPrefix(auth, "Bearer ") {
-		auth = "Token " + strings.TrimPrefix(auth, "Bearer ")
+	if after, ok := strings.CutPrefix(auth, "Bearer "); ok {
+		auth = "Token " + after
 	}
 
 	req, err := http.NewRequestWithContext(
