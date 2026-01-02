@@ -48,6 +48,7 @@ func HandleSpeech(c echo.Context, options mo.Option[types.SpeechRequestOptions])
 	if strings.HasPrefix(auth, "Bearer ") {
 		auth = "Token " + strings.TrimPrefix(auth, "Bearer ")
 	}
+
 	req.Header.Set("Authorization", auth)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "audio/*")
