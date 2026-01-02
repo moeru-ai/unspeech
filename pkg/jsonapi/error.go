@@ -9,19 +9,19 @@ type Links struct {
 	// a string whose value is a URI-reference [RFC3986 Section 4.1] pointing to the link’s target.
 	Href string `json:"href,omitempty"`
 	// a string indicating the link’s relation type.
-	Rel mo.Option[string] `json:"rel,omitempty"`
+	Rel mo.Option[string] `json:"rel"`
 	// a link to a description document (e.g. OpenAPI or JSON Schema) for the link target.
-	Describedby mo.Option[string] `json:"describedby,omitempty"`
+	Describedby mo.Option[string] `json:"describedby"`
 	// a string which serves as a label for the destination of a link
 	// such that it can be used as a human-readable identifier (e.g., a menu entry).
-	Title mo.Option[string] `json:"title,omitempty"`
+	Title mo.Option[string] `json:"title"`
 	// a string indicating the media type of the link’s target.
-	Type mo.Option[string] `json:"type,omitempty"`
+	Type mo.Option[string] `json:"type"`
 	// a string or an array of strings indicating the language(s) of the link’s target.
 	// An array of strings indicates that the link’s target is available in multiple languages.
-	Hreflang mo.Option[string] `json:"hreflang,omitempty"`
+	Hreflang mo.Option[string] `json:"hreflang"`
 	// a meta object containing non-standard meta-information about the link.
-	Meta mo.Option[map[string]any] `json:"meta,omitempty"`
+	Meta mo.Option[map[string]any] `json:"meta"`
 }
 
 type ErrorObjectSource struct {
@@ -42,7 +42,7 @@ type ErrorObject struct {
 	// a unique identifier for this particular occurrence of the problem.
 	ID string `json:"id,omitempty"`
 	// a links object containing references to the source of the error.
-	Links mo.Option[*Links] `json:"links,omitempty"`
+	Links mo.Option[*Links] `json:"links"`
 	// the HTTP status code applicable to this problem, expressed as a string value.
 	Status int `json:"status,omitempty"`
 	// an application-specific error code, expressed as a string value.
@@ -52,9 +52,9 @@ type ErrorObject struct {
 	// a human-readable explanation specific to this occurrence of the problem. Like title.
 	Detail string `json:"detail,omitempty"`
 	// an object containing references to the source of the error.
-	Source mo.Option[ErrorObjectSource] `json:"source,omitempty"`
+	Source mo.Option[ErrorObjectSource] `json:"source"`
 	// a meta object containing non-standard meta-information about the error.
-	Meta mo.Option[map[string]any] `json:"meta,omitempty"`
+	Meta mo.Option[map[string]any] `json:"meta"`
 }
 
 var _ logs.CallerLike = (*ErrorCaller)(nil)
