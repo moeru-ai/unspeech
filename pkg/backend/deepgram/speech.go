@@ -62,6 +62,7 @@ func HandleSpeech(c echo.Context, options mo.Option[types.SpeechRequestOptions])
 				WithCaller(),
 		)
 	}
+
 	defer func() { _ = res.Body.Close() }()
 
 	if res.StatusCode >= http.StatusBadRequest {

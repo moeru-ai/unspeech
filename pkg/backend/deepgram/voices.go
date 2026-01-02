@@ -74,11 +74,14 @@ func HandleVoices(c echo.Context, options mo.Option[types.VoicesRequestOptions])
 	}
 
 	var response DeepgramModelsResponse
-	if err := json.NewDecoder(res.Body).Decode(&response); err != nil {
+
+	err = json.NewDecoder(res.Body).Decode(&response)
+	if err != nil {
 		return mo.Err[any](apierrors.NewErrInternal().WithDetail("failed to decode upstream response"))
 	}
 
 	voices := make([]types.Voice, 0, len(response.TTS))
+
 	for _, model := range response.TTS {
 		// Map languages
 		langs := make([]types.VoiceLanguage, len(model.Languages))
