@@ -1,6 +1,7 @@
 export type * from './backend'
 export {
   createUnAlibabaCloud,
+  createUnDeepgram,
   createUnElevenLabs,
   createUnMicrosoft,
   createUnSpeech,
