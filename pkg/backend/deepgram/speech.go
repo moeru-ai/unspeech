@@ -30,10 +30,9 @@ func HandleSpeech(c echo.Context, options mo.Option[types.SpeechRequestOptions])
 	u.RawQuery = q.Encode()
 
 	// Request body only needs text
-	reqBody := map[string]string{
+	payload := lo.Must(json.Marshal(map[string]string{
 		"text": opt.Input,
-	}
-	payload := lo.Must(json.Marshal(reqBody))
+	}))
 
 	req, err := http.NewRequestWithContext(
 		c.Request().Context(),
