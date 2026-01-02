@@ -3,24 +3,25 @@
   "type": "module",
   "version": "0.1.8",
   "private": true,
-  "packageManager": "pnpm@10.23.0",
+  "packageManager": "pnpm@10.27.0",
   "scripts": {
     "build": "pnpm -r run build",
     "bump": "bumpp",
     "lint": "eslint --flag unstable_native_nodejs_ts_config --cache .",
     "lint:fix": "eslint --flag unstable_native_nodejs_ts_config --cache . --fix",
-    "test": "vitest"
+    "test": "vitest",
+    "typecheck": "pnpm -r run typecheck"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^6.2.0",
+    "@antfu/eslint-config": "^6.7.3",
     "@importantimport/tsconfig": "1.0.0-beta.2",
-    "@moeru/eslint-config": "^0.1.0-beta.13",
-    "@types/node": "^24.10.1",
-    "bumpp": "^10.3.1",
-    "eslint": "^9.39.1",
+    "@moeru/eslint-config": "^0.1.0-beta.14",
+    "@types/node": "^24.10.4",
+    "bumpp": "^10.3.2",
+    "eslint": "^9.39.2",
     "jiti": "^2.6.1",
-    "tsdown": "^0.16.6",
-    "tsx": "^4.20.6",
+    "tsdown": "^0.16.8",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   }
 }

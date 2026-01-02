@@ -1,8 +1,8 @@
-import type { SpeechProviderWithExtraOptions } from '@xsai-ext/shared-providers'
+import type { SpeechProviderWithExtraOptions } from '@xsai-ext/providers/utils'
 
 import type { UnSpeechOptions, VoiceProviderWithExtraOptions } from '../types'
 
-import { merge } from '@xsai-ext/shared-providers'
+import { merge } from '@xsai-ext/providers/utils'
 import { objCamelToSnake } from '@xsai/shared'
 
 /** @see {@link https://elevenlabs.io/docs/api-reference/text-to-speech/convert#request} */

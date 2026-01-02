@@ -1,7 +1,8 @@
-import type { SpeechProviderWithExtraOptions } from '@xsai-ext/shared-providers'
+import type { SpeechProviderWithExtraOptions } from '@xsai-ext/providers/utils'
+
 import type { VoiceProviderWithExtraOptions } from '../types'
 
-import { merge } from '@xsai-ext/shared-providers'
+import { merge } from '@xsai-ext/providers/utils'
 
 /** @see {@link https://developers.deepgram.com/docs/text-to-speech} */
 export interface UnDeepgramOptions {}

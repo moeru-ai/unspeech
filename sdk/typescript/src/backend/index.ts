@@ -1,7 +1,7 @@
 import type { UnSpeechOptions, VoiceProviderWithExtraOptions } from '../types'
 import type { MicrosoftRegions } from './microsoft'
 
-import { createSpeechProviderWithExtraOptions, merge } from '@xsai-ext/shared-providers'
+import { createSpeechProviderWithExtraOptions, merge } from '@xsai-ext/providers/utils'
 
 export * from './alibabacloud'
 export * from './deepgram'
