@@ -137,7 +137,14 @@ func HandleSpeech(c echo.Context, options mo.Option[types.SpeechRequestOptions])
 
 	conn, resp, err := websocket.DefaultDialer.Dial("wss://dashscope.aliyuncs.com/api-ws/v1/inference", headers)
 	if err != nil {
-		return mo.Err[any](apierrors.NewErrInternal().WithDetail(err.Error()).WithCaller())
+		// We'd get HTTP Response if the wss handshake fails e.g. invalid apikey
+		if resp != nil {
+			detail := utils.NewJSONResponseError(resp.StatusCode, resp.Body).OrEmpty().Error()
+			// Pass upstream error, local error (wss badhandshake) is not helpful
+			return mo.Err[any](apierrors.NewUpstreamError(resp.StatusCode).WithDetail(detail).WithCaller())
+		}
+		// If no response, it's a network/connection error
+		return mo.Err[any](apierrors.NewErrBadGateway().WithDetail(err.Error()).WithError(err).WithCaller())
 	}
 
 	defer func() {
