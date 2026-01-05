@@ -137,7 +137,26 @@ func HandleSpeech(c echo.Context, options mo.Option[types.SpeechRequestOptions])
 
 	conn, resp, err := websocket.DefaultDialer.Dial("wss://dashscope.aliyuncs.com/api-ws/v1/inference", headers)
 	if err != nil {
-		return mo.Err[any](apierrors.NewErrInternal().WithDetail(err.Error()).WithCaller())
+		if resp == nil {
+			return mo.Err[any](apierrors.NewErrBadGateway().WithDetail(err.Error()).WithCaller())
+		}
+
+		defer resp.Body.Close()
+
+		upstreamErrResult := utils.NewJSONResponseError(resp.StatusCode, resp.Body)
+		jsonErr, upstreamErr := upstreamErrResult.Get()
+
+		var detail string
+
+		if upstreamErr == nil {
+			detail = jsonErr.Error()
+		} else {
+			// The error from parsing the response is more specific than the generic handshake error.
+			detail = upstreamErr.Error()
+		}
+
+		// Pass upstream error, local error (wss badhandshake) is not helpful
+		return mo.Err[any](apierrors.NewUpstreamError(resp.StatusCode).WithDetail(detail).WithCaller())
 	}
 
 	defer func() {
