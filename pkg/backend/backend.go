@@ -7,6 +7,7 @@ import (
 	"github.com/moeru-ai/unspeech/pkg/apierrors"
 	"github.com/moeru-ai/unspeech/pkg/backend/alibaba"
 	"github.com/moeru-ai/unspeech/pkg/backend/deepgram"
+	"github.com/moeru-ai/unspeech/pkg/backend/doubao"
 	"github.com/moeru-ai/unspeech/pkg/backend/elevenlabs"
 	"github.com/moeru-ai/unspeech/pkg/backend/koemotion"
 	"github.com/moeru-ai/unspeech/pkg/backend/microsoft"
@@ -37,6 +38,8 @@ func Speech(c echo.Context) mo.Result[any] {
 		return volcengine.HandleSpeech(c, utils.ResultToOption(options))
 	case "ali", "aliyun", "alibaba", "bailian", "alibaba-model-studio":
 		return alibaba.HandleSpeech(c, utils.ResultToOption(options))
+	case "doubao", "bytedance", "volcengine-doubao", "doubao-tts":
+		return doubao.HandleSpeech(c, utils.ResultToOption(options))
 	default:
 		return mo.Err[any](apierrors.NewErrBadRequest().WithDetail("unsupported backend"))
 	}
@@ -63,6 +66,8 @@ func Voices(c echo.Context) mo.Result[any] {
 		return volcengine.HandleVoices(c, utils.ResultToOption(options))
 	case "ali", "aliyun", "alibaba", "bailian", "alibaba-model-studio":
 		return alibaba.HandleVoices(c, utils.ResultToOption(options))
+	case "doubao", "bytedance", "volcengine-doubao", "doubao-tts":
+		return doubao.HandleVoices(c, utils.ResultToOption(options))
 	default:
 		return mo.Err[any](apierrors.NewErrBadRequest().WithDetail("unsupported backend"))
 	}
