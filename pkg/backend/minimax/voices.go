@@ -1,6 +1,7 @@
 package minimax
 
 import (
+	"bytes"
 	"encoding/json"
 	"log/slog"
 	"net/http"
@@ -13,39 +14,39 @@ import (
 	"github.com/samber/mo"
 )
 
-// GetVoiceReq 获取音色列表请求
+// GetVoiceReq Request for getting voice list
 type GetVoiceReq struct {
 	VoiceType string `json:"voice_type"`
 }
 
-// SystemVoice 系统音色
+// SystemVoice System voice
 type SystemVoice struct {
 	VoiceID     string   `json:"voice_id"`
 	VoiceName   string   `json:"voice_name"`
 	Description []string `json:"description"`
 }
 
-// VoiceCloning 快速复刻音色
+// VoiceCloning Voice cloning
 type VoiceCloning struct {
 	VoiceID     string   `json:"voice_id"`
 	Description []string `json:"description"`
 	CreatedTime string   `json:"created_time"`
 }
 
-// VoiceGeneration 文生音色
+// VoiceGeneration Voice generation
 type VoiceGeneration struct {
 	VoiceID     string   `json:"voice_id"`
 	Description []string `json:"description"`
 	CreatedTime string   `json:"created_time"`
 }
 
-// BaseResp 基础响应
+// BaseResp Base response
 type BaseResp struct {
 	StatusCode int    `json:"status_code"`
 	StatusMsg  string `json:"status_msg"`
 }
 
-// GetVoiceResp 获取音色列表响应
+// GetVoiceResp Response for getting voice list
 type GetVoiceResp struct {
 	SystemVoice      []SystemVoice     `json:"system_voice"`
 	VoiceCloning    []VoiceCloning   `json:"voice_cloning"`
@@ -54,7 +55,7 @@ type GetVoiceResp struct {
 }
 
 var (
-	// 支持的音频格式
+	// Supported audio formats
 	formats = []types.VoiceFormat{
 		{Name: "MP3", Extension: ".mp3", MimeType: "audio/mpeg"},
 		{Name: "PCM", Extension: ".pcm", MimeType: "audio/pcm"},
@@ -63,12 +64,12 @@ var (
 	}
 )
 
-// HandleVoices 处理获取音色列表请求
+// HandleVoices handles getting voice list requests
 func HandleVoices(c echo.Context, options mo.Option[types.VoicesRequestOptions]) mo.Result[any] {
-	// 获取 token
+	// Get token
 	token := strings.TrimPrefix(c.Request().Header.Get("Authorization"), "Bearer ")
 
-	// 构建请求
+	// Build request
 	reqBody := GetVoiceReq{
 		VoiceType: "all",
 	}
@@ -78,22 +79,22 @@ func HandleVoices(c echo.Context, options mo.Option[types.VoicesRequestOptions])
 		return mo.Err[any](apierrors.NewErrInternal().WithDetail(err.Error()).WithCaller())
 	}
 
-	// 创建请求
+	// Create request
 	req, err := http.NewRequestWithContext(
 		c.Request().Context(),
 		http.MethodPost,
 		"https://api.minimaxi.com/v1/get_voice",
-		strings.NewReader(string(jsonBytes)),
+		bytes.NewReader(jsonBytes),
 	)
 	if err != nil {
 		return mo.Err[any](apierrors.NewErrInternal().WithDetail(err.Error()).WithCaller())
 	}
 
-	// 设置请求头
+	// Set request headers
 	req.Header.Set("Authorization", "Bearer "+token)
 	req.Header.Set("Content-Type", "application/json")
 
-	// 发送请求
+	// Send request
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return mo.Err[any](apierrors.NewErrBadGateway().WithDetail(err.Error()).WithError(err).WithCaller())
@@ -101,7 +102,7 @@ func HandleVoices(c echo.Context, options mo.Option[types.VoicesRequestOptions])
 
 	defer func() { _ = resp.Body.Close() }()
 
-	// 检查 HTTP 状态码
+	// Check HTTP status code
 	if resp.StatusCode >= 400 && resp.StatusCode < 600 {
 		switch {
 		case strings.HasPrefix(resp.Header.Get("Content-Type"), "application/json"):
@@ -116,22 +117,22 @@ func HandleVoices(c echo.Context, options mo.Option[types.VoicesRequestOptions])
 		}
 	}
 
-	// 解析响应
+	// Parse response
 	var voiceResp GetVoiceResp
 	err = json.NewDecoder(resp.Body).Decode(&voiceResp)
 	if err != nil {
 		return mo.Err[any](apierrors.NewErrBadGateway().WithDetail(err.Error()).WithError(err).WithCaller())
 	}
 
-	// 检查业务状态码
+	// Check business status code
 	if voiceResp.BaseResp.StatusCode != 0 {
 		return mo.Err[any](handleMinimaxError(voiceResp.BaseResp.StatusCode, voiceResp.BaseResp.StatusMsg))
 	}
 
-	// 转换音色列表
+	// Convert voice list
 	voices := make([]types.Voice, 0, len(voiceResp.SystemVoice)+len(voiceResp.VoiceCloning)+len(voiceResp.VoiceGeneration))
 
-	// 添加系统音色
+	// Add system voices
 	for _, v := range voiceResp.SystemVoice {
 		voices = append(voices, types.Voice{
 			ID:          v.VoiceID,
@@ -148,7 +149,7 @@ func HandleVoices(c echo.Context, options mo.Option[types.VoicesRequestOptions])
 		})
 	}
 
-	// 添加快速复刻音色
+	// Add voice cloning voices
 	for _, v := range voiceResp.VoiceCloning {
 		voices = append(voices, types.Voice{
 			ID:          v.VoiceID,
@@ -166,7 +167,7 @@ func HandleVoices(c echo.Context, options mo.Option[types.VoicesRequestOptions])
 		})
 	}
 
-	// 添加文生音色
+	// Add voice generation voices
 	for _, v := range voiceResp.VoiceGeneration {
 		voices = append(voices, types.Voice{
 			ID:          v.VoiceID,

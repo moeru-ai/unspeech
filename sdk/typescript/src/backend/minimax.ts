@@ -122,18 +122,19 @@ export function createUnMinimax(apiKey: string, baseURL = 'http://localhost:5933
     UnMinimaxOptions
   > = {
     voice: (options) => {
-      if (baseURL.endsWith('v1/')) {
-        baseURL = baseURL.slice(0, -3)
+      let adjustedBaseURL = baseURL
+      if (adjustedBaseURL.endsWith('v1/')) {
+        adjustedBaseURL = adjustedBaseURL.slice(0, -3)
       }
-      else if (baseURL.endsWith('v1')) {
-        baseURL = baseURL.slice(0, -2)
+      else if (adjustedBaseURL.endsWith('v1')) {
+        adjustedBaseURL = adjustedBaseURL.slice(0, -2)
       }
 
       return {
         query: 'provider=minimax',
         ...(options ? toUnSpeechOptions(options) : {}),
         apiKey,
-        baseURL,
+        baseURL: adjustedBaseURL,
       }
     },
   }
