@@ -7,7 +7,9 @@ words:
   - apierrors
   - Apim
   - bailian
+  - bidirection
   - bumpp
+  - bytedance
   - canonicalheader
   - chardata
   - cognitiveservices
@@ -74,6 +76,7 @@ words:
   - nolint
   - nolintlint
   - nosprintfhostport
+  - openspeech
   - paralleltest
   - perfsprint
   - prealloc
@@ -95,6 +98,7 @@ words:
   - truesilk
   - tsdown
   - typecheck
+  - Upgrader
   - unconvert
   - unparam
   - unspeech

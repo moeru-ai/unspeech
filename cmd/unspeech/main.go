@@ -31,6 +31,8 @@ func main() {
 
 			// OpenAI Compatible API
 			e.POST("/v1/audio/speech", ho.MonadEcho1(backend.Speech))
+			// Bidirectional streaming TTS over WebSocket.
+			e.GET("/v1/audio/speech/stream", ho.MonadEcho1(backend.SpeechStream))
 
 			// unSpeech API
 			e.GET("/api/voices", ho.MonadEcho1(backend.Voices))
