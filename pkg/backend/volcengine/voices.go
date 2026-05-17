@@ -37,6 +37,8 @@ type VoicesResponseDataResourcePack struct {
 	PurchasedAmount   string                                `json:"purchased_amount"`
 	CurrentUsage      string                                `json:"current_usage"`
 	Expires           string                                `json:"expires"`
+	CompatibleModels  []string                              `json:"compatible_models"`
+	SupportsStreaming bool                                  `json:"supports_streaming"`
 	Details           VoicesResponseDataResourcePackDetails `json:"details"`
 	GroupName         string                                `json:"group_name"`
 	Alias             string                                `json:"alias"`
@@ -54,9 +56,20 @@ type VoicesResponse struct {
 	Data   VoicesResponseData `json:"data"`
 }
 
-// ListVoices returns Volcengine's static voice catalogue embedded at build time.
-// No credentials are required because the catalogue ships with the binary.
-func ListVoices(_ context.Context) ([]types.Voice, error) {
+// ListVoices returns Volcengine's catalogue embedded at build time, filtered
+// to streaming-compatible voices and (optionally) to a specific
+// api_resource_id. Per-voice compatibility data comes from the embedded JSON
+// (compatible_models, supports_streaming), not from id-suffix inference —
+// regenerate voices.json via scripts/import-volcengine-voices when Volcengine
+// adds or removes voices.
+//
+// Filter semantics:
+//   - streaming-incompatible voices (supports_streaming == false) are always
+//     excluded; this file backs the bidirectional streaming endpoint.
+//   - modelFilter == "" returns every streaming-compatible voice.
+//   - modelFilter != "" further restricts to voices whose compatible_models
+//     contains the requested id.
+func ListVoices(_ context.Context, modelFilter string) ([]types.Voice, error) {
 	var voicesData VoicesResponse
 
 	err := json.Unmarshal([]byte(voicesJSON), &voicesData)
@@ -67,6 +80,13 @@ func ListVoices(_ context.Context) ([]types.Voice, error) {
 	voices := make([]types.Voice, 0, len(voicesData.Data.ResourcePacks))
 
 	for _, voice := range voicesData.Data.ResourcePacks {
+		if !voice.SupportsStreaming {
+			continue
+		}
+		if modelFilter != "" && !containsString(voice.CompatibleModels, modelFilter) {
+			continue
+		}
+
 		voices = append(voices, types.Voice{
 			ID:          voice.Code,
 			Name:        voice.ResourceDisplay,
@@ -86,7 +106,7 @@ func ListVoices(_ context.Context) ([]types.Voice, error) {
 				{Name: "Opus", Extension: ".opus", MimeType: "audio/opus", SampleRate: 24000, Bitrate: 16, FormatCode: "ogg_opus"}, //nolint:mnd
 				{Name: "MP3", Extension: ".mp3", MimeType: "audio/mp3", SampleRate: 24000, Bitrate: 16, FormatCode: "mp3"},         //nolint:mnd
 			},
-			CompatibleModels: []string{"v1"},
+			CompatibleModels: voice.CompatibleModels,
 			PreviewAudioURL:  voice.Details.DemoLink,
 			Languages: []types.VoiceLanguage{
 				{
@@ -100,8 +120,22 @@ func ListVoices(_ context.Context) ([]types.Voice, error) {
 	return voices, nil
 }
 
-func HandleVoices(c echo.Context, _ mo.Option[types.VoicesRequestOptions]) mo.Result[any] {
-	voices, err := ListVoices(c.Request().Context())
+func containsString(haystack []string, needle string) bool {
+	for _, s := range haystack {
+		if s == needle {
+			return true
+		}
+	}
+	return false
+}
+
+func HandleVoices(c echo.Context, options mo.Option[types.VoicesRequestOptions]) mo.Result[any] {
+	modelFilter := ""
+	if opts, ok := options.Get(); ok && opts.ExtraQuery != nil {
+		modelFilter = opts.ExtraQuery.Get("model")
+	}
+
+	voices, err := ListVoices(c.Request().Context(), modelFilter)
 	if err != nil {
 		return mo.Err[any](apierrors.NewErrInternal().WithDetail(err.Error()).WithCaller())
 	}
