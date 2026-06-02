@@ -240,8 +240,8 @@ the client may begin sending `text` frames.
 Marks the beginning of a sentence in the upstream output. The
 `payload` field carries the upstream event payload verbatim.
 
-```json
-{ "event": "sentence.start", "payload": { … upstream payload … } }
+```jsonc
+{ "event": "sentence.start", "payload": { /* upstream payload */ } }
 ```
 
 ### `sentence.end` (text)
@@ -271,8 +271,8 @@ asynchronously from the audio. May lag the audio for the same
 sentence; clients that drive captions should buffer audio playback to
 align with subtitle arrival, or accept that captions are best-effort.
 
-```json
-{ "event": "subtitle", "payload": { … upstream payload … } }
+```jsonc
+{ "event": "subtitle", "payload": { /* upstream payload */ } }
 ```
 
 ### `session.finished` (text)
