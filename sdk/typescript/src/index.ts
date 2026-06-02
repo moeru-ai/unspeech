@@ -9,6 +9,7 @@ export {
   createUnVolcengine,
   escapeMicrosoftSsmlText,
   inferMicrosoftContentType,
+  isMicrosoftVoiceId,
   microsoftSpeedToProsodyRate,
   resolveMicrosoftOutputFormat,
 } from './backend'
