@@ -6,10 +6,7 @@ import { requestHeaders, requestURL } from '@xsai/shared'
 
 import { UnSpeechAPIError } from './generate-speech-response'
 
-type StringFetch = (input: string, init: RequestInit) => Promise<Response>
-
-export interface ListVoicesOptions extends Omit<CommonRequestOptions, 'fetch' | 'model'> {
-  fetch?: StringFetch | typeof globalThis.fetch
+export interface ListVoicesOptions extends Omit<CommonRequestOptions, 'model'> {
   query?: string
 }
 
@@ -19,7 +16,7 @@ export interface ListVoicesResponse {
 
 export async function listVoices(options: ListVoicesOptions): Promise<Voice[]> {
   const fetchImpl = options.fetch ?? globalThis.fetch
-  const response = await fetchImpl(requestURL(options.query ? `api/voices?${options.query}` : 'api/voices', options.baseURL).toString(), {
+  const response = await fetchImpl(requestURL(options.query ? `api/voices?${options.query}` : 'api/voices', options.baseURL), {
     headers: requestHeaders({ ...options.headers }, options.apiKey),
     method: 'GET',
     signal: options.abortSignal,
