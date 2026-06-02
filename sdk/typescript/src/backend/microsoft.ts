@@ -101,6 +101,147 @@ export interface UnMicrosoftOptionCustomSSML {
 export type UnMicrosoftOptions = (UnMicrosoftOptionAutoSSML | UnMicrosoftOptionCustomSSML) & UnMicrosoftOptionCommon
 
 /**
+ * Default Microsoft output format used when callers only ask for OpenAI-style
+ * `mp3`. This keeps the common path on a compact 24kHz MP3 instead of the
+ * backend's maximum-quality 48kHz default.
+ */
+export const DEFAULT_MICROSOFT_OUTPUT_FORMAT = 'audio-24khz-48kbitrate-mono-mp3'
+
+const MICROSOFT_VOICE_ID = /^[a-z0-9-]+$/i
+
+/**
+ * Checks whether a Microsoft voice id is safe to embed in SSML attributes.
+ *
+ * Use when:
+ * - A caller builds SSML locally before sending it to unspeech.
+ *
+ * Expects:
+ * - Microsoft neural voice ids such as `en-US-AvaMultilingualNeural`.
+ *
+ * Returns:
+ * - `true` for the canonical letters/digits/hyphen shape.
+ */
+export function isMicrosoftVoiceId(voice: string): boolean {
+  return MICROSOFT_VOICE_ID.test(voice)
+}
+
+/**
+ * Resolves OpenAI-style short audio format names to Microsoft output formats.
+ *
+ * Before:
+ * - `"mp3"`
+ * - `"wav"`
+ * - `"audio-24khz-48kbitrate-mono-mp3"`
+ *
+ * After:
+ * - `"audio-24khz-48kbitrate-mono-mp3"`
+ * - `"riff-24khz-16bit-mono-pcm"`
+ * - `"audio-24khz-48kbitrate-mono-mp3"`
+ */
+export function resolveMicrosoftOutputFormat(responseFormat: string | undefined): string {
+  if (!responseFormat)
+    return DEFAULT_MICROSOFT_OUTPUT_FORMAT
+  if (responseFormat.includes('-'))
+    return responseFormat
+  if (responseFormat === 'mp3')
+    return DEFAULT_MICROSOFT_OUTPUT_FORMAT
+  if (responseFormat === 'wav')
+    return 'riff-24khz-16bit-mono-pcm'
+  if (responseFormat === 'opus')
+    return 'ogg-24khz-16bit-mono-opus'
+  return responseFormat
+}
+
+/**
+ * Infers the MIME type for a Microsoft output format.
+ *
+ * Before:
+ * - `"audio-24khz-48kbitrate-mono-mp3"`
+ * - `"ogg-24khz-16bit-mono-opus"`
+ * - `"riff-24khz-16bit-mono-pcm"`
+ *
+ * After:
+ * - `"audio/mpeg"`
+ * - `"audio/ogg"`
+ * - `"audio/wav"`
+ */
+export function inferMicrosoftContentType(format: string): string {
+  if (format.includes('mp3'))
+    return 'audio/mpeg'
+  if (format.includes('opus'))
+    return 'audio/ogg'
+  if (format.includes('pcm') || format.startsWith('riff'))
+    return 'audio/wav'
+  return 'application/octet-stream'
+}
+
+/**
+ * Normalizes a speech speed multiplier into Microsoft SSML prosody rate.
+ *
+ * Before:
+ * - `1.0`
+ * - `1.2`
+ * - `0.8`
+ *
+ * After:
+ * - `""`
+ * - `"+20%"`
+ * - `"-20%"`
+ */
+export function microsoftSpeedToProsodyRate(speed: number | undefined): string {
+  if (speed == null || speed === 1)
+    return ''
+
+  const delta = Math.round((speed - 1) * 100)
+  if (delta === 0)
+    return ''
+
+  return delta > 0 ? `+${delta}%` : `${delta}%`
+}
+
+/**
+ * Escapes plain text before inserting it into Microsoft SSML.
+ *
+ * Before:
+ * - `"Tom & <Jerry>"`
+ *
+ * After:
+ * - `"Tom &amp; &lt;Jerry&gt;"`
+ */
+export function escapeMicrosoftSsmlText(text: string): string {
+  return text
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll('\'', '&apos;')
+}
+
+/**
+ * Builds a Microsoft-compatible SSML envelope.
+ *
+ * Use when:
+ * - Sending plain text through unspeech's Microsoft backend while preserving
+ *   speed/prosody control.
+ *
+ * Expects:
+ * - `text` is plain text. Already-built SSML should be passed through with
+ *   `disableSsml`.
+ *
+ * Returns:
+ * - A `<speak>` document that Microsoft accepts as `application/ssml+xml`.
+ */
+export function buildMicrosoftSsml(text: string, voice: string, speed: number | undefined): string {
+  const safe = escapeMicrosoftSsmlText(text)
+  const rate = microsoftSpeedToProsodyRate(speed)
+  const inner = rate
+    ? `<prosody rate='${rate}'>${safe}</prosody>`
+    : safe
+
+  return `<speak version='1.0' xml:lang='en-US'><voice name='${voice}'>${inner}</voice></speak>`
+}
+
+/**
  * [Microsoft / Azure AI](https://speech.microsoft.com/portal) provider for [UnSpeech](https://github.com/moeru-ai/unspeech)
  * only.
  *
