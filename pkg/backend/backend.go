@@ -15,6 +15,7 @@ import (
 	"github.com/moeru-ai/unspeech/pkg/backend/koemotion"
 	"github.com/moeru-ai/unspeech/pkg/backend/microsoft"
 	"github.com/moeru-ai/unspeech/pkg/backend/openai"
+	"github.com/moeru-ai/unspeech/pkg/backend/stepfun"
 	"github.com/moeru-ai/unspeech/pkg/backend/types"
 	"github.com/moeru-ai/unspeech/pkg/backend/volcengine"
 	"github.com/moeru-ai/unspeech/pkg/utils"
@@ -38,6 +39,8 @@ func Speech(c echo.Context) mo.Result[any] {
 	switch options.MustGet().Backend {
 	case "openai":
 		return openai.HandleSpeech(c, utils.ResultToOption(options))
+	case "stepfun", "step":
+		return stepfun.HandleSpeech(c, utils.ResultToOption(options))
 	case "deepgram":
 		return deepgram.HandleSpeech(c, utils.ResultToOption(options))
 	case "elevenlabs":
@@ -154,6 +157,8 @@ func Voices(c echo.Context) mo.Result[any] {
 	switch options.MustGet().Backend {
 	case "openai":
 		return openai.HandleVoices(c, utils.ResultToOption(options))
+	case "stepfun", "step":
+		return stepfun.HandleVoices(c, utils.ResultToOption(options))
 	case "deepgram":
 		return deepgram.HandleVoices(c, utils.ResultToOption(options))
 	case "elevenlabs":

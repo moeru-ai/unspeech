@@ -7,6 +7,7 @@ export * from './alibabacloud'
 export * from './deepgram'
 export * from './elevenlabs'
 export * from './microsoft'
+export * from './stepfun'
 export * from './volcengine'
 
 /** @see {@link https://github.com/moeru-ai/unspeech} */
@@ -26,7 +27,7 @@ export function createUnSpeech(apiKey: string, baseURL = 'http://localhost:5933/
         | 'ali'
         | 'alibaba'
         | 'alibaba-model-studio'
-        | 'aliyun' | 'bailian' | 'deepgram' | 'elevenlabs' | 'koemotion' | 'openai'
+        | 'aliyun' | 'bailian' | 'deepgram' | 'elevenlabs' | 'koemotion' | 'openai' | 'step' | 'stepfun'
     }
   > = {
     voice: (options) => {
@@ -61,6 +62,7 @@ export function createUnSpeech(apiKey: string, baseURL = 'http://localhost:5933/
       | `elevenlabs/${string}`
       | `koemotion/${string}`
       | `openai/${string}`
+      | `stepfun/${string}`
       | `volcano/${string}`
       | `volcengine/${string}`,
       UnSpeechOptions
