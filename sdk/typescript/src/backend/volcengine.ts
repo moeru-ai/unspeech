@@ -90,6 +90,16 @@ export interface UnVolcengineOptions {
   user?: {
     uid?: string
   }
+  /**
+   * Volcengine ARK resource ID.
+   *
+   * - `seed-tts-2.0` for 豆包语音合成模型2.0 (ARK platform)
+   * - `seed-tts-1.0` for 豆包语音合成模型1.0
+   * - `volc.service_type.10029` for legacy speech service
+   *
+   * @default 'seed-tts-2.0'
+   */
+  resourceId?: string
 }
 
 /**
@@ -106,17 +116,12 @@ export interface UnVolcengineOptions {
  */
 export function createUnVolcengine(apiKey: string, baseURL = 'http://localhost:5933/v1/') {
   const toUnSpeechOptions = (options: UnVolcengineOptions): UnSpeechOptions => {
-    const extraBody: Record<string, unknown> = {
-      app: {
-        appid: options.app?.appId,
-        token: apiKey,
-      },
-    }
+    const extraBody: Record<string, unknown> = {}
 
-    if (typeof options.app !== 'undefined') {
+    if (typeof options.app?.appId === 'string' && options.app.appId.length > 0) {
       extraBody.app = {
         ...options.app,
-        appid: options.app?.appId,
+        appid: options.app.appId,
         token: apiKey,
       }
     }
@@ -125,6 +130,9 @@ export function createUnVolcengine(apiKey: string, baseURL = 'http://localhost:5
     }
     if (typeof options.audio !== 'undefined') {
       extraBody.audio = options.audio
+    }
+    if (typeof options.resourceId === 'string') {
+      extraBody.resource_id = options.resourceId
     }
 
     return { extraBody: objCamelToSnake(extraBody) }

@@ -1,6 +1,7 @@
 package volcengine
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
@@ -65,7 +66,30 @@ type SpeechRequestOptions struct {
 func HandleSpeech(c echo.Context, options mo.Option[types.SpeechRequestOptions]) mo.Result[any] {
 	opts := options.MustGet()
 
+	appID := utils.GetByJSONPath[string](opts.ExtraBody, "{ .app.appid }")
+
+	if appID == "" {
+		return handleSpeechV3(c, opts)
+	}
+
 	token := strings.TrimPrefix(c.Request().Header.Get("Authorization"), "Bearer ")
+
+	resourceID := utils.GetByJSONPath[string](opts.ExtraBody, "{ .resource_id }")
+	if resourceID == "" {
+		if voices, err := ListVoices(c.Request().Context(), ""); err == nil {
+			for _, v := range voices {
+				if v.ID == opts.Voice {
+					if len(v.CompatibleModels) > 0 {
+						resourceID = v.CompatibleModels[0]
+					}
+					break
+				}
+			}
+		}
+	}
+	if resourceID == "" {
+		resourceID = "seed-tts-2.0"
+	}
 
 	cluster := utils.GetByJSONPath[string](opts.ExtraBody, "{ .app.cluster }")
 	if cluster == "" {
@@ -94,7 +118,7 @@ func HandleSpeech(c echo.Context, options mo.Option[types.SpeechRequestOptions])
 
 	newReqParams := &SpeechRequestOptions{
 		App: SpeechRequestOptionsApp{
-			AppID:   utils.GetByJSONPath[string](opts.ExtraBody, "{ .app.appid }"),
+			AppID:   appID,
 			Token:   token,
 			Cluster: cluster,
 		},
@@ -133,12 +157,17 @@ func HandleSpeech(c echo.Context, options mo.Option[types.SpeechRequestOptions])
 		return mo.Err[any](apierrors.NewErrInternal().WithDetail(err.Error()).WithCaller())
 	}
 
-	req, err := http.NewRequestWithContext(c.Request().Context(), http.MethodPost, "https://openspeech.bytedance.com/api/v1/tts", bytes.NewBuffer(jsonBytes))
+	req, err := http.NewRequestWithContext(c.Request().Context(), http.MethodPost, "https://openspeech.bytedance.com/api/v3/tts/unidirectional", bytes.NewBuffer(jsonBytes))
 	if err != nil {
 		return mo.Err[any](apierrors.NewErrInternal().WithDetail(err.Error()).WithCaller())
 	}
 
+	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer;"+token)
+	req.Header.Set("X-Api-App-Id", appID)
+	req.Header.Set("X-Api-Access-Key", token)
+	req.Header.Set("X-Api-Resource-Id", resourceID)
+	req.Header.Set("X-Api-Request-Id", requestID)
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -146,6 +175,14 @@ func HandleSpeech(c echo.Context, options mo.Option[types.SpeechRequestOptions])
 	}
 
 	defer func() { _ = resp.Body.Close() }()
+
+	slog.Info("volcengine v3 request",
+		slog.String("endpoint", "https://openspeech.bytedance.com/api/v3/tts/unidirectional"),
+		slog.String("resource_id", resourceID),
+		slog.String("voice_type", opts.Voice),
+		slog.Int("status", resp.StatusCode),
+		slog.String("logid", resp.Header.Get("X-Tt-Logid")),
+	)
 
 	if resp.StatusCode >= 400 && resp.StatusCode < 600 {
 		switch {
@@ -166,21 +203,58 @@ func HandleSpeech(c echo.Context, options mo.Option[types.SpeechRequestOptions])
 		}
 	}
 
-	var resBody map[string]any
-
-	err = json.NewDecoder(resp.Body).Decode(&resBody)
-	if err != nil {
-		return mo.Err[any](apierrors.NewErrInternal().WithDetail(err.Error()).WithError(err).WithCaller())
+	var audioBytes []byte
+	scanner := bufio.NewScanner(resp.Body)
+	lineCount := 0
+	for scanner.Scan() {
+		line := bytes.TrimSpace(scanner.Bytes())
+		if len(line) == 0 {
+			continue
+		}
+		lineCount++
+		var raw map[string]any
+		if err := json.Unmarshal(line, &raw); err != nil {
+			slog.Warn("volcengine v3: skip malformed line",
+				slog.Int("line_no", lineCount),
+				slog.String("line", string(line[:min(len(line), 200)])))
+			continue
+		}
+		// Debug: log raw keys of first 3 lines
+		if lineCount <= 3 {
+			keys := make([]string, 0, len(raw))
+			for k := range raw {
+				keys = append(keys, k)
+			}
+			slog.Info("volcengine v3: debug line keys",
+				slog.Int("line_no", lineCount),
+				slog.Any("keys", keys),
+				slog.String("raw", string(line[:min(len(line), 300)])))
+		}
+		b64 := ""
+		if data, ok := raw["data"].(string); ok {
+			b64 = data
+		} else if msg, ok := raw["payload_msg"].(map[string]any); ok {
+			if data, ok := msg["data"].(string); ok {
+				b64 = data
+			}
+		}
+		if b64 == "" {
+			continue
+		}
+		decoded, err := base64.StdEncoding.DecodeString(b64)
+		if err != nil {
+			slog.Warn("volcengine v3: skip malformed base64 chunk", slog.String("err", err.Error()))
+			continue
+		}
+		audioBytes = append(audioBytes, decoded...)
 	}
 
-	audioBase64String := utils.GetByJSONPath[string](resBody, "{ .data }")
-	if audioBase64String == "" {
-		return mo.Err[any](apierrors.NewErrInternal().WithDetail("upstream returned empty audio base64 string").WithCaller())
+	if err := scanner.Err(); err != nil {
+		return mo.Err[any](apierrors.NewErrInternal().WithDetail("volcengine v3: read streaming body: " + err.Error()).WithCaller())
 	}
 
-	audioBytes, err := base64.StdEncoding.DecodeString(audioBase64String)
-	if err != nil {
-		return mo.Err[any](apierrors.NewErrInternal().WithDetail(err.Error()).WithError(err).WithCaller())
+	if len(audioBytes) == 0 {
+		return mo.Err[any](apierrors.NewErrInternal().WithDetail("upstream returned empty audio").WithCaller())
 	}
 
 	return mo.Ok[any](c.Blob(http.StatusOK, "audio/mp3", audioBytes))
