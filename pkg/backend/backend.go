@@ -12,6 +12,7 @@ import (
 	"github.com/moeru-ai/unspeech/pkg/backend/alibaba"
 	"github.com/moeru-ai/unspeech/pkg/backend/deepgram"
 	"github.com/moeru-ai/unspeech/pkg/backend/elevenlabs"
+	"github.com/moeru-ai/unspeech/pkg/backend/fishaudio"
 	"github.com/moeru-ai/unspeech/pkg/backend/koemotion"
 	"github.com/moeru-ai/unspeech/pkg/backend/microsoft"
 	"github.com/moeru-ai/unspeech/pkg/backend/openai"
@@ -45,6 +46,8 @@ func Speech(c echo.Context) mo.Result[any] {
 		return deepgram.HandleSpeech(c, utils.ResultToOption(options))
 	case "elevenlabs":
 		return elevenlabs.HandleSpeech(c, utils.ResultToOption(options))
+	case "fishaudio", "fish-audio", "fish":
+		return fishaudio.HandleSpeech(c, utils.ResultToOption(options))
 	case "koemotion":
 		return koemotion.HandleSpeech(c, utils.ResultToOption(options))
 	case "microsoft", "azure":
@@ -163,6 +166,8 @@ func Voices(c echo.Context) mo.Result[any] {
 		return deepgram.HandleVoices(c, utils.ResultToOption(options))
 	case "elevenlabs":
 		return elevenlabs.HandleVoices(c, utils.ResultToOption(options))
+	case "fishaudio", "fish-audio", "fish":
+		return fishaudio.HandleVoices(c, utils.ResultToOption(options))
 	case "koemotion":
 		return koemotion.HandleVoices(c, utils.ResultToOption(options))
 	case "microsoft", "azure":
