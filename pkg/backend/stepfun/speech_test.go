@@ -104,12 +104,12 @@ func TestResolveSpeechEndpoint(t *testing.T) {
 		},
 		{
 			name:      "explicit default profile uses the default endpoint",
-			extraBody: map[string]any{"endpoint_profile": "default"},
+			extraBody: map[string]any{endpointProfileField: "default"},
 			want:      defaultSpeechURL,
 		},
 		{
 			name:      "step plan profile uses the step plan endpoint",
-			extraBody: map[string]any{"endpoint_profile": "step-plan"},
+			extraBody: map[string]any{endpointProfileField: "step-plan"},
 			want:      stepPlanSpeechURL,
 		},
 	}
@@ -133,7 +133,7 @@ func TestResolveSpeechEndpointRejectsUnknownProfile(t *testing.T) {
 	t.Parallel()
 
 	_, err := resolveSpeechEndpoint(map[string]any{
-		"endpoint_profile": "custom-url",
+		endpointProfileField: "custom-url",
 	})
 	if err == nil {
 		t.Fatal("resolveSpeechEndpoint returned nil error")

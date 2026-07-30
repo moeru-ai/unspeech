@@ -16,8 +16,9 @@ import (
 )
 
 const (
-	defaultSpeechURL  = "https://api.stepfun.com/v1/audio/speech"
-	stepPlanSpeechURL = "https://api.stepfun.com/step_plan/v1/audio/speech"
+	endpointProfileField = "endpoint_profile"
+	defaultSpeechURL     = "https://api.stepfun.com/v1/audio/speech"
+	stepPlanSpeechURL    = "https://api.stepfun.com/step_plan/v1/audio/speech"
 )
 
 type speechRequest struct {
@@ -115,7 +116,7 @@ func resolveSpeechEndpoint(extraBody map[string]any) (string, error) {
 	// A profile is a provider-owned endpoint identity, not a caller-supplied
 	// URL. Keeping the URL mapping here preserves StepFun as the single source
 	// of truth and prevents this proxy from becoming an SSRF primitive.
-	switch utils.GetByJSONPath[string](extraBody, "{ .endpoint_profile }") {
+	switch utils.GetByJSONPath[string](extraBody, "{ ."+endpointProfileField+" }") {
 	case "", "default":
 		return defaultSpeechURL, nil
 	case "step-plan":
