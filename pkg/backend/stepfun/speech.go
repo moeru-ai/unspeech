@@ -15,7 +15,11 @@ import (
 	"github.com/samber/mo"
 )
 
-const defaultSpeechURL = "https://api.stepfun.com/v1/audio/speech"
+const (
+	endpointProfileField = "endpoint_profile"
+	defaultSpeechURL     = "https://api.stepfun.com/v1/audio/speech"
+	stepPlanSpeechURL    = "https://api.stepfun.com/step_plan/v1/audio/speech"
+)
 
 type speechRequest struct {
 	Model            string         `json:"model"`
@@ -34,16 +38,23 @@ type speechRequest struct {
 
 func HandleSpeech(c echo.Context, options mo.Option[types.SpeechRequestOptions]) mo.Result[any] {
 	opt := options.MustGet()
+
+	speechEndpoint, endpointErr := resolveSpeechEndpoint(opt.ExtraBody)
+	if endpointErr != nil {
+		return mo.Err[any](endpointErr)
+	}
+
 	values, buildErr := buildSpeechRequest(opt)
 	if buildErr != nil {
 		return mo.Err[any](buildErr)
 	}
+
 	payload := lo.Must(json.Marshal(values))
 
 	req, err := http.NewRequestWithContext(
 		c.Request().Context(),
 		http.MethodPost,
-		defaultSpeechURL,
+		speechEndpoint,
 		bytes.NewBuffer(payload),
 	)
 	if err != nil {
@@ -99,6 +110,21 @@ func HandleSpeech(c echo.Context, options mo.Option[types.SpeechRequestOptions])
 	}
 
 	return mo.Ok[any](c.Stream(http.StatusOK, contentType, res.Body))
+}
+
+func resolveSpeechEndpoint(extraBody map[string]any) (string, error) {
+	// A profile is a provider-owned endpoint identity, not a caller-supplied
+	// URL. Keeping the URL mapping here preserves StepFun as the single source
+	// of truth and prevents this proxy from becoming an SSRF primitive.
+	switch utils.GetByJSONPath[string](extraBody, "{ ."+endpointProfileField+" }") {
+	case "", "default":
+		return defaultSpeechURL, nil
+	case "step-plan":
+		return stepPlanSpeechURL, nil
+	default:
+		return "", apierrors.NewErrBadRequest().
+			WithDetail("unsupported stepfun endpoint profile")
+	}
 }
 
 func buildSpeechRequest(opt types.SpeechRequestOptions) (speechRequest, error) {

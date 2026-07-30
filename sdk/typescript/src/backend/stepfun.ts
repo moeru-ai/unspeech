@@ -7,6 +7,15 @@ import { objCamelToSnake } from '@xsai/shared'
 
 export interface UnStepfunOptions {
   /**
+   * Selects a StepFun-defined API endpoint without exposing an arbitrary URL.
+   *
+   * Use `step-plan` for requests covered by a Step Plan subscription. Omit
+   * this option, or use `default`, for StepFun's default speech endpoint.
+   *
+   * @default 'default'
+   */
+  endpointProfile?: 'default' | 'step-plan'
+  /**
    * Audio volume. Range: 0.1 to 2.0.
    *
    * @default 1

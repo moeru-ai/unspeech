@@ -241,7 +241,7 @@ Marks the beginning of a sentence in the upstream output. The
 `payload` field carries the upstream event payload verbatim.
 
 ```json
-{ "event": "sentence.start", "payload": { … upstream payload … } }
+{ "event": "sentence.start", "payload": { /* upstream payload */ } }
 ```
 
 ### `sentence.end` (text)
@@ -272,7 +272,7 @@ sentence; clients that drive captions should buffer audio playback to
 align with subtitle arrival, or accept that captions are best-effort.
 
 ```json
-{ "event": "subtitle", "payload": { … upstream payload … } }
+{ "event": "subtitle", "payload": { /* upstream payload */ } }
 ```
 
 ### `session.finished` (text)
