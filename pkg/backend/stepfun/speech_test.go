@@ -89,3 +89,56 @@ func TestBuildSpeechRequestRejectsInstructionForLegacyModels(t *testing.T) {
 		t.Fatalf("error = %q", err.Error())
 	}
 }
+
+func TestResolveSpeechEndpoint(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name      string
+		extraBody map[string]any
+		want      string
+	}{
+		{
+			name: "omitted profile uses the default endpoint",
+			want: defaultSpeechURL,
+		},
+		{
+			name:      "explicit default profile uses the default endpoint",
+			extraBody: map[string]any{"endpoint_profile": "default"},
+			want:      defaultSpeechURL,
+		},
+		{
+			name:      "step plan profile uses the step plan endpoint",
+			extraBody: map[string]any{"endpoint_profile": "step-plan"},
+			want:      stepPlanSpeechURL,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			got, err := resolveSpeechEndpoint(tt.extraBody)
+			if err != nil {
+				t.Fatalf("resolveSpeechEndpoint returned error: %v", err)
+			}
+			if got != tt.want {
+				t.Fatalf("resolveSpeechEndpoint = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestResolveSpeechEndpointRejectsUnknownProfile(t *testing.T) {
+	t.Parallel()
+
+	_, err := resolveSpeechEndpoint(map[string]any{
+		"endpoint_profile": "custom-url",
+	})
+	if err == nil {
+		t.Fatal("resolveSpeechEndpoint returned nil error")
+	}
+	if !strings.Contains(err.Error(), "unsupported stepfun endpoint profile") {
+		t.Fatalf("error = %q", err.Error())
+	}
+}
