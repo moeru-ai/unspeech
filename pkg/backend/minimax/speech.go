@@ -1,6 +1,7 @@
 package minimax
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/hex"
 	"encoding/json"
@@ -37,12 +38,17 @@ type AudioSetting struct {
 
 // TTSRequest MiniMax TTS request
 type TTSRequest struct {
-	Model        string        `json:"model"`
-	Text         string        `json:"text"`
-	Stream       bool          `json:"stream,omitempty"`
-	VoiceSetting *VoiceSetting `json:"voice_setting,omitempty"`
-	AudioSetting *AudioSetting `json:"audio_setting,omitempty"`
-	OutputFormat string        `json:"output_format,omitempty"`
+	Model         string         `json:"model"`
+	Text          string         `json:"text"`
+	Stream        bool           `json:"stream,omitempty"`
+	StreamOptions *StreamOptions `json:"stream_options,omitempty"`
+	VoiceSetting  *VoiceSetting  `json:"voice_setting,omitempty"`
+	AudioSetting  *AudioSetting  `json:"audio_setting,omitempty"`
+	OutputFormat  string         `json:"output_format,omitempty"`
+}
+
+type StreamOptions struct {
+	ExcludeAggregatedAudio bool `json:"exclude_aggregated_audio"`
 }
 
 // TTSResponseData MiniMax TTS response data
@@ -76,6 +82,66 @@ type TTSResponse struct {
 	TraceID   string               `json:"trace_id"`
 	ExtraInfo TTSResponseExtraInfo `json:"extra_info"`
 	BaseResp  TTSResponseBaseResp  `json:"base_resp"`
+}
+
+type ttsResponseDecoder interface {
+	Decode(any) error
+}
+
+type sseTTSResponseDecoder struct {
+	scanner *bufio.Scanner
+}
+
+func newTTSResponseDecoder(body io.Reader, contentType string) ttsResponseDecoder {
+	if strings.HasPrefix(strings.ToLower(strings.TrimSpace(contentType)), "text/event-stream") {
+		return newSSETTSResponseDecoder(body)
+	}
+
+	reader := bufio.NewReader(body)
+	prefix, _ := reader.Peek(len("data:"))
+	if bytes.Equal(prefix, []byte("data:")) {
+		return newSSETTSResponseDecoder(reader)
+	}
+
+	return json.NewDecoder(reader)
+}
+
+func newSSETTSResponseDecoder(body io.Reader) ttsResponseDecoder {
+	scanner := bufio.NewScanner(body)
+	scanner.Buffer(make([]byte, 64*1024), 16*1024*1024)
+	return &sseTTSResponseDecoder{scanner: scanner}
+}
+
+func (d *sseTTSResponseDecoder) Decode(target any) error {
+	dataLines := make([]string, 0, 1)
+	for d.scanner.Scan() {
+		line := d.scanner.Text()
+		if line == "" {
+			if len(dataLines) == 0 {
+				continue
+			}
+			return decodeSSEData(dataLines, target)
+		}
+		if strings.HasPrefix(line, "data:") {
+			dataLines = append(dataLines, strings.TrimSpace(strings.TrimPrefix(line, "data:")))
+		}
+	}
+	if err := d.scanner.Err(); err != nil {
+		return err
+	}
+	if len(dataLines) != 0 {
+		return decodeSSEData(dataLines, target)
+	}
+
+	return io.EOF
+}
+
+func decodeSSEData(dataLines []string, target any) error {
+	data := strings.Join(dataLines, "\n")
+	if data == "[DONE]" {
+		return io.EOF
+	}
+	return json.Unmarshal([]byte(data), target)
 }
 
 // HandleSpeech handles MiniMax TTS requests
@@ -159,6 +225,9 @@ func buildTTSRequest(opts types.SpeechRequestOptions, stream bool) TTSRequest {
 		Text:         opts.Input,
 		Stream:       stream,
 		OutputFormat: "hex",
+	}
+	if stream {
+		reqBody.StreamOptions = &StreamOptions{ExcludeAggregatedAudio: true}
 	}
 
 	if opts.Voice != "" || opts.Speed != 0 {
@@ -336,7 +405,7 @@ func handleStreamingSpeech(c echo.Context, token string, opts types.SpeechReques
 	}
 
 	// Streaming: read response until status == 2
-	decoder := json.NewDecoder(resp.Body)
+	decoder := newTTSResponseDecoder(resp.Body, resp.Header.Get(echo.HeaderContentType))
 	c.Response().Header().Set(echo.HeaderContentType, getContentType(reqBody.AudioSetting))
 
 	for {
@@ -353,6 +422,13 @@ func handleStreamingSpeech(c echo.Context, token string, opts types.SpeechReques
 			return handleStreamError(c, handleMinimaxError(ttsResp.BaseResp.StatusCode, ttsResp.BaseResp.StatusMsg))
 		}
 
+		// The status=2 frame is a completion/summary event. MiniMax includes
+		// the complete aggregated clip there unless explicitly excluded; never
+		// append it after the status=1 incremental chunks.
+		if ttsResp.Data.Status == 2 {
+			break
+		}
+
 		if ttsResp.Data.Audio != "" {
 			audioBytes, decodeErr := hex.DecodeString(ttsResp.Data.Audio)
 			if decodeErr != nil {
@@ -365,10 +441,6 @@ func handleStreamingSpeech(c echo.Context, token string, opts types.SpeechReques
 			c.Response().Flush()
 		}
 
-		// status == 2 means synthesis complete
-		if ttsResp.Data.Status == 2 {
-			break
-		}
 	}
 
 	return mo.Ok[any](nil)

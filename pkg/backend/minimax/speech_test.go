@@ -20,6 +20,12 @@ import (
 
 type roundTripFunc func(*http.Request) (*http.Response, error)
 
+type panicReader struct{}
+
+func (panicReader) Read([]byte) (int, error) {
+	panic("reader must not be consumed while selecting an SSE decoder")
+}
+
 func (f roundTripFunc) RoundTrip(req *http.Request) (*http.Response, error) {
 	return f(req)
 }
@@ -192,7 +198,8 @@ func TestHandleStreamingSpeechWritesEachChunkBeforeUpstreamCompletes(t *testing.
 		_, _ = fmt.Fprintln(upstreamWriter, `{"data":{"audio":"0102","status":1},"base_resp":{"status_code":0}}`)
 		close(firstChunkSent)
 		<-releaseFinalChunk
-		_, _ = fmt.Fprintln(upstreamWriter, `{"data":{"audio":"0304","status":2},"base_resp":{"status_code":0}}`)
+		_, _ = fmt.Fprintln(upstreamWriter, `{"data":{"audio":"0304","status":1},"base_resp":{"status_code":0}}`)
+		_, _ = fmt.Fprintln(upstreamWriter, `{"data":{"audio":"01020304","status":2},"base_resp":{"status_code":0}}`)
 		_ = upstreamWriter.Close()
 	}()
 
@@ -241,6 +248,56 @@ func TestHandleStreamingSpeechWritesEachChunkBeforeUpstreamCompletes(t *testing.
 	}
 	if got := recorder.Body.Bytes(); string(got) != string([]byte{0x01, 0x02, 0x03, 0x04}) {
 		t.Fatalf("streamed audio = %v, want [1 2 3 4]", got)
+	}
+}
+
+func TestHandleStreamingSpeechDecodesSSEDataFrames(t *testing.T) {
+	setDefaultClient(t, func(req *http.Request) (*http.Response, error) {
+		return &http.Response{
+			StatusCode: http.StatusOK,
+			Header:     http.Header{echo.HeaderContentType: []string{"text/event-stream"}},
+			Body: io.NopCloser(strings.NewReader(
+				"data: {\"data\":{\"audio\":\"0102\",\"status\":1},\"base_resp\":{\"status_code\":0}}\n\n" +
+					"data: {\"data\":{\"audio\":\"0304\",\"status\":1},\"base_resp\":{\"status_code\":0}}\n\n" +
+					"data: {\"data\":{\"audio\":\"01020304\",\"status\":2},\"base_resp\":{\"status_code\":0}}\n\n",
+			)),
+		}, nil
+	})
+
+	recorder := httptest.NewRecorder()
+	context := echo.New().NewContext(httptest.NewRequest(http.MethodPost, "/v1/audio/speech", nil), recorder)
+	result := handleStreamingSpeech(context, "test-token", types.SpeechRequestOptions{
+		OpenAISpeechRequestOptions: types.OpenAISpeechRequestOptions{Input: "hello", Voice: "test-voice"},
+		Model:                      "speech-2.8-turbo",
+	})
+
+	if result.IsError() {
+		t.Fatalf("handleStreamingSpeech returned error: %v", result.Error())
+	}
+	if got := recorder.Body.Bytes(); string(got) != string([]byte{0x01, 0x02, 0x03, 0x04}) {
+		t.Fatalf("streamed SSE audio = %v, want [1 2 3 4]", got)
+	}
+}
+
+func TestBuildTTSRequestExcludesAggregatedStreamAudio(t *testing.T) {
+	reqBody := buildTTSRequest(types.SpeechRequestOptions{
+		OpenAISpeechRequestOptions: types.OpenAISpeechRequestOptions{Input: "hello", Voice: "test-voice"},
+		Model:                      "speech-2.8-turbo",
+	}, true)
+
+	encoded, err := json.Marshal(reqBody)
+	if err != nil {
+		t.Fatalf("marshal TTS request: %v", err)
+	}
+	if !strings.Contains(string(encoded), `"stream_options":{"exclude_aggregated_audio":true}`) {
+		t.Fatalf("streaming request = %s, want exclude_aggregated_audio=true", encoded)
+	}
+}
+
+func TestNewTTSResponseDecoderUsesContentTypeWithoutReading(t *testing.T) {
+	decoder := newTTSResponseDecoder(panicReader{}, "text/event-stream; charset=utf-8")
+	if _, ok := decoder.(*sseTTSResponseDecoder); !ok {
+		t.Fatalf("decoder type = %T, want *sseTTSResponseDecoder", decoder)
 	}
 }
 
