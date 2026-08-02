@@ -19,6 +19,7 @@ const (
 	endpointProfileField = "endpoint_profile"
 	defaultSpeechURL     = "https://api.stepfun.com/v1/audio/speech"
 	stepPlanSpeechURL    = "https://api.stepfun.com/step_plan/v1/audio/speech"
+	maxInputLength       = 1000
 )
 
 type speechRequest struct {
@@ -135,7 +136,7 @@ func buildSpeechRequest(opt types.SpeechRequestOptions) (speechRequest, error) {
 		ResponseFormat: opt.ResponseFormat,
 		Speed:          opt.Speed,
 	}
-	if len(opt.Input) > 1000 {
+	if len(opt.Input) > maxInputLength {
 		return body, apierrors.NewErrBadRequest().WithDetail("stepfun tts input must be at most 1000 characters")
 	}
 
@@ -147,12 +148,14 @@ func buildSpeechRequest(opt types.SpeechRequestOptions) (speechRequest, error) {
 		if opt.Model == modelStepAudio25TTS {
 			return body, apierrors.NewErrBadRequest().WithDetail("stepaudio-2.5-tts does not support voice_label; use instruction or inline parentheses prompts")
 		}
+
 		body.VoiceLabel = voiceLabel
 	}
 	if instruction := utils.GetByJSONPath[string](extra, "{ .instruction }"); instruction != "" {
 		if opt.Model != modelStepAudio25TTS {
 			return body, apierrors.NewErrBadRequest().WithDetail("stepfun instruction is only supported by stepaudio-2.5-tts")
 		}
+
 		body.Instruction = instruction
 	}
 	if sampleRate := utils.GetByJSONPath[*int](extra, "{ .sample_rate }"); sampleRate != nil {

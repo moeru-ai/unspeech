@@ -15,7 +15,10 @@ import (
 	"github.com/samber/mo"
 )
 
-const defaultSpeechURL = "https://api.fish.audio/v1/tts"
+const (
+	defaultSpeechURL = "https://api.fish.audio/v1/tts"
+	formatMP3        = "mp3"
+)
 
 // prosody carries Fish Audio's speech pacing controls.
 //
@@ -202,8 +205,8 @@ func buildSpeechRequest(opt types.SpeechRequestOptions) (speechRequest, error) {
 // upstream equivalent and are rejected instead of being silently transcoded.
 func formatForResponseFormat(responseFormat string) (string, error) {
 	switch responseFormat {
-	case "", "mp3":
-		return "mp3", nil
+	case "", formatMP3:
+		return formatMP3, nil
 	case "wav", "pcm", "opus":
 		return responseFormat, nil
 	default:

@@ -20,7 +20,6 @@ func TestBuildSpeechRequestMapsOpenAIFields(t *testing.T) {
 		},
 		Model: modelS1,
 	})
-
 	if err != nil {
 		t.Fatalf("buildSpeechRequest returned error: %v", err)
 	}
@@ -48,7 +47,6 @@ func TestBuildSpeechRequestDefaultsToMP3(t *testing.T) {
 		},
 		Model: modelS1,
 	})
-
 	if err != nil {
 		t.Fatalf("buildSpeechRequest returned error: %v", err)
 	}
@@ -78,7 +76,6 @@ func TestBuildSpeechRequestMapsExtraBody(t *testing.T) {
 		},
 		Model: modelS1,
 	})
-
 	if err != nil {
 		t.Fatalf("buildSpeechRequest returned error: %v", err)
 	}
@@ -119,7 +116,6 @@ func TestBuildSpeechRequestExtraProsodyOverridesSpeed(t *testing.T) {
 		},
 		Model: modelS1,
 	})
-
 	if err != nil {
 		t.Fatalf("buildSpeechRequest returned error: %v", err)
 	}
@@ -146,7 +142,6 @@ func TestBuildSpeechRequestRejectsUnsupportedFormats(t *testing.T) {
 			},
 			Model: modelS1,
 		})
-
 		if err == nil {
 			t.Fatalf("buildSpeechRequest(%q) returned nil error", format)
 		}
