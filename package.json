@@ -9,7 +9,7 @@
     "bump": "bumpp",
     "lint": "eslint --flag unstable_native_nodejs_ts_config --cache .",
     "lint:fix": "eslint --flag unstable_native_nodejs_ts_config --cache . --fix",
-    "test": "tsx --test",
+    "test": "vitest",
     "typecheck": "pnpm -r run typecheck"
   },
   "devDependencies": {
@@ -22,6 +22,7 @@
     "jiti": "^2.6.1",
     "tsdown": "^0.16.8",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
   }
 }

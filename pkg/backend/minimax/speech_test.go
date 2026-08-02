@@ -1,6 +1,7 @@
 package minimax
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -18,6 +19,12 @@ import (
 	"github.com/samber/mo"
 )
 
+const (
+	testInput        = "hello"
+	testVoice        = "test-voice"
+	testMinimaxModel = "speech-2.8-turbo"
+)
+
 type roundTripFunc func(*http.Request) (*http.Response, error)
 
 type panicReader struct{}
@@ -32,6 +39,7 @@ func (f roundTripFunc) RoundTrip(req *http.Request) (*http.Response, error) {
 
 type signalingRecorder struct {
 	*httptest.ResponseRecorder
+
 	wrote chan struct{}
 	once  sync.Once
 }
@@ -39,29 +47,34 @@ type signalingRecorder struct {
 func (r *signalingRecorder) Write(data []byte) (int, error) {
 	written, err := r.ResponseRecorder.Write(data)
 	r.once.Do(func() { close(r.wrote) })
+
 	return written, err
 }
 
 func TestHandleSpeechMapsOpenAIFields(t *testing.T) {
 	var captured TTSRequest
+
 	setDefaultClient(t, func(req *http.Request) (*http.Response, error) {
-		if err := json.NewDecoder(req.Body).Decode(&captured); err != nil {
-			t.Fatalf("decode upstream request: %v", err)
+		decodeErr := json.NewDecoder(req.Body).Decode(&captured)
+		if decodeErr != nil {
+			t.Fatalf("decode upstream request: %v", decodeErr)
 		}
+
 		return jsonResponse(http.StatusOK, `{"data":{"audio":"0102"},"base_resp":{"status_code":0}}`), nil
 	})
 
 	recorder := httptest.NewRecorder()
-	context := echo.New().NewContext(httptest.NewRequest(http.MethodPost, "/v1/audio/speech", nil), recorder)
+	request := httptest.NewRequestWithContext(context.Background(), http.MethodPost, "/v1/audio/speech", nil)
+	context := echo.New().NewContext(request, recorder)
 	result := HandleSpeech(context, mo.Some(types.SpeechRequestOptions{
 		OpenAISpeechRequestOptions: types.OpenAISpeechRequestOptions{
-			Input:          "hello",
-			Voice:          "test-voice",
+			Input:          testInput,
+			Voice:          testVoice,
 			Speed:          1.25,
-			ResponseFormat: "wav",
+			ResponseFormat: audioFormatWAV,
 			ExtraBody:      map[string]any{"sample_rate": 24000},
 		},
-		Model: "speech-2.8-turbo",
+		Model: testMinimaxModel,
 	}))
 
 	if result.IsError() {
@@ -73,31 +86,34 @@ func TestHandleSpeechMapsOpenAIFields(t *testing.T) {
 	if captured.AudioSetting == nil || captured.AudioSetting.Format != "wav" || captured.AudioSetting.SampleRate != 24000 {
 		t.Fatalf("AudioSetting = %+v, want format wav and sample rate 24000", captured.AudioSetting)
 	}
-	if got := recorder.Header().Get(echo.HeaderContentType); got != "audio/wav" {
+	if got := recorder.Header().Get(echo.HeaderContentType); got != contentTypeWAV {
 		t.Fatalf("Content-Type = %q, want audio/wav", got)
 	}
 }
 
 func TestHandleSpeechMapsChannelOption(t *testing.T) {
 	var captured TTSRequest
+
 	setDefaultClient(t, func(req *http.Request) (*http.Response, error) {
-		if err := json.NewDecoder(req.Body).Decode(&captured); err != nil {
-			t.Fatalf("decode upstream request: %v", err)
+		decodeErr := json.NewDecoder(req.Body).Decode(&captured)
+		if decodeErr != nil {
+			t.Fatalf("decode upstream request: %v", decodeErr)
 		}
+
 		return jsonResponse(http.StatusOK, `{"data":{"audio":"0102"},"base_resp":{"status_code":0}}`), nil
 	})
 
 	context := echo.New().NewContext(
-		httptest.NewRequest(http.MethodPost, "/v1/audio/speech", nil),
+		httptest.NewRequestWithContext(context.Background(), http.MethodPost, "/v1/audio/speech", nil),
 		httptest.NewRecorder(),
 	)
 	result := HandleSpeech(context, mo.Some(types.SpeechRequestOptions{
 		OpenAISpeechRequestOptions: types.OpenAISpeechRequestOptions{
-			Input:     "hello",
-			Voice:     "test-voice",
+			Input:     testInput,
+			Voice:     testVoice,
 			ExtraBody: map[string]any{"channel": 2},
 		},
-		Model: "speech-2.8-turbo",
+		Model: testMinimaxModel,
 	}))
 
 	if result.IsError() {
@@ -114,10 +130,11 @@ func TestHandleStreamingSpeechRejectsIncompleteResponseBeforeAudio(t *testing.T)
 	})
 
 	recorder := httptest.NewRecorder()
-	context := echo.New().NewContext(httptest.NewRequest(http.MethodPost, "/v1/audio/speech", nil), recorder)
+	request := httptest.NewRequestWithContext(context.Background(), http.MethodPost, "/v1/audio/speech", nil)
+	context := echo.New().NewContext(request, recorder)
 	result := handleStreamingSpeech(context, "test-token", types.SpeechRequestOptions{
-		OpenAISpeechRequestOptions: types.OpenAISpeechRequestOptions{Input: "hello", Voice: "test-voice"},
-		Model:                      "speech-2.8-turbo",
+		OpenAISpeechRequestOptions: types.OpenAISpeechRequestOptions{Input: testInput, Voice: testVoice},
+		Model:                      testMinimaxModel,
 	})
 
 	if result.IsOk() {
@@ -133,21 +150,31 @@ func TestHandleStreamingSpeechAbortsIncompleteResponseAfterAudio(t *testing.T) {
 	e := echo.New()
 	e.POST("/", func(c echo.Context) error {
 		result := handleStreamingSpeech(c, "test-token", types.SpeechRequestOptions{
-			OpenAISpeechRequestOptions: types.OpenAISpeechRequestOptions{Input: "hello", Voice: "test-voice"},
-			Model:                      "speech-2.8-turbo",
+			OpenAISpeechRequestOptions: types.OpenAISpeechRequestOptions{Input: testInput, Voice: testVoice},
+			Model:                      testMinimaxModel,
 		})
 		if result.IsError() {
 			return result.Error()
 		}
+
 		return nil
 	})
+
 	server := httptest.NewServer(e)
 	t.Cleanup(server.Close)
 
-	response, err := server.Client().Post(server.URL, "application/json", strings.NewReader("{}"))
+	request, err := http.NewRequestWithContext(context.Background(), http.MethodPost, server.URL, strings.NewReader("{}"))
+	if err != nil {
+		t.Fatalf("create streaming speech request: %v", err)
+	}
+
+	request.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+	response, err := server.Client().Do(request)
 	if err != nil {
 		t.Fatalf("request streaming speech: %v", err)
 	}
+
 	defer func() { _ = response.Body.Close() }()
 
 	_, readErr := io.ReadAll(response.Body)
@@ -160,13 +187,15 @@ func TestHandleVoicesPreservesUnknownContentTypeErrorStatus(t *testing.T) {
 	setDefaultClient(t, func(req *http.Request) (*http.Response, error) {
 		response := jsonResponse(http.StatusTooManyRequests, "rate limited")
 		response.Header.Set(echo.HeaderContentType, "application/octet-stream")
+
 		return response, nil
 	})
 
 	context := echo.New().NewContext(
-		httptest.NewRequest(http.MethodGet, "/api/voices?provider=minimax", nil),
+		httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/api/voices?provider=minimax", nil),
 		httptest.NewRecorder(),
 	)
+
 	result := HandleVoices(context, mo.Some(types.VoicesRequestOptions{Backend: "minimax"}))
 	if result.IsOk() {
 		t.Fatal("HandleVoices accepted an upstream 429 response")
@@ -196,8 +225,10 @@ func TestHandleStreamingSpeechWritesEachChunkBeforeUpstreamCompletes(t *testing.
 
 	go func() {
 		_, _ = fmt.Fprintln(upstreamWriter, `{"data":{"audio":"0102","status":1},"base_resp":{"status_code":0}}`)
+
 		close(firstChunkSent)
 		<-releaseFinalChunk
+
 		_, _ = fmt.Fprintln(upstreamWriter, `{"data":{"audio":"0304","status":1},"base_resp":{"status_code":0}}`)
 		_, _ = fmt.Fprintln(upstreamWriter, `{"data":{"audio":"01020304","status":2},"base_resp":{"status_code":0}}`)
 		_ = upstreamWriter.Close()
@@ -208,26 +239,28 @@ func TestHandleStreamingSpeechWritesEachChunkBeforeUpstreamCompletes(t *testing.
 		wrote:            make(chan struct{}),
 	}
 	e := echo.New()
-	request := httptest.NewRequest(http.MethodPost, "/v1/audio/speech", nil)
+	request := httptest.NewRequestWithContext(context.Background(), http.MethodPost, "/v1/audio/speech", nil)
 	context := e.NewContext(request, recorder)
 	resultDone := make(chan error, 1)
 
 	go func() {
 		result := handleStreamingSpeech(context, "test-token", types.SpeechRequestOptions{
 			OpenAISpeechRequestOptions: types.OpenAISpeechRequestOptions{
-				Input: "hello",
-				Voice: "test-voice",
+				Input: testInput,
+				Voice: testVoice,
 			},
-			Model: "speech-2.8-turbo",
+			Model: testMinimaxModel,
 		})
 		if result.IsError() {
 			resultDone <- result.Error()
 			return
 		}
+
 		resultDone <- nil
 	}()
 
 	<-firstChunkSent
+
 	select {
 	case <-recorder.wrote:
 	case <-time.After(500 * time.Millisecond):
@@ -243,8 +276,10 @@ func TestHandleStreamingSpeechWritesEachChunkBeforeUpstreamCompletes(t *testing.
 	}
 
 	close(releaseFinalChunk)
-	if err := <-resultDone; err != nil {
-		t.Fatalf("handleStreamingSpeech returned error: %v", err)
+
+	resultErr := <-resultDone
+	if resultErr != nil {
+		t.Fatalf("handleStreamingSpeech returned error: %v", resultErr)
 	}
 	if got := recorder.Body.Bytes(); string(got) != string([]byte{0x01, 0x02, 0x03, 0x04}) {
 		t.Fatalf("streamed audio = %v, want [1 2 3 4]", got)
@@ -265,10 +300,11 @@ func TestHandleStreamingSpeechDecodesSSEDataFrames(t *testing.T) {
 	})
 
 	recorder := httptest.NewRecorder()
-	context := echo.New().NewContext(httptest.NewRequest(http.MethodPost, "/v1/audio/speech", nil), recorder)
+	request := httptest.NewRequestWithContext(context.Background(), http.MethodPost, "/v1/audio/speech", nil)
+	context := echo.New().NewContext(request, recorder)
 	result := handleStreamingSpeech(context, "test-token", types.SpeechRequestOptions{
-		OpenAISpeechRequestOptions: types.OpenAISpeechRequestOptions{Input: "hello", Voice: "test-voice"},
-		Model:                      "speech-2.8-turbo",
+		OpenAISpeechRequestOptions: types.OpenAISpeechRequestOptions{Input: testInput, Voice: testVoice},
+		Model:                      testMinimaxModel,
 	})
 
 	if result.IsError() {
@@ -281,8 +317,8 @@ func TestHandleStreamingSpeechDecodesSSEDataFrames(t *testing.T) {
 
 func TestBuildTTSRequestExcludesAggregatedStreamAudio(t *testing.T) {
 	reqBody := buildTTSRequest(types.SpeechRequestOptions{
-		OpenAISpeechRequestOptions: types.OpenAISpeechRequestOptions{Input: "hello", Voice: "test-voice"},
-		Model:                      "speech-2.8-turbo",
+		OpenAISpeechRequestOptions: types.OpenAISpeechRequestOptions{Input: testInput, Voice: testVoice},
+		Model:                      testMinimaxModel,
 	}, true)
 
 	encoded, err := json.Marshal(reqBody)
@@ -303,8 +339,11 @@ func TestNewTTSResponseDecoderUsesContentTypeWithoutReading(t *testing.T) {
 
 func setDefaultClient(t *testing.T, roundTrip roundTripFunc) {
 	t.Helper()
+
 	originalClient := http.DefaultClient
+
 	t.Cleanup(func() { http.DefaultClient = originalClient })
+
 	http.DefaultClient = &http.Client{Transport: roundTrip}
 }
 

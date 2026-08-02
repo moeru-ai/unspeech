@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"io"
 	"log/slog"
 	"net/http"
@@ -15,6 +16,22 @@ import (
 	"github.com/moeru-ai/unspeech/pkg/backend/types"
 	"github.com/moeru-ai/unspeech/pkg/utils"
 	"github.com/samber/mo"
+)
+
+const (
+	sseDataPrefix                        = "data:"
+	initialSSEBufferSize                 = 64 * 1024
+	maximumSSEEventSize                  = 16 * 1024 * 1024
+	streamCompleteStatus                 = 2
+	minimaxAuthFailedCode                = 1004
+	minimaxRateLimitCode                 = 1002
+	minimaxAlternateRateLimitCode        = 1039
+	minimaxInvalidParameterCode          = 1042
+	minimaxAlternateInvalidParameterCode = 2013
+	minimaxTimeoutCode                   = 1001
+	contentTypeMPEG                      = "audio/mpeg"
+	contentTypeWAV                       = "audio/wav"
+	audioFormatWAV                       = "wav"
 )
 
 // VoiceSetting MiniMax voice settings
@@ -85,7 +102,7 @@ type TTSResponse struct {
 }
 
 type ttsResponseDecoder interface {
-	Decode(any) error
+	Decode(target any) error
 }
 
 type sseTTSResponseDecoder struct {
@@ -98,8 +115,9 @@ func newTTSResponseDecoder(body io.Reader, contentType string) ttsResponseDecode
 	}
 
 	reader := bufio.NewReader(body)
-	prefix, _ := reader.Peek(len("data:"))
-	if bytes.Equal(prefix, []byte("data:")) {
+
+	prefix, _ := reader.Peek(len(sseDataPrefix))
+	if bytes.Equal(prefix, []byte(sseDataPrefix)) {
 		return newSSETTSResponseDecoder(reader)
 	}
 
@@ -108,26 +126,31 @@ func newTTSResponseDecoder(body io.Reader, contentType string) ttsResponseDecode
 
 func newSSETTSResponseDecoder(body io.Reader) ttsResponseDecoder {
 	scanner := bufio.NewScanner(body)
-	scanner.Buffer(make([]byte, 64*1024), 16*1024*1024)
+	scanner.Buffer(make([]byte, initialSSEBufferSize), maximumSSEEventSize)
+
 	return &sseTTSResponseDecoder{scanner: scanner}
 }
 
 func (d *sseTTSResponseDecoder) Decode(target any) error {
 	dataLines := make([]string, 0, 1)
+
 	for d.scanner.Scan() {
 		line := d.scanner.Text()
 		if line == "" {
 			if len(dataLines) == 0 {
 				continue
 			}
+
 			return decodeSSEData(dataLines, target)
 		}
-		if strings.HasPrefix(line, "data:") {
-			dataLines = append(dataLines, strings.TrimSpace(strings.TrimPrefix(line, "data:")))
+		if data, ok := strings.CutPrefix(line, sseDataPrefix); ok {
+			dataLines = append(dataLines, strings.TrimSpace(data))
 		}
 	}
-	if err := d.scanner.Err(); err != nil {
-		return err
+
+	scannerErr := d.scanner.Err()
+	if scannerErr != nil {
+		return scannerErr
 	}
 	if len(dataLines) != 0 {
 		return decodeSSEData(dataLines, target)
@@ -141,6 +164,7 @@ func decodeSSEData(dataLines []string, target any) error {
 	if data == "[DONE]" {
 		return io.EOF
 	}
+
 	return json.Unmarshal([]byte(data), target)
 }
 
@@ -197,6 +221,7 @@ func HandleSpeech(c echo.Context, options mo.Option[types.SpeechRequestOptions])
 
 	// Parse response
 	var ttsResp TTSResponse
+
 	err = json.NewDecoder(resp.Body).Decode(&ttsResp)
 	if err != nil {
 		return mo.Err[any](apierrors.NewErrBadGateway().WithDetail(err.Error()).WithError(err).WithCaller())
@@ -253,6 +278,7 @@ func buildVoiceSettings(extraBody map[string]any, reqBody *TTSRequest) {
 		if reqBody.VoiceSetting == nil {
 			reqBody.VoiceSetting = &VoiceSetting{}
 		}
+
 		reqBody.VoiceSetting.Speed = *speed
 	}
 
@@ -260,6 +286,7 @@ func buildVoiceSettings(extraBody map[string]any, reqBody *TTSRequest) {
 		if reqBody.VoiceSetting == nil {
 			reqBody.VoiceSetting = &VoiceSetting{}
 		}
+
 		reqBody.VoiceSetting.Vol = *vol
 	}
 
@@ -267,6 +294,7 @@ func buildVoiceSettings(extraBody map[string]any, reqBody *TTSRequest) {
 		if reqBody.VoiceSetting == nil {
 			reqBody.VoiceSetting = &VoiceSetting{}
 		}
+
 		reqBody.VoiceSetting.Pitch = *pitch
 	}
 
@@ -274,6 +302,7 @@ func buildVoiceSettings(extraBody map[string]any, reqBody *TTSRequest) {
 		if reqBody.VoiceSetting == nil {
 			reqBody.VoiceSetting = &VoiceSetting{}
 		}
+
 		reqBody.VoiceSetting.Emotion = *emotion
 	}
 }
@@ -284,6 +313,7 @@ func buildAudioSettings(extraBody map[string]any, reqBody *TTSRequest) {
 		if reqBody.AudioSetting == nil {
 			reqBody.AudioSetting = &AudioSetting{}
 		}
+
 		reqBody.AudioSetting.SampleRate = *sampleRate
 	}
 
@@ -291,6 +321,7 @@ func buildAudioSettings(extraBody map[string]any, reqBody *TTSRequest) {
 		if reqBody.AudioSetting == nil {
 			reqBody.AudioSetting = &AudioSetting{}
 		}
+
 		reqBody.AudioSetting.Bitrate = *bitrate
 	}
 
@@ -298,6 +329,7 @@ func buildAudioSettings(extraBody map[string]any, reqBody *TTSRequest) {
 		if reqBody.AudioSetting == nil {
 			reqBody.AudioSetting = &AudioSetting{}
 		}
+
 		reqBody.AudioSetting.Format = *format
 	}
 
@@ -305,6 +337,7 @@ func buildAudioSettings(extraBody map[string]any, reqBody *TTSRequest) {
 		if reqBody.AudioSetting == nil {
 			reqBody.AudioSetting = &AudioSetting{}
 		}
+
 		reqBody.AudioSetting.Channel = *channel
 	}
 }
@@ -316,16 +349,17 @@ func getContentType(audioSetting *AudioSetting) string {
 	}
 
 	contentTypes := map[string]string{
-		"pcm":  "audio/pcm",
-		"wav":  "audio/wav",
-		"flac": "audio/flac",
-		"mp3":  "audio/mpeg",
+		"pcm":          "audio/pcm",
+		audioFormatWAV: contentTypeWAV,
+		"flac":         "audio/flac",
+		"mp3":          contentTypeMPEG,
 	}
 
 	if ct, ok := contentTypes[audioSetting.Format]; ok {
 		return ct
 	}
-	return "audio/mpeg"
+
+	return contentTypeMPEG
 }
 
 // handleHTTPError handles HTTP errors from upstream
@@ -345,24 +379,27 @@ func handleHTTPError(resp *http.Response) mo.Result[any] {
 			slog.String("content_type", resp.Header.Get("Content-Type")),
 		)
 	}
+
 	return mo.Err[any](apierrors.NewUpstreamError(resp.StatusCode))
 }
 
 // handleMinimaxError handles MiniMax error codes
 func handleMinimaxError(code int, msg string) *apierrors.Error {
 	var httpStatus int
+
 	switch code {
-	case 1004: // Auth failed
+	case minimaxAuthFailedCode:
 		httpStatus = http.StatusUnauthorized
-	case 1002, 1039: // Rate limit
+	case minimaxRateLimitCode, minimaxAlternateRateLimitCode:
 		httpStatus = http.StatusTooManyRequests
-	case 1042, 2013: // Invalid parameter
+	case minimaxInvalidParameterCode, minimaxAlternateInvalidParameterCode:
 		httpStatus = http.StatusBadRequest
-	case 1001: // Timeout
+	case minimaxTimeoutCode:
 		httpStatus = http.StatusGatewayTimeout
 	default:
 		httpStatus = http.StatusBadGateway
 	}
+
 	return apierrors.NewUpstreamError(httpStatus).WithDetailf("minimax error: %d - %s", code, msg)
 }
 
@@ -410,11 +447,14 @@ func handleStreamingSpeech(c echo.Context, token string, opts types.SpeechReques
 
 	for {
 		var ttsResp TTSResponse
-		if err := decoder.Decode(&ttsResp); err != nil {
-			if err == io.EOF {
+
+		decodeErr := decoder.Decode(&ttsResp)
+		if decodeErr != nil {
+			if errors.Is(decodeErr, io.EOF) {
 				return handleStreamError(c, apierrors.NewErrBadGateway().WithDetail("upstream stream ended before completion").WithCaller())
 			}
-			return handleStreamError(c, apierrors.NewErrBadGateway().WithDetail(err.Error()).WithError(err).WithCaller())
+
+			return handleStreamError(c, apierrors.NewErrBadGateway().WithDetail(decodeErr.Error()).WithError(decodeErr).WithCaller())
 		}
 
 		// Check business status code
@@ -425,22 +465,23 @@ func handleStreamingSpeech(c echo.Context, token string, opts types.SpeechReques
 		// The status=2 frame is a completion/summary event. MiniMax includes
 		// the complete aggregated clip there unless explicitly excluded; never
 		// append it after the status=1 incremental chunks.
-		if ttsResp.Data.Status == 2 {
+		if ttsResp.Data.Status == streamCompleteStatus {
 			break
 		}
 
 		if ttsResp.Data.Audio != "" {
-			audioBytes, decodeErr := hex.DecodeString(ttsResp.Data.Audio)
-			if decodeErr != nil {
-				return handleStreamError(c, apierrors.NewErrInternal().WithDetail("failed to decode hex audio: "+decodeErr.Error()).WithError(decodeErr).WithCaller())
+			audioBytes, audioDecodeErr := hex.DecodeString(ttsResp.Data.Audio)
+			if audioDecodeErr != nil {
+				return handleStreamError(c, apierrors.NewErrInternal().WithDetail("failed to decode hex audio: "+audioDecodeErr.Error()).WithError(audioDecodeErr).WithCaller())
 			}
 
-			if _, writeErr := c.Response().Write(audioBytes); writeErr != nil {
+			_, writeErr := c.Response().Write(audioBytes)
+			if writeErr != nil {
 				return handleStreamError(c, apierrors.NewErrInternal().WithDetail(writeErr.Error()).WithError(writeErr).WithCaller())
 			}
+
 			c.Response().Flush()
 		}
-
 	}
 
 	return mo.Ok[any](nil)

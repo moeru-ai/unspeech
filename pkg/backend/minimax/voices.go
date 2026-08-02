@@ -12,6 +12,14 @@ import (
 	"github.com/samber/mo"
 )
 
+const (
+	voiceLabelType        = "type"
+	automaticLanguage     = "Auto"
+	automaticLanguageCode = "auto"
+	modelSpeech28Turbo    = "speech-2.8-turbo"
+	modelSpeech28HD       = "speech-2.8-hd"
+)
+
 // GetVoiceReq Request for getting voice list
 type GetVoiceReq struct {
 	VoiceType string `json:"voice_type"`
@@ -55,10 +63,10 @@ type GetVoiceResp struct {
 var (
 	// Supported audio formats
 	formats = []types.VoiceFormat{
-		{Name: "MP3", Extension: ".mp3", MimeType: "audio/mpeg"},
+		{Name: "MP3", Extension: ".mp3", MimeType: contentTypeMPEG},
 		{Name: "PCM", Extension: ".pcm", MimeType: "audio/pcm"},
 		{Name: "FLAC", Extension: ".flac", MimeType: "audio/flac"},
-		{Name: "WAV", Extension: ".wav", MimeType: "audio/wav"},
+		{Name: "WAV", Extension: ".wav", MimeType: contentTypeWAV},
 	}
 )
 
@@ -107,6 +115,7 @@ func HandleVoices(c echo.Context, options mo.Option[types.VoicesRequestOptions])
 
 	// Parse response
 	var voiceResp GetVoiceResp
+
 	err = json.NewDecoder(resp.Body).Decode(&voiceResp)
 	if err != nil {
 		return mo.Err[any](apierrors.NewErrBadGateway().WithDetail(err.Error()).WithError(err).WithCaller())
@@ -127,12 +136,12 @@ func HandleVoices(c echo.Context, options mo.Option[types.VoicesRequestOptions])
 			Name:        v.VoiceName,
 			Description: strings.Join(v.Description, ", "),
 			Labels: map[string]any{
-				"type": "system",
+				voiceLabelType: "system",
 			},
 			Tags:              []string{"system"},
-			Languages:         []types.VoiceLanguage{{Title: "Auto", Code: "auto"}},
+			Languages:         []types.VoiceLanguage{{Title: automaticLanguage, Code: automaticLanguageCode}},
 			Formats:           formats,
-			CompatibleModels:  []string{"speech-2.8-turbo", "speech-2.8-hd", "speech-2.6-turbo", "speech-2.6-hd"},
+			CompatibleModels:  []string{modelSpeech28Turbo, modelSpeech28HD, "speech-2.6-turbo", "speech-2.6-hd"},
 			PredefinedOptions: map[string]any{},
 		})
 	}
@@ -144,13 +153,13 @@ func HandleVoices(c echo.Context, options mo.Option[types.VoicesRequestOptions])
 			Name:        v.VoiceID,
 			Description: strings.Join(v.Description, ", "),
 			Labels: map[string]any{
-				"type":        "voice_cloning",
-				"createdTime": v.CreatedTime,
+				voiceLabelType: "voice_cloning",
+				"createdTime":  v.CreatedTime,
 			},
 			Tags:              []string{"voice_cloning"},
-			Languages:         []types.VoiceLanguage{{Title: "Auto", Code: "auto"}},
+			Languages:         []types.VoiceLanguage{{Title: automaticLanguage, Code: automaticLanguageCode}},
 			Formats:           formats,
-			CompatibleModels:  []string{"speech-2.8-turbo", "speech-2.8-hd"},
+			CompatibleModels:  []string{modelSpeech28Turbo, modelSpeech28HD},
 			PredefinedOptions: map[string]any{},
 		})
 	}
@@ -162,13 +171,13 @@ func HandleVoices(c echo.Context, options mo.Option[types.VoicesRequestOptions])
 			Name:        v.VoiceID,
 			Description: strings.Join(v.Description, ", "),
 			Labels: map[string]any{
-				"type":        "voice_generation",
-				"createdTime": v.CreatedTime,
+				voiceLabelType: "voice_generation",
+				"createdTime":  v.CreatedTime,
 			},
 			Tags:              []string{"voice_generation"},
-			Languages:         []types.VoiceLanguage{{Title: "Auto", Code: "auto"}},
+			Languages:         []types.VoiceLanguage{{Title: automaticLanguage, Code: automaticLanguageCode}},
 			Formats:           formats,
-			CompatibleModels:  []string{"speech-2.8-turbo", "speech-2.8-hd"},
+			CompatibleModels:  []string{modelSpeech28Turbo, modelSpeech28HD},
 			PredefinedOptions: map[string]any{},
 		})
 	}
