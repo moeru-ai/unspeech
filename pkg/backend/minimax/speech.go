@@ -73,7 +73,7 @@ type TTSResponseBaseResp struct {
 // TTSResponse MiniMax TTS response
 type TTSResponse struct {
 	Data      TTSResponseData      `json:"data"`
-	TraceID   string              `json:"trace_id"`
+	TraceID   string               `json:"trace_id"`
 	ExtraInfo TTSResponseExtraInfo `json:"extra_info"`
 	BaseResp  TTSResponseBaseResp  `json:"base_resp"`
 }
@@ -93,26 +93,7 @@ func HandleSpeech(c echo.Context, options mo.Option[types.SpeechRequestOptions])
 		return handleStreamingSpeech(c, token, opts)
 	}
 
-	// Build MiniMax request
-	reqBody := TTSRequest{
-		Model:        opts.Model,
-		Text:         opts.Input,
-		Stream:       false,
-		OutputFormat: "hex",
-	}
-
-	// Set voice_id from user input
-	if opts.Voice != "" {
-		reqBody.VoiceSetting = &VoiceSetting{
-			VoiceID: opts.Voice,
-		}
-	}
-
-	// Build voice settings from ExtraBody
-	buildVoiceSettings(opts.ExtraBody, &reqBody)
-
-	// Build audio settings from ExtraBody
-	buildAudioSettings(opts.ExtraBody, &reqBody)
+	reqBody := buildTTSRequest(opts, false)
 
 	// Serialize request body
 	jsonBytes, err := json.Marshal(reqBody)
@@ -163,13 +144,38 @@ func HandleSpeech(c echo.Context, options mo.Option[types.SpeechRequestOptions])
 	// Decode hex audio
 	audioBytes, err := hex.DecodeString(ttsResp.Data.Audio)
 	if err != nil {
-		return mo.Err[any](apierrors.NewErrInternal().WithDetail("failed to decode hex audio: "+err.Error()).WithError(err).WithCaller())
+		return mo.Err[any](apierrors.NewErrInternal().WithDetail("failed to decode hex audio: " + err.Error()).WithError(err).WithCaller())
 	}
 
 	// Determine content type
 	contentType := getContentType(reqBody.AudioSetting)
 
 	return mo.Ok[any](c.Blob(http.StatusOK, contentType, audioBytes))
+}
+
+func buildTTSRequest(opts types.SpeechRequestOptions, stream bool) TTSRequest {
+	reqBody := TTSRequest{
+		Model:        opts.Model,
+		Text:         opts.Input,
+		Stream:       stream,
+		OutputFormat: "hex",
+	}
+
+	if opts.Voice != "" || opts.Speed != 0 {
+		reqBody.VoiceSetting = &VoiceSetting{
+			VoiceID: opts.Voice,
+			Speed:   opts.Speed,
+		}
+	}
+	if opts.ResponseFormat != "" {
+		reqBody.AudioSetting = &AudioSetting{Format: opts.ResponseFormat}
+	}
+
+	// Provider-specific extra_body values take precedence over OpenAI fields.
+	buildVoiceSettings(opts.ExtraBody, &reqBody)
+	buildAudioSettings(opts.ExtraBody, &reqBody)
+
+	return reqBody
 }
 
 // buildVoiceSettings builds VoiceSetting from ExtraBody
@@ -206,7 +212,9 @@ func buildVoiceSettings(extraBody map[string]any, reqBody *TTSRequest) {
 // buildAudioSettings builds AudioSetting from ExtraBody
 func buildAudioSettings(extraBody map[string]any, reqBody *TTSRequest) {
 	if sampleRate := utils.GetByJSONPath[*int](extraBody, "{ .sample_rate }"); sampleRate != nil {
-		reqBody.AudioSetting = &AudioSetting{}
+		if reqBody.AudioSetting == nil {
+			reqBody.AudioSetting = &AudioSetting{}
+		}
 		reqBody.AudioSetting.SampleRate = *sampleRate
 	}
 
@@ -223,6 +231,13 @@ func buildAudioSettings(extraBody map[string]any, reqBody *TTSRequest) {
 		}
 		reqBody.AudioSetting.Format = *format
 	}
+
+	if channel := utils.GetByJSONPath[*int](extraBody, "{ .channel }"); channel != nil {
+		if reqBody.AudioSetting == nil {
+			reqBody.AudioSetting = &AudioSetting{}
+		}
+		reqBody.AudioSetting.Channel = *channel
+	}
 }
 
 // getContentType returns MIME type based on audio format
@@ -235,13 +250,13 @@ func getContentType(audioSetting *AudioSetting) string {
 		"pcm":  "audio/pcm",
 		"wav":  "audio/wav",
 		"flac": "audio/flac",
-		"mp3":  "audio/mp3",
+		"mp3":  "audio/mpeg",
 	}
 
 	if ct, ok := contentTypes[audioSetting.Format]; ok {
 		return ct
 	}
-	return "audio/mp3"
+	return "audio/mpeg"
 }
 
 // handleHTTPError handles HTTP errors from upstream
@@ -284,24 +299,7 @@ func handleMinimaxError(code int, msg string) *apierrors.Error {
 
 // handleStreamingSpeech handles streaming TTS requests
 func handleStreamingSpeech(c echo.Context, token string, opts types.SpeechRequestOptions) mo.Result[any] {
-	// Build MiniMax request
-	reqBody := TTSRequest{
-		Model:        opts.Model,
-		Text:         opts.Input,
-		Stream:       true,
-		OutputFormat: "hex",
-	}
-
-	// Set voice_id
-	if opts.Voice != "" {
-		reqBody.VoiceSetting = &VoiceSetting{
-			VoiceID: opts.Voice,
-		}
-	}
-
-	// Build settings from ExtraBody
-	buildVoiceSettings(opts.ExtraBody, &reqBody)
-	buildAudioSettings(opts.ExtraBody, &reqBody)
+	reqBody := buildTTSRequest(opts, true)
 
 	// Serialize request body
 	jsonBytes, err := json.Marshal(reqBody)
@@ -339,24 +337,33 @@ func handleStreamingSpeech(c echo.Context, token string, opts types.SpeechReques
 
 	// Streaming: read response until status == 2
 	decoder := json.NewDecoder(resp.Body)
-	audioHex := new(strings.Builder)
+	c.Response().Header().Set(echo.HeaderContentType, getContentType(reqBody.AudioSetting))
 
 	for {
 		var ttsResp TTSResponse
 		if err := decoder.Decode(&ttsResp); err != nil {
 			if err == io.EOF {
-				break
+				return handleStreamError(c, apierrors.NewErrBadGateway().WithDetail("upstream stream ended before completion").WithCaller())
 			}
-			return mo.Err[any](apierrors.NewErrBadGateway().WithDetail(err.Error()).WithError(err).WithCaller())
+			return handleStreamError(c, apierrors.NewErrBadGateway().WithDetail(err.Error()).WithError(err).WithCaller())
 		}
 
 		// Check business status code
 		if ttsResp.BaseResp.StatusCode != 0 {
-			return mo.Err[any](handleMinimaxError(ttsResp.BaseResp.StatusCode, ttsResp.BaseResp.StatusMsg))
+			return handleStreamError(c, handleMinimaxError(ttsResp.BaseResp.StatusCode, ttsResp.BaseResp.StatusMsg))
 		}
 
-		// Append audio data
-		audioHex.WriteString(ttsResp.Data.Audio)
+		if ttsResp.Data.Audio != "" {
+			audioBytes, decodeErr := hex.DecodeString(ttsResp.Data.Audio)
+			if decodeErr != nil {
+				return handleStreamError(c, apierrors.NewErrInternal().WithDetail("failed to decode hex audio: "+decodeErr.Error()).WithError(decodeErr).WithCaller())
+			}
+
+			if _, writeErr := c.Response().Write(audioBytes); writeErr != nil {
+				return handleStreamError(c, apierrors.NewErrInternal().WithDetail(writeErr.Error()).WithError(writeErr).WithCaller())
+			}
+			c.Response().Flush()
+		}
 
 		// status == 2 means synthesis complete
 		if ttsResp.Data.Status == 2 {
@@ -364,14 +371,16 @@ func handleStreamingSpeech(c echo.Context, token string, opts types.SpeechReques
 		}
 	}
 
-	// Decode hex audio
-	audioBytes, err := hex.DecodeString(audioHex.String())
-	if err != nil {
-		return mo.Err[any](apierrors.NewErrInternal().WithDetail("failed to decode hex audio: "+err.Error()).WithError(err).WithCaller())
+	return mo.Ok[any](nil)
+}
+
+func handleStreamError(c echo.Context, err *apierrors.Error) mo.Result[any] {
+	if !c.Response().Committed {
+		return mo.Err[any](err)
 	}
 
-	// Determine content type
-	contentType := getContentType(reqBody.AudioSetting)
-
-	return mo.Ok[any](c.Blob(http.StatusOK, contentType, audioBytes))
+	// Once audio bytes have been sent, an HTTP error response would corrupt the
+	// stream. Abort the connection so Fetch/HTTP clients fail while reading the
+	// body instead of accepting truncated audio as a successful 200 response.
+	panic(http.ErrAbortHandler)
 }

@@ -3,14 +3,12 @@ package minimax
 import (
 	"bytes"
 	"encoding/json"
-	"log/slog"
 	"net/http"
 	"strings"
 
 	"github.com/labstack/echo/v4"
 	"github.com/moeru-ai/unspeech/pkg/apierrors"
 	"github.com/moeru-ai/unspeech/pkg/backend/types"
-	"github.com/moeru-ai/unspeech/pkg/utils"
 	"github.com/samber/mo"
 )
 
@@ -48,8 +46,8 @@ type BaseResp struct {
 
 // GetVoiceResp Response for getting voice list
 type GetVoiceResp struct {
-	SystemVoice      []SystemVoice     `json:"system_voice"`
-	VoiceCloning    []VoiceCloning   `json:"voice_cloning"`
+	SystemVoice     []SystemVoice     `json:"system_voice"`
+	VoiceCloning    []VoiceCloning    `json:"voice_cloning"`
 	VoiceGeneration []VoiceGeneration `json:"voice_generation"`
 	BaseResp        BaseResp          `json:"base_resp"`
 }
@@ -104,17 +102,7 @@ func HandleVoices(c echo.Context, options mo.Option[types.VoicesRequestOptions])
 
 	// Check HTTP status code
 	if resp.StatusCode >= 400 && resp.StatusCode < 600 {
-		switch {
-		case strings.HasPrefix(resp.Header.Get("Content-Type"), "application/json"):
-			return mo.Err[any](apierrors.
-				NewUpstreamError(resp.StatusCode).
-				WithDetail(utils.NewJSONResponseError(resp.StatusCode, resp.Body).OrEmpty().Error()))
-		default:
-			slog.Warn("unknown upstream error with unknown Content-Type",
-				slog.Int("status", resp.StatusCode),
-				slog.String("content_type", resp.Header.Get("Content-Type")),
-			)
-		}
+		return handleHTTPError(resp)
 	}
 
 	// Parse response

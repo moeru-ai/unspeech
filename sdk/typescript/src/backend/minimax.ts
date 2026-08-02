@@ -64,15 +64,15 @@ export interface UnMinimaxOptions {
  * MiniMax TTS models
  * @see https://platform.minimaxi.com/docs/guides/speech-t2a-http#model
  */
-export type MinimaxModel =
-  | 'speech-2.8-hd'
-  | 'speech-2.8-turbo'
-  | 'speech-2.6-hd'
-  | 'speech-2.6-turbo'
-  | 'speech-02-hd'
-  | 'speech-02-turbo'
-  | 'speech-01-hd'
-  | 'speech-01-turbo'
+export type MinimaxModel
+  = | 'speech-2.8-hd'
+    | 'speech-2.8-turbo'
+    | 'speech-2.6-hd'
+    | 'speech-2.6-turbo'
+    | 'speech-02-hd'
+    | 'speech-02-turbo'
+    | 'speech-01-hd'
+    | 'speech-01-turbo'
 
 /**
  * [MiniMax](https://platform.minimaxi.com/) provider for [UnSpeech](https://github.com/moeru-ai/unspeech)
@@ -114,7 +114,7 @@ export function createUnMinimax(apiKey: string, baseURL = 'http://localhost:5933
       ...(options ? toUnSpeechOptions(options) : {}),
       apiKey,
       baseURL,
-      model: `minimax/${model}`,
+      model,
     }),
   }
 
