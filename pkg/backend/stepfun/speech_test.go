@@ -25,7 +25,6 @@ func TestBuildSpeechRequestForStepAudio25(t *testing.T) {
 		},
 		Model: modelStepAudio25TTS,
 	})
-
 	if err != nil {
 		t.Fatalf("buildSpeechRequest returned error: %v", err)
 	}
@@ -59,7 +58,6 @@ func TestBuildSpeechRequestRejectsStepAudio25VoiceLabel(t *testing.T) {
 		},
 		Model: modelStepAudio25TTS,
 	})
-
 	if err == nil {
 		t.Fatal("buildSpeechRequest returned nil error")
 	}
@@ -81,7 +79,6 @@ func TestBuildSpeechRequestRejectsInstructionForLegacyModels(t *testing.T) {
 		},
 		Model: modelStepTTS2,
 	})
-
 	if err == nil {
 		t.Fatal("buildSpeechRequest returned nil error")
 	}
