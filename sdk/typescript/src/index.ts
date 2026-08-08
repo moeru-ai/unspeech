@@ -5,6 +5,7 @@ export {
   createUnDeepgram,
   createUnElevenLabs,
   createUnMicrosoft,
+  createUnMinimax,
   createUnSpeech,
   createUnVolcengine,
   escapeMicrosoftSsmlText,

@@ -51,6 +51,7 @@ import {
   createUnAlibabaCloud,
   createUnElevenLabs,
   createUnMicrosoft,
+  createUnMinimax,
   createUnSpeech,
   createUnVolcengine,
 } from 'unspeech'
@@ -62,6 +63,7 @@ When using
 - [Alibaba Cloud Model Studio / 阿里云百炼 / CosyVoice](https://www.alibabacloud.com/en/product/modelstudio)
 - [Volcano Engine / 火山引擎语音技术](https://www.volcengine.com/product/voice-tech)
 - [ElevenLabs](https://elevenlabs.io/docs/api-reference/text-to-speech/convert)
+- [MiniMax](https://platform.minimaxi.com/docs/guides/speech-t2a-http)
 
 providers, [SSML](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/speech-synthesis-markup) is supported to control in fine grain level for pitch, volume, rate, etc.
 
