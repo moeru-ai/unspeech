@@ -15,7 +15,12 @@ import (
 	"github.com/samber/mo"
 )
 
-const defaultSpeechURL = "https://api.stepfun.com/v1/audio/speech"
+const (
+	endpointProfileField = "endpoint_profile"
+	defaultSpeechURL     = "https://api.stepfun.com/v1/audio/speech"
+	stepPlanSpeechURL    = "https://api.stepfun.com/step_plan/v1/audio/speech"
+	maxInputLength       = 1000
+)
 
 type speechRequest struct {
 	Model            string         `json:"model"`
@@ -34,16 +39,23 @@ type speechRequest struct {
 
 func HandleSpeech(c echo.Context, options mo.Option[types.SpeechRequestOptions]) mo.Result[any] {
 	opt := options.MustGet()
+
+	speechEndpoint, endpointErr := resolveSpeechEndpoint(opt.ExtraBody)
+	if endpointErr != nil {
+		return mo.Err[any](endpointErr)
+	}
+
 	values, buildErr := buildSpeechRequest(opt)
 	if buildErr != nil {
 		return mo.Err[any](buildErr)
 	}
+
 	payload := lo.Must(json.Marshal(values))
 
 	req, err := http.NewRequestWithContext(
 		c.Request().Context(),
 		http.MethodPost,
-		defaultSpeechURL,
+		speechEndpoint,
 		bytes.NewBuffer(payload),
 	)
 	if err != nil {
@@ -101,6 +113,21 @@ func HandleSpeech(c echo.Context, options mo.Option[types.SpeechRequestOptions])
 	return mo.Ok[any](c.Stream(http.StatusOK, contentType, res.Body))
 }
 
+func resolveSpeechEndpoint(extraBody map[string]any) (string, error) {
+	// A profile is a provider-owned endpoint identity, not a caller-supplied
+	// URL. Keeping the URL mapping here preserves StepFun as the single source
+	// of truth and prevents this proxy from becoming an SSRF primitive.
+	switch utils.GetByJSONPath[string](extraBody, "{ ."+endpointProfileField+" }") {
+	case "", "default":
+		return defaultSpeechURL, nil
+	case "step-plan":
+		return stepPlanSpeechURL, nil
+	default:
+		return "", apierrors.NewErrBadRequest().
+			WithDetail("unsupported stepfun endpoint profile")
+	}
+}
+
 func buildSpeechRequest(opt types.SpeechRequestOptions) (speechRequest, error) {
 	body := speechRequest{
 		Model:          opt.Model,
@@ -109,7 +136,7 @@ func buildSpeechRequest(opt types.SpeechRequestOptions) (speechRequest, error) {
 		ResponseFormat: opt.ResponseFormat,
 		Speed:          opt.Speed,
 	}
-	if len(opt.Input) > 1000 {
+	if len(opt.Input) > maxInputLength {
 		return body, apierrors.NewErrBadRequest().WithDetail("stepfun tts input must be at most 1000 characters")
 	}
 
@@ -121,12 +148,14 @@ func buildSpeechRequest(opt types.SpeechRequestOptions) (speechRequest, error) {
 		if opt.Model == modelStepAudio25TTS {
 			return body, apierrors.NewErrBadRequest().WithDetail("stepaudio-2.5-tts does not support voice_label; use instruction or inline parentheses prompts")
 		}
+
 		body.VoiceLabel = voiceLabel
 	}
 	if instruction := utils.GetByJSONPath[string](extra, "{ .instruction }"); instruction != "" {
 		if opt.Model != modelStepAudio25TTS {
 			return body, apierrors.NewErrBadRequest().WithDetail("stepfun instruction is only supported by stepaudio-2.5-tts")
 		}
+
 		body.Instruction = instruction
 	}
 	if sampleRate := utils.GetByJSONPath[*int](extra, "{ .sample_rate }"); sampleRate != nil {

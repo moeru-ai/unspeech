@@ -6,7 +6,9 @@ import { createSpeechProviderWithExtraOptions, merge } from '@xsai-ext/providers
 export * from './alibabacloud'
 export * from './deepgram'
 export * from './elevenlabs'
+export * from './fishaudio'
 export * from './microsoft'
+export * from './minimax'
 export * from './stepfun'
 export * from './volcengine'
 
@@ -27,7 +29,7 @@ export function createUnSpeech(apiKey: string, baseURL = 'http://localhost:5933/
         | 'ali'
         | 'alibaba'
         | 'alibaba-model-studio'
-        | 'aliyun' | 'bailian' | 'deepgram' | 'elevenlabs' | 'koemotion' | 'openai' | 'step' | 'stepfun'
+        | 'aliyun' | 'bailian' | 'deepgram' | 'elevenlabs' | 'fish' | 'fish-audio' | 'fishaudio' | 'koemotion' | 'minimax' | 'openai' | 'step' | 'stepfun'
     }
   > = {
     voice: (options) => {
@@ -60,7 +62,9 @@ export function createUnSpeech(apiKey: string, baseURL = 'http://localhost:5933/
       | `aliyun/${string}`
       | `deepgram/${string}`
       | `elevenlabs/${string}`
+      | `fishaudio/${string}`
       | `koemotion/${string}`
+      | `minimax/${string}`
       | `openai/${string}`
       | `stepfun/${string}`
       | `volcano/${string}`

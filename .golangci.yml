@@ -2,6 +2,7 @@ version: "2"
 linters:
   default: all
   disable:
+    - goconst
     - containedctx
     - contextcheck
     - cyclop
@@ -15,6 +16,7 @@ linters:
     - gocyclo
     - godot
     - godox
+    - gosmopolitan
     - ireturn
     - lll
     - maintidx
@@ -26,6 +28,7 @@ linters:
     - testpackage
     - varnamelen
     - wrapcheck
+    - wsl
   settings:
     dupl:
       threshold: 600

@@ -133,7 +133,9 @@ func newMockUpstream(t *testing.T, onTaskRequest func(conn *websocket.Conn, sess
 				// frame inline matching the wire layout (header + event +
 				// conn_id_size=0 + payload_size + payload).
 				bin := buildConnEventFrame(replyFrame.event, []byte(`{}`))
-				if writeErr := conn.WriteMessage(websocket.BinaryMessage, bin); writeErr != nil {
+
+				writeErr := conn.WriteMessage(websocket.BinaryMessage, bin)
+				if writeErr != nil {
 					t.Errorf("mock upstream write: %v", writeErr)
 
 					return
@@ -141,6 +143,7 @@ func newMockUpstream(t *testing.T, onTaskRequest func(conn *websocket.Conn, sess
 
 			case v3EventStartSession:
 				sessionID = frame.sessionID
+
 				replyBin := encodeV3Frame(v3Frame{
 					msgType:   v3MsgTypeFullClient | 0b1000,
 					flags:     v3FlagWithEvent,
@@ -149,7 +152,9 @@ func newMockUpstream(t *testing.T, onTaskRequest func(conn *websocket.Conn, sess
 					sessionID: sessionID,
 					payload:   []byte(`{}`),
 				})
-				if writeErr := conn.WriteMessage(websocket.BinaryMessage, replyBin); writeErr != nil {
+
+				writeErr := conn.WriteMessage(websocket.BinaryMessage, replyBin)
+				if writeErr != nil {
 					t.Errorf("mock upstream write: %v", writeErr)
 
 					return
@@ -185,6 +190,13 @@ func newMockUpstream(t *testing.T, onTaskRequest func(conn *websocket.Conn, sess
 
 			case v3EventFinishConnection:
 				return
+
+			case v3EventConnectionStarted, v3EventConnectionFailed, v3EventConnectionFinished,
+				v3EventSessionStarted, v3EventSessionCanceled, v3EventSessionFinished, v3EventSessionFailed,
+				v3EventTTSSentenceStart, v3EventTTSSentenceEnd, v3EventTTSResponse:
+				t.Errorf("mock upstream received server event from client: %d", frame.event)
+
+				return
 			}
 		}
 	}
@@ -202,7 +214,7 @@ func buildConnEventFrame(event v3Event, payload []byte) []byte {
 	header := []byte{
 		(1 << 4) | 1, // version=1, header_size=1*4
 		(byte(v3MsgTypeFullClient|0b1000) << 4) | v3FlagWithEvent,
-		(v3SerialJSON << 4) | 0,
+		v3SerialJSON << 4,
 		0,
 	}
 
@@ -216,7 +228,7 @@ func buildConnEventFrame(event v3Event, payload []byte) []byte {
 	buf = append(buf, 0, 0, 0, 0)
 
 	// payload size + payload
-	pSize := uint32(len(payload)) //nolint:gosec
+	pSize := uint32(len(payload))
 	buf = append(buf, byte(pSize>>24), byte(pSize>>16), byte(pSize>>8), byte(pSize))
 	buf = append(buf, payload...)
 
@@ -256,6 +268,7 @@ func dialBridge(t *testing.T, upstreamURL string) *websocket.Conn {
 
 	dialer := *websocket.DefaultDialer
 	dialer.HandshakeTimeout = 5 * time.Second
+
 	conn, resp, dialErr := dialer.Dial(wsURL.String(), hdr)
 	if resp != nil {
 		_ = resp.Body.Close()
@@ -277,10 +290,12 @@ type clientEvent struct {
 	Message string `json:"message"`
 }
 
-func drainClient(t *testing.T, conn *websocket.Conn, deadline time.Time) (events []clientEvent, audioBytes int) {
+func drainClient(t *testing.T, conn *websocket.Conn, deadline time.Time) ([]clientEvent, int) {
 	t.Helper()
 
 	_ = conn.SetReadDeadline(deadline)
+	events := make([]clientEvent, 0)
+	audioBytes := 0
 
 	for {
 		msgType, data, err := conn.ReadMessage()
@@ -299,7 +314,8 @@ func drainClient(t *testing.T, conn *websocket.Conn, deadline time.Time) (events
 		case websocket.TextMessage:
 			var ev clientEvent
 
-			if err := json.Unmarshal(data, &ev); err == nil {
+			err := json.Unmarshal(data, &ev)
+			if err == nil {
 				events = append(events, ev)
 
 				if ev.Event == "session.finished" || ev.Event == "error" {
@@ -324,7 +340,7 @@ func TestBridge_FinishWaitsForUpstreamCompletion(t *testing.T) {
 		// staggered writes to simulate streaming over wall-clock time —
 		// if the bridge tears down on `finish` instead of waiting, only
 		// the first few chunks would be forwarded.
-		for i := 0; i < chunks; i++ {
+		for range chunks {
 			frame := encodeV3Frame(v3Frame{
 				msgType:   v3MsgTypeFullClient | 0b1000, // server-response
 				flags:     v3FlagWithEvent,
@@ -368,6 +384,7 @@ func TestBridge_FinishWaitsForUpstreamCompletion(t *testing.T) {
 	require.NotEmpty(t, events, "expected at least one server event")
 
 	var sawStarted, sawFinished bool
+
 	for _, ev := range events {
 		switch ev.Event {
 		case "session.started":

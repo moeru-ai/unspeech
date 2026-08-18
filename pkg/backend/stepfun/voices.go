@@ -12,6 +12,7 @@ const (
 	modelStepAudio25TTS = "stepaudio-2.5-tts"
 	modelStepTTS2       = "step-tts-2"
 	modelStepTTSMini    = "step-tts-mini"
+	defaultSampleRate   = 24000
 )
 
 var (
@@ -22,11 +23,11 @@ var (
 	}
 
 	formats = []types.VoiceFormat{
-		{Name: "MP3", Extension: ".mp3", MimeType: "audio/mpeg", SampleRate: 24000, FormatCode: "mp3"},
-		{Name: "WAV", Extension: ".wav", MimeType: "audio/wav", SampleRate: 24000, FormatCode: "wav"},
-		{Name: "FLAC", Extension: ".flac", MimeType: "audio/flac", SampleRate: 24000, FormatCode: "flac"},
-		{Name: "Opus", Extension: ".opus", MimeType: "audio/opus", SampleRate: 24000, FormatCode: "opus"},
-		{Name: "PCM", Extension: ".pcm", MimeType: "audio/L16", SampleRate: 24000, FormatCode: "pcm"},
+		{Name: "MP3", Extension: ".mp3", MimeType: "audio/mpeg", SampleRate: defaultSampleRate, FormatCode: "mp3"},
+		{Name: "WAV", Extension: ".wav", MimeType: "audio/wav", SampleRate: defaultSampleRate, FormatCode: "wav"},
+		{Name: "FLAC", Extension: ".flac", MimeType: "audio/flac", SampleRate: defaultSampleRate, FormatCode: "flac"},
+		{Name: "Opus", Extension: ".opus", MimeType: "audio/opus", SampleRate: defaultSampleRate, FormatCode: "opus"},
+		{Name: "PCM", Extension: ".pcm", MimeType: "audio/L16", SampleRate: defaultSampleRate, FormatCode: "pcm"},
 	}
 
 	voiceIDs = []struct {
@@ -104,11 +105,13 @@ func HandleVoices(c echo.Context, _ mo.Option[types.VoicesRequestOptions]) mo.Re
 func splitSceneTags(scene string) []string {
 	tags := make([]string, 0)
 	start := 0
+
 	for i, r := range scene {
 		if r == '、' {
 			if start < i {
 				tags = append(tags, scene[start:i])
 			}
+
 			start = i + len(string(r))
 		}
 	}

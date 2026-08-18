@@ -1,4 +1,4 @@
-# unSpeech `0.1.16`
+# unSpeech
 
 > Your Text-to-Speech Services, All-in-One.
 
@@ -12,6 +12,8 @@ unSpeech lets you use various online TTS with OpenAI-compatible API.
 - [Alibaba Cloud Model Studio / 阿里云百炼 / CosyVoice](https://www.alibabacloud.com/en/product/modelstudio)
 - [Volcano Engine / 火山引擎语音技术](https://www.volcengine.com/product/voice-tech)
 - [ElevenLabs](https://elevenlabs.io/docs/api-reference/text-to-speech/convert)
+- [Fish Audio](https://docs.fish.audio/api-reference/endpoint/openapi-v1/text-to-speech)
+- [MiniMax](https://platform.minimaxi.com/docs/guides/speech-t2a-http)
 - [Koemotion (by Rinna)](https://koemotion.rinna.co.jp/)
 
 ## Getting Started

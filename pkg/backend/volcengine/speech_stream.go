@@ -144,6 +144,7 @@ func HandleSpeechStream(c echo.Context, clientWS *websocket.Conn, options mo.Opt
 	bridgeErr := bridge.start(c.Request().Context())
 	if bridgeErr != nil {
 		bridge.sendClientError("upstream_error", bridgeErr.Error())
+
 		_ = clientWS.WriteMessage(
 			websocket.CloseMessage,
 			websocket.FormatCloseMessage(websocket.CloseInternalServerErr, truncateWsCloseReason(bridgeErr.Error())),
@@ -555,7 +556,8 @@ func (b *v3Bridge) readClientLoop(ctx context.Context) error {
 			}
 
 		case types.SpeechStreamClientEventFinish:
-			if finishErr := b.finishSession(); finishErr != nil {
+			finishErr := b.finishSession()
+			if finishErr != nil {
 				return finishErr
 			}
 

@@ -54,6 +54,7 @@ func TestListVoicesNoFilterReturnsUnionAndExcludesIncompatible(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ListVoices: %v", err)
 	}
+
 	v10, _ := ListVoices(context.Background(), "seed-tts-1.0")
 	v20, _ := ListVoices(context.Background(), "seed-tts-2.0")
 

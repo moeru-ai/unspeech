@@ -5,6 +5,7 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
+	"slices"
 
 	"github.com/labstack/echo/v4"
 	"github.com/moeru-ai/unspeech/pkg/apierrors"
@@ -121,12 +122,7 @@ func ListVoices(_ context.Context, modelFilter string) ([]types.Voice, error) {
 }
 
 func containsString(haystack []string, needle string) bool {
-	for _, s := range haystack {
-		if s == needle {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(haystack, needle)
 }
 
 func HandleVoices(c echo.Context, options mo.Option[types.VoicesRequestOptions]) mo.Result[any] {
