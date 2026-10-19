@@ -1,6 +1,7 @@
 package stepfun
 
 import (
+	"encoding/json"
 	"strings"
 	"testing"
 
@@ -21,6 +22,7 @@ func TestBuildSpeechRequestForStepAudio25(t *testing.T) {
 				"instruction": "温柔、克制、有一点笑意",
 				"volume":      1.1,
 				"sample_rate": 24000,
+				"language":    "en",
 			},
 		},
 		Model: modelStepAudio25TTS,
@@ -42,6 +44,32 @@ func TestBuildSpeechRequestForStepAudio25(t *testing.T) {
 	}
 	if req.SampleRate == nil || *req.SampleRate != 24000 {
 		t.Fatalf("SampleRate = %v, want 24000", req.SampleRate)
+	}
+	if req.Language != "en" {
+		t.Fatalf("Language = %q, want %q", req.Language, "en")
+	}
+}
+
+func TestBuildSpeechRequestOmitsLanguageByDefault(t *testing.T) {
+	t.Parallel()
+
+	req, err := buildSpeechRequest(types.SpeechRequestOptions{
+		OpenAISpeechRequestOptions: types.OpenAISpeechRequestOptions{
+			Input: "你好",
+			Voice: "cixingnansheng",
+		},
+		Model: modelStepAudio25TTS,
+	})
+	if err != nil {
+		t.Fatalf("buildSpeechRequest returned error: %v", err)
+	}
+
+	payload, err := json.Marshal(req)
+	if err != nil {
+		t.Fatalf("json.Marshal returned error: %v", err)
+	}
+	if strings.Contains(string(payload), `"language"`) {
+		t.Fatalf("payload = %s, want no language field", payload)
 	}
 }
 

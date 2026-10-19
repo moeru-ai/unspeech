@@ -28,6 +28,7 @@ type speechRequest struct {
 	Voice            string         `json:"voice"`
 	ResponseFormat   string         `json:"response_format,omitempty"`
 	Speed            float64        `json:"speed,omitempty"`
+	Language         string         `json:"language,omitempty"`
 	Volume           *float64       `json:"volume,omitempty"`
 	VoiceLabel       map[string]any `json:"voice_label,omitempty"`
 	Instruction      string         `json:"instruction,omitempty"`
@@ -141,6 +142,11 @@ func buildSpeechRequest(opt types.SpeechRequestOptions) (speechRequest, error) {
 	}
 
 	extra := opt.ExtraBody
+	// StepFun reads the text in this language, for example `en` or `ja`. Without it, a short or mixed text, such as
+	// a digit next to Latin letters, can be read in the language of the voice. StepFun validates the value.
+	if language := utils.GetByJSONPath[string](extra, "{ .language }"); language != "" {
+		body.Language = language
+	}
 	if volume := utils.GetByJSONPath[*float64](extra, "{ .volume }"); volume != nil {
 		body.Volume = volume
 	}

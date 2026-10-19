@@ -16,6 +16,13 @@ export interface UnStepfunOptions {
    */
   endpointProfile?: 'default' | 'step-plan'
   /**
+   * The language that StepFun reads the text in, for example `en` or `ja`.
+   *
+   * Without it, a short or mixed text, such as a digit next to Latin letters,
+   * can be read in the language of the voice.
+   */
+  language?: 'zh' | 'en' | 'ja' | 'ko' | 'fr' | 'es' | string
+  /**
    * Audio volume. Range: 0.1 to 2.0.
    *
    * @default 1
