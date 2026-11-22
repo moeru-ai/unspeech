@@ -15,6 +15,10 @@ export interface ListVoicesOptions extends Omit<CommonRequestOptions, 'fetch' | 
 
 export interface ListVoicesResponse {
   voices: Voice[]
+  /** Number of voices that match the filters across all pages. Only paginated catalogs (Fish Audio) set it. */
+  total?: number
+  /** Whether a later page exists, when the provider says so. */
+  has_more?: boolean
 }
 
 export async function listVoices(options: ListVoicesOptions): Promise<Voice[]> {
