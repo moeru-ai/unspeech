@@ -83,6 +83,7 @@ func TestListVoicesForwardsFiltersAndTotal(t *testing.T) {
 		gotAuth = r.Header.Get("Authorization")
 
 		w.Header().Set("Content-Type", "application/json")
+
 		_, _ = w.Write([]byte(`{"total":1240,"has_more":true,"items":[{"_id":"voice-1","title":"Voice","languages":["zh"],"licensed":true}]}`))
 	}))
 
