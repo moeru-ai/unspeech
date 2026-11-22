@@ -78,4 +78,9 @@ type Voice struct {
 
 type ListVoicesResponse struct {
 	Voices []Voice `json:"voices"`
+	// Total is the number of voices that match the filters across all pages.
+	// Only paginated catalogs (Fish Audio) set it.
+	Total *int `json:"total,omitempty"`
+	// HasMore reports whether a later page exists, when the provider says so.
+	HasMore *bool `json:"has_more,omitempty"`
 }

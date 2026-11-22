@@ -80,12 +80,21 @@ type voiceModel struct {
 	Author      voiceModelAuthor   `json:"author"`
 	LikeCount   int                `json:"like_count"`
 	TaskCount   int                `json:"task_count"`
+	Licensed    bool               `json:"licensed"`
 }
 
 type listVoiceModelsResponse struct {
-	Items []voiceModel `json:"items"`
-	Total int          `json:"total"`
+	Items   []voiceModel `json:"items"`
+	Total   int          `json:"total"`
+	HasMore *bool        `json:"has_more"`
 }
+
+// forwardedQueryKeys are the Fish Audio `GET /model` filters that callers can set.
+// https://docs.fish.audio/api-reference/endpoint/model/list-models
+var forwardedQueryKeys = []string{"title", "self", "sort_by", "page_size", "page_number", "licensed", "author_id"}
+
+// forwardedListQueryKeys accept several values, for example `language=zh&language=ja`.
+var forwardedListQueryKeys = []string{"language", "tag"}
 
 // VoicesCredentials holds the Fish Audio API key for voices listing.
 type VoicesCredentials struct {
@@ -104,12 +113,20 @@ func (e *UpstreamError) Error() string {
 	return fmt.Sprintf("fish audio returned %d: %s", e.StatusCode, e.Body)
 }
 
-// ListVoices fetches voice models from Fish Audio and maps them to types.Voice.
+// ListVoices fetches one page of voice models from Fish Audio and maps them to types.Voice.
 //
 // Callers can narrow results with `query` (already validated url.Values):
-// title, language, self, sort_by, page_size, and page_number are forwarded.
-func ListVoices(ctx context.Context, creds VoicesCredentials, query url.Values) ([]types.Voice, error) {
-	reqURL := lo.Must(url.Parse(defaultVoicesURL))
+// title, language, tag, self, licensed, author_id, sort_by, page_size, and
+// page_number are forwarded.
+func ListVoices(ctx context.Context, creds VoicesCredentials, query url.Values) (types.ListVoicesResponse, error) {
+	return listVoices(ctx, http.DefaultClient, defaultVoicesURL, creds, query)
+}
+
+func listVoices(ctx context.Context, client *http.Client, baseURL string, creds VoicesCredentials, query url.Values) (types.ListVoicesResponse, error) {
+	reqURL, err := url.Parse(baseURL)
+	if err != nil {
+		return types.ListVoicesResponse{}, fmt.Errorf("fishaudio: parse voices url: %w", err)
+	}
 
 	upstreamQuery := url.Values{}
 	// Popular voices first gives a useful default picker ordering; the
@@ -117,9 +134,17 @@ func ListVoices(ctx context.Context, creds VoicesCredentials, query url.Values) 
 	upstreamQuery.Set("sort_by", "task_count")
 	upstreamQuery.Set("page_size", "50")
 
-	for _, key := range []string{"title", "language", "self", "sort_by", "page_size", "page_number"} {
+	for _, key := range forwardedQueryKeys {
 		if value := query.Get(key); value != "" {
 			upstreamQuery.Set(key, value)
+		}
+	}
+
+	for _, key := range forwardedListQueryKeys {
+		for _, value := range query[key] {
+			if value = strings.TrimSpace(value); value != "" {
+				upstreamQuery.Add(key, value)
+			}
 		}
 	}
 
@@ -127,16 +152,16 @@ func ListVoices(ctx context.Context, creds VoicesCredentials, query url.Values) 
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, reqURL.String(), nil)
 	if err != nil {
-		return nil, fmt.Errorf("fishaudio: build request: %w", err)
+		return types.ListVoicesResponse{}, fmt.Errorf("fishaudio: build request: %w", err)
 	}
 
 	if creds.APIKey != "" {
 		req.Header.Set("Authorization", "Bearer "+creds.APIKey)
 	}
 
-	res, err := http.DefaultClient.Do(req)
+	res, err := client.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("fishaudio: call voices: %w", err)
+		return types.ListVoicesResponse{}, fmt.Errorf("fishaudio: call voices: %w", err)
 	}
 
 	defer func() { _ = res.Body.Close() }()
@@ -144,7 +169,7 @@ func ListVoices(ctx context.Context, creds VoicesCredentials, query url.Values) 
 	if res.StatusCode >= 400 && res.StatusCode < 600 {
 		body, _ := io.ReadAll(res.Body)
 
-		return nil, &UpstreamError{
+		return types.ListVoicesResponse{}, &UpstreamError{
 			StatusCode:  res.StatusCode,
 			ContentType: res.Header.Get("Content-Type"),
 			Body:        string(body),
@@ -155,12 +180,18 @@ func ListVoices(ctx context.Context, creds VoicesCredentials, query url.Values) 
 
 	err = json.NewDecoder(res.Body).Decode(&response)
 	if err != nil {
-		return nil, fmt.Errorf("fishaudio: decode voices: %w", err)
+		return types.ListVoicesResponse{}, fmt.Errorf("fishaudio: decode voices: %w", err)
 	}
 
-	return lo.Map(response.Items, func(item voiceModel, _ int) types.Voice {
-		return mapVoice(item)
-	}), nil
+	total := response.Total
+
+	return types.ListVoicesResponse{
+		Voices: lo.Map(response.Items, func(item voiceModel, _ int) types.Voice {
+			return mapVoice(item)
+		}),
+		Total:   &total,
+		HasMore: response.HasMore,
+	}, nil
 }
 
 func mapVoice(item voiceModel) types.Voice {
@@ -172,6 +203,7 @@ func mapVoice(item voiceModel) types.Voice {
 			"author":     item.Author.Nickname,
 			"like_count": item.LikeCount,
 			"task_count": item.TaskCount,
+			"licensed":   item.Licensed,
 		},
 		Tags:             item.Tags,
 		Languages:        make([]types.VoiceLanguage, 0, len(item.Languages)),
@@ -205,7 +237,7 @@ func HandleVoices(c echo.Context, options mo.Option[types.VoicesRequestOptions])
 		query = opts.ExtraQuery
 	}
 
-	voices, err := ListVoices(c.Request().Context(), creds, query)
+	response, err := ListVoices(c.Request().Context(), creds, query)
 	if err != nil {
 		var upErr *UpstreamError
 		if errors.As(err, &upErr) {
@@ -231,5 +263,5 @@ func HandleVoices(c echo.Context, options mo.Option[types.VoicesRequestOptions])
 		return mo.Err[any](apierrors.NewErrBadGateway().WithError(err).WithCaller())
 	}
 
-	return mo.Ok[any](types.ListVoicesResponse{Voices: voices})
+	return mo.Ok[any](response)
 }
