@@ -23,6 +23,7 @@ func TestMapVoice(t *testing.T) {
 		Author:    voiceModelAuthor{ID: "author-id", Nickname: "Author"},
 		LikeCount: 42,
 		TaskCount: 1000,
+		Licensed:  true,
 	})
 
 	if voice.ID != "802e3bc2b27e49c2995d23ef70e6ac89" {
@@ -43,6 +44,9 @@ func TestMapVoice(t *testing.T) {
 	// Unknown codes fall back to the raw code as title.
 	if voice.Languages[2].Code != "xx" || voice.Languages[2].Title != "xx" {
 		t.Fatalf("Languages[2] = %+v", voice.Languages[2])
+	}
+	if voice.Labels["licensed"] != true {
+		t.Fatalf("Labels[licensed] = %v", voice.Labels["licensed"])
 	}
 	if voice.Labels["author"] != "Author" {
 		t.Fatalf("Labels[author] = %v", voice.Labels["author"])
@@ -81,6 +85,7 @@ func TestListVoicesForwardsFiltersAndTotal(t *testing.T) {
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = w.Write([]byte(`{"total":1240,"has_more":true,"items":[{"_id":"voice-1","title":"Voice","languages":["zh"],"licensed":true}]}`))
 	}))
+
 	defer server.Close()
 
 	query := url.Values{
@@ -104,6 +109,7 @@ func TestListVoicesForwardsFiltersAndTotal(t *testing.T) {
 	if langs := gotQuery["language"]; len(langs) != 2 || langs[0] != "zh" || langs[1] != "ja" {
 		t.Fatalf("language = %v", langs)
 	}
+
 	for key, want := range map[string]string{
 		"tag": "female", "licensed": "true", "title": "calm", "page_number": "3", "page_size": "20", "sort_by": "task_count",
 	} {
